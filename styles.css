@@ -86,7 +86,7 @@ body {
 }
 
 .logo img {
-    height: 25px;
+    height: 40px;
     width: auto;
     margin-left: 00px;
     margin-top: 00px;
@@ -135,12 +135,19 @@ body {
     cursor: pointer;
 }
 
-.hamburger span {
-    width: 25px;
-    height: 3px;
-    background: #fff;
-    transition: all 0.3s;
-}
+.hamburger {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+  }
+  
+  .hamburger img {
+    width: 28px;     /* adjust if needed */
+    height: auto;
+    display: block;
+  }
+  
 
 /* Mobile menus */
 
@@ -379,6 +386,7 @@ body {
 .services {
     padding: 100px 0;
     position: relative;
+    overflow-x: auto;
 
 }
 .services::before {
@@ -396,6 +404,14 @@ body {
     pointer-events: none;
     background-position: center top;
   }
+  .services .card-content h3 {
+    font-size: clamp(27px, 2vw, 22px);
+  }
+  
+  .services .card-content p {
+    font-size: clamp(13px, 1.6vw, 14px);
+  }
+  
 
 /* container already exists in your project,
    keeping it here for clarity */
@@ -413,15 +429,13 @@ body {
 /* ================================
    SERVICES GRID (RESPONSIVE SYSTEM)
 ================================ */
-
 .services-grid {
-    width: 60%;   
-
-    margin: 0px auto 0;
-    width: min(60%, 1200px);
+    max-width: 800px;
+    min-width: 500px;     /* 🔒 LOCKS CARD WIDTH */
+    margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(5, 1fr); /* 5-unit system */
-    gap: 6px;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
 }
 
 /* ================================
@@ -438,7 +452,7 @@ body {
     grid-auto-rows: minmax(180px, auto);
     min-height: 220px;
     position: relative;
-    overflow: hidden;
+    overflow: clip;
     cursor: pointer;
 }
 
@@ -476,16 +490,14 @@ body {
 ================================ */
 
 .card-content {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-
-    padding: 28px;
-
+    position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-
+    justify-content: flex-start;
+    padding: 28px 28px 76px; /* 🔒 reserve arrow space */
+    height: 100%;
+    inset: 0;
+    z-index: 2;
     color: #ffffff;
 }
 
@@ -498,6 +510,7 @@ body {
     font-size: 22px;
     line-height: 1.2;
     margin: 0;
+    margin-bottom: 12px;
 }
 
 .card-content p {
@@ -505,6 +518,9 @@ body {
     line-height: 1.5;
     margin: 0;
     max-width: 90%;
+    overflow-wrap: break-word;
+    flex-grow: 1;
+    margin-bottom: 0;
 }
 
 /* ================================
@@ -521,7 +537,9 @@ body {
 ================================ */
 
 .card-link {
-    align-self: flex-end;
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
 
     width: 44px;
     height: 44px;
@@ -629,15 +647,15 @@ body {
     border-radius: 12px;
     border: 2px solid #ffffff;
     object-fit: cover;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.30);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.30);
     transition: all 0.3s;
     cursor: pointer;
 }
 
 .p1 { top: 12%; left: 20%; z-index: 2; rotate:-5deg}
-.p2 { top: 10%; left: 25%; z-index: 3; rotate:-4deg }
-.p3 { top: 8%; left: 35%; z-index: 4; rotate:-0deg }
-.p4 { top: 6%; left: 45%; z-index: 5; rotate: 4deg }
+.p2 { top: 10%; left: 30%; z-index: 3; rotate:6deg }
+.p3 { top: 8%; left: 40%; z-index: 4; rotate:-0deg }
+.p4 { top: 6%; left: 50%; z-index: 5; rotate: 4deg }
 .p5 { top: 12%; left: 60%; z-index: 6; rotate: 5deg }
 
 .port-img:hover {
@@ -686,22 +704,17 @@ body {
 }
 
 .logo-track {
-  max-width: 1200px;   /* 🔑 key */
-  margin: 0 auto;      /* 🔑 key */
-  justify-items: center;
-}
-
-.clients-padding .logo-track {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
-  }
-  
-
+    grid-template-columns: repeat(4, 1fr); /* desktop 4x3 */
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    justify-items: center;
+}
 
 
 .logo-track img {
-    height: 55px;
+    height: 70px;
     width: auto;
     opacity: 0.6;
     filter: grayscale(100%);
@@ -723,13 +736,14 @@ body {
   }
   
   .breaking-box {
-    background: linear-gradient(180deg, #000000 0%, #280e05 100%);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: linear-gradient(180deg, #c8c8c8 0%, #ffffff 100%);
+   
     border-radius: 35px;
     padding: 70px 35px;
     max-width: 1200px;
     margin: 0 auto;
     text-align: center;
+    overflow: hidden;
   }
   
   .bb-logo {
@@ -745,13 +759,49 @@ body {
   
   .bb-scroll {
     display: flex;
-    gap: 20px;
+    gap: 8px;
     justify-content: center;
     margin-bottom: 40px;
 }
 
+/* Apple-style card */
+.bb-card {
+    position: relative;
+    flex: 0 0 220px;
+    aspect-ratio: 9 / 16;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.bb-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Play icon */
+.bb-play {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+}
+
+.bb-play::before {
+    content: "▶";
+    width: 46px;
+    height: 46px;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 18px;
+}
+
+
 .bb-scroll iframe {
-    width: 220px;
+    width: 200px;
     aspect-ratio: 9 / 16;
     border-radius: 12px;
     border: none;
@@ -784,7 +834,7 @@ body {
     font-size: clamp(24px, 4vw, 20px);
     font-weight: 400;
     text-align: center;
-    max-width: 900px;
+    max-width: 700px;
     margin: 0 auto 45px;
     line-height: 1.4;
     color: #1a1a1a;
@@ -943,11 +993,12 @@ body {
     transform: scale(1.03);
 }
 
-.explore-box img {
+.explore-box video {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
+
 
 .explore-overlay {
     position: absolute;
@@ -956,16 +1007,27 @@ body {
     right: 18px;
     display: flex;
     justify-content: space-between;
+    line-height: 35px;
     align-items: center;
-    color: #00ff00;
-    font-size: 16px;
-    font-weight: 600;
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: 200;
 }
 
 .explore-overlay img {
     width: 45px;
     height: 45px;
 }
+
+.footer-explore .explore-overlay span {
+    font-family: 'Jersey 20', cursive;   /* OR Playfair / Jersey */
+    font-weight: 600;
+    font-size: 50px;                    /* tweak */
+    letter-spacing: 0.2px;
+  }
+  
+
+
 
 .footer-quiz {
     text-align: center;
@@ -1094,17 +1156,13 @@ body {
 }
 
 .quiz-modal-content {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  
-    background: rgba(253, 246, 246, 0.861);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-  
-    border: 1px solid rgba(255, 253, 253, 0.623);
-    border-radius: 18px;
+    padding: 28px 32px;
+    max-width: 420px;
+    background: rgba(255,255,255,0.92);
+    border-radius: 20px;
+    text-align: left;
 }
+
 
 @keyframes slideUp {
     from {
@@ -1132,12 +1190,30 @@ body {
     line-height: 1.5;
 }
 
+    
+.mobile-big-btn {
+    display: block;
+    margin: 16px auto 0;
+  
+    padding: 14px 40px;
+    font-size: 16px;
+    font-weight: 600;
+  
+    border-radius: 999px;
+    border: none;
+    background: #000;
+    color: #fff;
+  }
+  
 
 
-
+   /*_______________________________________________________________________________________*/
 
 /* Responsive */
 @media (max-width: 1024px) {
+    .services-grid {
+        min-width: 90%;
+    }
     .footer-grid {
         grid-template-columns: 1fr;
         gap: 40px;
@@ -1171,20 +1247,13 @@ body {
       overflow-x: auto;
       flex-wrap: nowrap;
       justify-content: flex-start;
-  }
-  
-  .bb-scroll iframe {
-      flex: 0 0 70%;
-  }
-  
-    .mobile-cta.primary {
-        height: 180px; /* you control height here */
-        background-image: url("assets/images/breaking-brand-mobile-menu.jpg");
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
       }
-
+    
+      .bb-scroll iframe {
+      flex: 0 0 50%;
+  }
+  
+ 
 
     .hero .font-primary {       
         letter-spacing: -2px;
@@ -1243,9 +1312,7 @@ body {
         display: none;
     }
 
-    .hamburger {
-        display: flex;
-    }
+
     .container,
     .header-container,
     .footer-container {
@@ -1279,141 +1346,171 @@ body {
     }
 
 
+      .logo-track {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+      }
+
+    
+    }
+    
+    .section-title {
+        font-size: 40px;        /* or whatever your original was */
+
+    }
+    
+    
+   /*_______________________________________________________________________________________*/
+
+ 
+  @media (max-width: 1023px) {
+    .logo-track {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    
+  @media (max-width: 900px) {
+    
+    .mobile-cta.primary {
+        height: 180px; /* you control height here */
+        background-image: url("assets/images/breaking-brand-mobile-menu.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+
+      
+      .hamburger { display: flex; }
+      .nav { display: none; }
+    
     .mobile-menu {
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      display: none;
-    }
-    
-    .mobile-menu.active {
-      display: block;
-    }
-    
-    /* background */
-    .mobile-menu-bg {
         position: fixed;
         inset: 0;
-      
-        background-color: rgba(0,0,0,0.8);
-        background-image: url("assets/images/mobile-grid.png");
-        background-repeat: no-repeat;
-        background-position: center;
-        background-size: 110%;
-        opacity: 1;      
-        backdrop-filter: blur(18px);
-        pointer-events: none;
+        z-index: 9999;
+        display: none;
         
       }
       
       
-    
-    /* content wrapper */
-    .mobile-menu-content {
-      position: relative;
-      height: 100%;
-      padding: 40px 35px 30px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      color: #fff;
-    }
-    
-    /* logo */
-    .mobile-menu-logo img {
-        width: clamp(140px, 60vw, 220px);
-        height: auto;
+      
+      .mobile-menu.active {
         display: block;
-        margin: 0 auto;
       }
-    
-      .mobile-menu-logo {
-        padding: 0;
-        text-align: center;
-        margin-bottom: 0px;
-      }
-
-    /* links */
-    .mobile-menu-links {
-      display: flex;
-      flex-direction: column;
-      gap: 0px;
-      padding: 12PX 24px;
-    }
-    
-    .mobile-menu-links a {
-      font-size: 26px;
-      font-weight: 600;
-      color: #fff;
-      text-decoration: none;
-      width: 100%;
-      text-align: center;
-    }
-    
-    /* white boxes */
-    .mobile-cta {
-      background: #fff;
-      color: #000;
-      border-radius: 26px;
-      padding: 22px;
-    }
-    
-    .mobile-cta.primary {
+      
+      /* background */
+      .mobile-menu-bg {
+          position: fixed;
+          inset: 0;
+        
+          background-color: rgba(0,0,0,0.8);
+          background-image: url("assets/images/mobile-grid.png");
+          background-repeat: no-repeat;
+          background-position: center;
+          background-size: 110%;
+          opacity: 1;      
+          backdrop-filter: blur(18px);
+          pointer-events: auto;
+          
+        }
+             
+      
+      /* content wrapper */
+      .mobile-menu-content {
+        position: relative;
+        height: 100%;
+        padding: 40px 35px 30px;
         display: flex;
         flex-direction: column;
-        align-items: center;
-        height: 180px; 
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-image: url("assets/images/breaking-brand-mobile-menu.jpg") !important;
-      }
-      
-
-
-    
-    
-    .mobile-cta.secondary h3 {
-      font-size: 22px;
-      line-height: 1.2;
-      text-align: center;
-    }
-    
-    .mobile-cta.secondary h3 span {
-      color: #888;
-      text-align: center;
-    }
-    
-    .mobile-cta p {
-      font-size: 14px;
-      color: #777;
-      text-align: center;
-    }
-    
-    .mobile-cta.clickable {
-        display: block;
-        text-decoration: none;
-        color: inherit;
-        cursor: pointer;
-      }
-
-
-    
-    .mobile-big-btn {
-        display: block;
-        margin: 16px auto 0;
-      
-        padding: 14px 40px;
-        font-size: 16px;
-        font-weight: 600;
-      
-        border-radius: 999px;
-        border: none;
-        background: #000;
+        gap: 4px;
         color: #fff;
+        z-index: 2;
       }
       
-    
+      /* logo */
+      .mobile-menu-logo img {
+          width: clamp(140px, 60vw, 220px);
+          height: auto;
+          display: block;
+          margin: 0 auto;
+        }
+      
+        .mobile-menu-logo {
+          padding: 0;
+          text-align: center;
+          margin-bottom: 0px;
+        }
+  
+      /* links */
+      .mobile-menu-links {
+        display: flex;
+        flex-direction: column;
+        gap: 0px;
+        padding: 38PX 24px;
+      }
+      
+      .mobile-menu-links a {
+        font-size: 26px;
+        font-weight: 600;
+        color: #fff;
+        text-decoration: none;
+        width: 100%;
+        text-align: center;
+      }
+      
+      /* white boxes */
+      .mobile-cta {
+        background: #fff;
+        color: #000;
+        border-radius: 26px;
+        padding: 22px;
+      }
+      
+      .mobile-cta.primary {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          height: 180px; 
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
+          background-image: url("assets/images/breaking-brand-mobile-menu.jpg") !important;
+        }
+        
+
+        .mobile-cta.secondary {
+            position: relative;
+            z-index: 5;
+          }
+          
+        
+      .mobile-cta.secondary h3 {
+        font-size: 22px;
+        line-height: 1.2;
+        text-align: center;
+      }
+      
+      .mobile-cta.secondary h3 span {
+        color: #888;
+        text-align: center;
+        position: relative;
+        z-index: 2;
+      }
+      
+      .mobile-cta p {
+        font-size: 14px;
+        color: #777;
+        text-align: center;
+      }
+      
+      .mobile-cta.clickable {
+          display: block;
+          text-decoration: none;
+          color: inherit;
+          cursor: pointer;
+        }
+  
+
     /* social */
     .mobile-social {
         margin-top: auto;
@@ -1429,32 +1526,25 @@ body {
         display: block;
       }
       
-    
-    }
-    
-    .section-title {
-        font-size: 40px;        /* or whatever your original was */
 
-    }
-    
+      @media (max-width: 560px) {
+       
+        .section-title {
+            font-size: 38px;
+        }
+        
+        .section-text {
+            
+            padding: 10px 25px;
 
-  @media (min-width: 900px) {
-    .mobile-menu { display: none !important; }
-  }
+        }
 
-  @media (min-width: 900px) {
-    .mobile-menu { display: none !important; }
-  }
+        .portfolio-box h2 {
+            font-size: clamp(43px, 5vw, 50px);
+            font-weight: 600;
 
-  @media (max-width: 1023px) {
-    .logo-track {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-    
-    @media (max-width: 767px) {
-      .logo-track {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
-      }
+        }
+
+        }
+
   }
