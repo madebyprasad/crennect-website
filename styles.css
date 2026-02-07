@@ -1,3 +1,17 @@
+
+  .page {
+    max-width: 100%;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+
+  html, body {
+    width: 100%;
+    overflow-x: hidden;
+  }
+  
+
+
 * {
     margin: 0;
     padding: 0;
@@ -736,7 +750,7 @@ body {
   }
   
   .breaking-box {
-    background: linear-gradient(180deg, #c8c8c8 0%, #ffffff 100%);
+    background: linear-gradient(180deg, #ffffff 0%, #ffffff 50%);
    
     border-radius: 35px;
     padding: 70px 35px;
@@ -752,7 +766,7 @@ body {
   }
   
   .bb-tagline {
-    color: rgba(255,255,255,0.9);
+    color: rgba(0, 0, 0, 0.9);
     font-size: 17px;
     margin-bottom: 45px;
   }
