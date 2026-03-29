@@ -1,0 +1,126 @@
+import { Suspense } from 'react';
+import type { Metadata } from 'next';
+import PortfolioCard from '@/components/PortfolioCard';
+import SearchBar from '@/components/SearchBar';
+import TagFilter from '@/components/TagFilter';
+import { getPublishedPortfolios, getAllTags } from '@/lib/db';
+
+export const metadata: Metadata = {
+  title: 'Portfolio',
+  description: 'Browse our collection of brand strategy, creative marketing, and AI-powered solutions case studies.',
+};
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+interface PageProps {
+  searchParams: {
+    search?: string;
+    tags?: string;
+    page?: string;
+  };
+}
+
+async function PortfolioContent({ searchParams }: PageProps) {
+  const search = searchParams.search;
+  const tags = searchParams.tags?.split(',').filter(Boolean);
+  const page = parseInt(searchParams.page || '1', 10);
+
+  const [{ portfolios, total, totalPages }, allTags] = await Promise.all([
+    getPublishedPortfolios({ search, tags, page, limit: 12 }),
+    getAllTags(),
+  ]);
+
+  return (
+    <>
+      {/* Filters Section */}
+      <section style={{ background: '#fff', paddingTop: '40px', paddingBottom: '20px' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 40px' }}>
+          <div className="portfolio-filters">
+            <SearchBar />
+            <TagFilter tags={allTags} />
+          </div>
+        </div>
+      </section>
+
+      {/* Portfolio Grid Section */}
+      <section style={{ background: '#fff', paddingBottom: '80px' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 40px' }}>
+          {portfolios.length > 0 ? (
+            <>
+              <div className="portfolio-grid">
+                {portfolios.map((portfolio: any) => (
+                  <PortfolioCard key={portfolio.id} portfolio={portfolio} />
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="portfolio-pagination">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+                    <a
+                      key={pageNum}
+                      href={`/portfolio?page=${pageNum}${search ? `&search=${search}` : ''}${tags ? `&tags=${tags.join(',')}` : ''}`}
+                      className={`portfolio-page-btn ${pageNum === page ? 'active' : ''}`}
+                    >
+                      {pageNum}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="portfolio-empty">
+              <div className="portfolio-empty-icon">📂</div>
+              <h3 className="portfolio-empty-title">Try something else</h3>
+              <p>
+                {search || tags
+                  ? "Try adjusting your search or filters."
+                  : "Check back soon for new case studies."}
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+    </>
+  );
+}
+
+export default function PortfolioPage({ searchParams }: PageProps) {
+  return (
+    <>
+      {/* Hero Section — place hero-reel.mp4 in /public/assets/videos/ */}
+      <section className="portfolio-hero">
+        <video
+          className="portfolio-hero-video"
+          autoPlay
+          muted
+          loop
+          playsInline
+          src="/assets/videos/hero-reel.mp4"
+        />
+        <div className="portfolio-hero-overlay" />
+        <div className="portfolio-hero-content" style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 40px' }}>
+          <h1 className="portfolio-hero-title">
+            <span className="font-primary">Our </span>
+            <span className="font-curvy">Work</span>
+          </h1>
+          <p className="portfolio-hero-subtitle">
+            Explore how we help brands define authority, break categories,
+            and scale with intelligent systems.
+          </p>
+        </div>
+      </section>
+
+      <Suspense
+        fallback={
+          <div className="portfolio-loading">
+            <div className="portfolio-spinner"></div>
+          </div>
+        }
+      >
+        <PortfolioContent searchParams={searchParams} />
+      </Suspense>
+    </>
+  );
+}

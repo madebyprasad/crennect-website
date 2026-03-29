@@ -1,0 +1,10 @@
+{
+  "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "https://crennect.com/:path*",
+      "destination": "https://www.crennect.com/:path*",
+      "permanent": true
+    }
+  ]
+}
