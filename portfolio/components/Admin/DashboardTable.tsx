@@ -50,7 +50,7 @@ export default function DashboardTable({ portfolios }: DashboardTableProps) {
     if (!confirm(`Delete ${selected.size} portfolio(s)? This cannot be undone.`)) return;
     setDeleting(true);
     try {
-      for (const id of selected) {
+      for (const id of Array.from(selected)) {
         const res = await fetch(`/api/portfolios/${id}`, { method: 'DELETE' });
         if (!res.ok) throw new Error(`Delete failed for ${id}`);
       }
