@@ -304,16 +304,22 @@ export async function createPortfolio(
 
   const payload: any = { ...portfolio, slug, created_by: userId, status: 'draft' };
 
-  let result = await supabaseAdmin.from('portfolios').insert(payload).select().single();
+  let { data: rows, error: insertError } = await supabaseAdmin
+    .from('portfolios')
+    .insert(payload)
+    .select();
 
   // Retry without gallery_layout if the column doesn't exist yet
-  if (result.error?.message?.includes('gallery_layout')) {
+  if (insertError?.message?.includes('gallery_layout')) {
     const { gallery_layout, ...withoutLayout } = payload;
-    result = await supabaseAdmin.from('portfolios').insert(withoutLayout).select().single();
+    const retry = await supabaseAdmin.from('portfolios').insert(withoutLayout).select();
+    rows = retry.data;
+    insertError = retry.error;
   }
 
-  const { data, error } = result;
-  if (error) throw error;
+  if (insertError) throw insertError;
+  const data = rows?.[0];
+  if (!data) throw new Error('Insert failed — SUPABASE_SERVICE_ROLE_KEY may not be configured or RLS is blocking writes');
 
   if (tagIds.length > 0) {
     await supabaseAdmin.from('portfolio_tags').insert(
@@ -336,16 +342,23 @@ export async function updatePortfolio(
 
   const payload: any = { ...portfolio, updated_at: new Date().toISOString() };
 
-  let result = await supabaseAdmin.from('portfolios').update(payload).eq('id', id).select().single();
+  let { data: rows, error: updateError } = await supabaseAdmin
+    .from('portfolios')
+    .update(payload)
+    .eq('id', id)
+    .select();
 
   // Retry without gallery_layout if the column doesn't exist yet
-  if (result.error?.message?.includes('gallery_layout')) {
+  if (updateError?.message?.includes('gallery_layout')) {
     const { gallery_layout, ...withoutLayout } = payload;
-    result = await supabaseAdmin.from('portfolios').update(withoutLayout).eq('id', id).select().single();
+    const retry = await supabaseAdmin.from('portfolios').update(withoutLayout).eq('id', id).select();
+    rows = retry.data;
+    updateError = retry.error;
   }
 
-  const { data, error } = result;
-  if (error) throw error;
+  if (updateError) throw updateError;
+  const data = rows?.[0];
+  if (!data) throw new Error('Update failed — SUPABASE_SERVICE_ROLE_KEY may not be configured or RLS is blocking writes');
 
   if (tagIds !== undefined) {
     await supabaseAdmin
