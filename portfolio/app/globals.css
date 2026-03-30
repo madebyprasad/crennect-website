@@ -34,6 +34,37 @@
 }
 
 /* ================================
+   HEADER — LIGHT BACKGROUND VARIANT
+   Used on portfolio detail pages (white bg)
+   ================================ */
+.header.header--light {
+  background: rgba(255, 255, 255, 0.97) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  box-shadow: 0 1px 20px rgba(0, 0, 0, 0.08) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+.header--light .nav a {
+  color: #1a1a1a !important;
+}
+
+.header--light .nav a:hover {
+  color: #000 !important;
+  opacity: 0.75 !important;
+}
+
+.header--light .btn-nav {
+  color: #1a1a1a !important;
+  border-color: #1a1a1a !important;
+}
+
+.header--light .btn-nav:hover {
+  background: #1a1a1a !important;
+  color: #fff !important;
+}
+
+/* ================================
    PORTFOLIO HERO SECTION
    ================================ */
 section.portfolio-hero {

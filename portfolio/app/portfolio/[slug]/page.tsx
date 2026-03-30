@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { getPortfolioBySlug, getSuggestedPortfolios } from '@/lib/db';
+import { getPortfolioBySlug, getSuggestedPortfolios, incrementPortfolioView } from '@/lib/db';
 import type { PortfolioMedia } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
@@ -42,6 +42,9 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
   if (!portfolio) {
     notFound();
   }
+
+  // Fire-and-forget — does not block rendering
+  void incrementPortfolioView(portfolio.id);
 
   const tags = portfolio.tags || [];
   const media: PortfolioMedia[] = portfolio.media || (portfolio as any).portfolio_media || [];

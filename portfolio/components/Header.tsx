@@ -1,11 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-
-const BASE_URL = process.env.NODE_ENV === 'development' ? '' : '';
+import { usePathname } from 'next/navigation';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Portfolio detail pages (/portfolio/[slug]) have a white background
+  const isLightBg = !!(pathname?.match(/^\/portfolio\/.+/));
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -21,16 +24,16 @@ export default function Header() {
     let lastScroll = 0;
     const header = document.querySelector('.header') as HTMLElement;
     if (!header) return;
-    
+
     const handleScroll = () => {
       const currentScroll = window.pageYOffset;
-      
+
       if (currentScroll > 100) {
         header.style.padding = '10px 0';
       } else {
         header.style.padding = '15px 0';
       }
-      
+
       if (currentScroll <= 0) {
         header.style.transform = 'translateY(0)';
       } else if (currentScroll > lastScroll && currentScroll > 150) {
@@ -38,7 +41,7 @@ export default function Header() {
       } else if (currentScroll < lastScroll) {
         header.style.transform = 'translateY(0)';
       }
-      
+
       lastScroll = currentScroll;
     };
 
@@ -46,41 +49,52 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const navLinkStyle = isLightBg ? { color: '#1a1a1a' } : {};
+
   return (
     <>
-      {/* Header - exact copy from homepage */}
-      <header className="header">
+      <header className={`header${isLightBg ? ' header--light' : ''}`}>
         <div className="header-container">
           <a href="/index.html" className="logo">
-            <img src="/assets/images/logo.svg" alt="Crennect Logo" />
+            <img
+              src={isLightBg ? '/assets/images/crennect-logo.svg' : '/assets/images/logo.svg'}
+              alt="Crennect Logo"
+            />
           </a>
-          
+
           <nav className="nav">
-            <a href="/about.html">About us</a>
-            <a href="https://www.behance.net/madebyprasad">Our work</a>
-            <a href="/index.html#genai">GenAI</a>
-            <a href="/services.html">How We Help</a>
-            <a href="/index.html#resources">Resources</a>
-            <a href="https://linktr.ee/crennect" className="btn-nav">Breaking Brands</a>
+            <a href="/about.html" style={navLinkStyle}>About us</a>
+            <a href="https://www.behance.net/madebyprasad" style={navLinkStyle}>Our work</a>
+            <a href="/index.html#genai" style={navLinkStyle}>GenAI</a>
+            <a href="/services.html" style={navLinkStyle}>How We Help</a>
+            <a href="/index.html#resources" style={navLinkStyle}>Resources</a>
+            <a
+              href="https://linktr.ee/crennect"
+              className="btn-nav"
+              style={isLightBg ? { color: '#1a1a1a', borderColor: '#1a1a1a' } : {}}
+            >
+              Breaking Brands
+            </a>
           </nav>
           <button className="hamburger" aria-label="Menu" onClick={toggleMobileMenu}>
-            <img src="/assets/images/hamburger.svg" alt="Menu" />
+            <img
+              src={isLightBg ? '/assets/images/hamburger-reverse.svg' : '/assets/images/hamburger.svg'}
+              alt="Menu"
+            />
           </button>
         </div>
       </header>
 
-      {/* Mobile Menu - exact copy from homepage */}
+      {/* Mobile Menu */}
       <div className={`mobile-menu ${mobileMenuOpen ? 'active' : ''}`}>
         <div className="mobile-menu-bg" onClick={closeMobileMenu}></div>
-      
+
         <div className="mobile-menu-content">
-      
-          {/* Logo */}
+
           <div className="mobile-menu-logo">
             <img src="/assets/images/logo.svg" alt="Crennect" />
           </div>
-      
-          {/* Main links */}
+
           <div className="mobile-menu-links">
             <a href="/about.html" onClick={closeMobileMenu}>About us</a>
             <a href="https://www.behance.net/madebyprasad" onClick={closeMobileMenu}>Our work</a>
@@ -88,22 +102,19 @@ export default function Header() {
             <a href="/services.html" onClick={closeMobileMenu}>How We Help</a>
             <a href="/index.html#resources" onClick={closeMobileMenu}>Resources</a>
           </div>
-      
-          {/* Breaking Brands CTA */}
+
           <a href="https://linktr.ee/crennect"
             className="mobile-cta primary clickable bb-image-only"
             aria-label="Breaking Brands"
             onClick={closeMobileMenu}>
           </a>
 
-          {/* Contact box */}
           <div className="mobile-cta secondary">
             <h3>Reach out to us<br/>for your brand boost</h3>
             <p> reach@crennect.com </p>
             <a href="/contact.html" className="mobile-big-btn" onClick={closeMobileMenu}>Contact us</a>
           </div>
-          
-          {/* Social */}
+
           <div className="mobile-social social-icons">
             <a href="https://www.linkedin.com/company/crennect/" target="_blank" rel="noopener noreferrer" aria-label="Visit us on LinkedIn">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
@@ -118,7 +129,7 @@ export default function Header() {
               <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.04c-5.5 0-10 4.49-10 10.02 0 5 3.66 9.15 8.44 9.9v-7H7.9v-2.9h2.54V9.85c0-2.52 1.49-3.91 3.78-3.91 1.09 0 2.23.19 2.23.19v2.47h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.9h-2.33v7a10 10 0 0 0 8.44-9.9c0-5.53-4.5-10.02-10-10.02z"/></svg>
             </a>
           </div>
-                
+
         </div>
       </div>
     </>

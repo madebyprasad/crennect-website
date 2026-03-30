@@ -1,5 +1,7 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import type { Portfolio } from '@/lib/types';
 
 interface PortfolioCardProps {
@@ -7,10 +9,31 @@ interface PortfolioCardProps {
 }
 
 export default function PortfolioCard({ portfolio }: PortfolioCardProps) {
+  const [loading, setLoading] = useState(false);
   const tags = portfolio.tags || [];
 
   return (
-    <Link href={`/portfolio/${portfolio.slug}`} className="portfolio-card">
+    <Link
+      href={`/portfolio/${portfolio.slug}`}
+      className="portfolio-card"
+      onClick={() => setLoading(true)}
+      style={{ position: 'relative' }}
+    >
+      {loading && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(255,255,255,0.75)',
+            zIndex: 10,
+          }}
+        >
+          <div className="portfolio-spinner" />
+        </div>
+      )}
       <div className="portfolio-card-image">
         {portfolio.featured_image_url ? (
           <img

@@ -207,12 +207,27 @@ export async function getPortfolioBySlug(slug: string): Promise<Portfolio | null
 
   if (error || !data) return null;
 
-  await supabase
-    .from('portfolios')
-    .update({ view_count: (data.view_count || 0) + 1 })
-    .eq('id', data.id);
-
   return data;
+}
+
+export async function incrementPortfolioView(id: string): Promise<void> {
+  if (!supabase) return; // Demo mode — no-op
+
+  // Prefer atomic RPC (created in schema.sql with SECURITY DEFINER)
+  const { error: rpcError } = await supabase.rpc('increment_portfolio_view', { row_id: id });
+
+  if (rpcError && supabaseAdmin) {
+    // Fallback: direct update via service-role client (bypasses RLS)
+    const { data } = await supabaseAdmin
+      .from('portfolios')
+      .select('view_count')
+      .eq('id', id)
+      .single();
+    await supabaseAdmin
+      .from('portfolios')
+      .update({ view_count: (data?.view_count ?? 0) + 1 })
+      .eq('id', id);
+  }
 }
 
 export async function getSuggestedPortfolios(
