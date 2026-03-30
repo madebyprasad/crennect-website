@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getPortfolioBySlug, getSuggestedPortfolios } from '@/lib/db';
+import type { PortfolioMedia } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -43,7 +44,7 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
   }
 
   const tags = portfolio.tags || [];
-  const media = portfolio.media || (portfolio as any).portfolio_media || [];
+  const media: PortfolioMedia[] = portfolio.media || (portfolio as any).portfolio_media || [];
 
   const isYouTube = (url: string) => /youtube\.com|youtu\.be/.test(url);
   const getYouTubeId = (url: string) => {
