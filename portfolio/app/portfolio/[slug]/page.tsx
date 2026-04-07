@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { getPortfolioBySlug, getSuggestedPortfolios, incrementPortfolioView } from '@/lib/db';
+import Script from 'next/script';
+import { getPortfolioBySlug, getSuggestedPortfolios } from '@/lib/db';
 import type { PortfolioMedia } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
@@ -43,11 +44,11 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  // Fire-and-forget — does not block rendering
-  void incrementPortfolioView(portfolio.id);
-
   const tags = portfolio.tags || [];
-  const media: PortfolioMedia[] = portfolio.media || (portfolio as any).portfolio_media || [];
+  const allMedia: PortfolioMedia[] = portfolio.media || (portfolio as any).portfolio_media || [];
+  // Separate hero video (always full-width, before gallery) from gallery media
+  const heroVideo = allMedia.find((m) => m.alt_text === 'hero-video') || null;
+  const media: PortfolioMedia[] = allMedia.filter((m) => m.alt_text !== 'hero-video');
 
   const isYouTube = (url: string) => /youtube\.com|youtu\.be/.test(url);
   const getYouTubeId = (url: string) => {
@@ -160,6 +161,40 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
             </div>
           )}
 
+          {/* Hero Video — always full-width, no title */}
+          {heroVideo && heroVideo.content_url && (
+            <section className="portfolio-hero-video">
+              {isYouTube(heroVideo.content_url) ? (
+                <div style={{ aspectRatio: '16/9', position: 'relative', borderRadius: '8px', overflow: 'hidden', background: '#000' }}>
+                  <div
+                    className="yt-facade"
+                    data-ytid={getYouTubeId(heroVideo.content_url)}
+                    style={{ position: 'absolute', inset: 0, cursor: 'pointer' }}
+                  >
+                    <img
+                      src={`https://img.youtube.com/vi/${getYouTubeId(heroVideo.content_url)}/hqdefault.jpg`}
+                      alt=""
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    />
+                    <span className="yt-play-btn">
+                      <svg viewBox="0 0 68 48" width="68" height="48">
+                        <path d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55c-2.93.78-4.63 3.26-5.42 6.19C.06 13.05 0 24 0 24s.06 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C67.94 34.95 68 24 68 24s-.06-10.95-1.48-16.26z" fill="#ff0000"/>
+                        <path d="M45 24 27 14v20" fill="#fff"/>
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <video
+                  src={heroVideo.content_url}
+                  controls
+                  playsInline
+                  style={{ width: '100%', aspectRatio: '16/9', display: 'block', borderRadius: '8px', background: '#000' }}
+                />
+              )}
+            </section>
+          )}
+
           {/* Media Gallery */}
           {media.length > 0 && (
             <section className="portfolio-media-gallery">
@@ -175,14 +210,23 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
                     const ytId = isYouTube(item.content_url) ? getYouTubeId(item.content_url) : null;
                     if (ytId) {
                       return (
-                        <div key={item.id} className="portfolio-media-item">
-                          <div className="portfolio-media-embed">
-                            <iframe
-                              src={`https://www.youtube.com/embed/${ytId}`}
-                              allow="autoplay; encrypted-media"
-                              allowFullScreen
-                              style={{ width: '100%', aspectRatio: '16/9', border: 'none', borderRadius: '8px', display: 'block' }}
+                        <div key={item.id} style={{ aspectRatio: '16/9', position: 'relative', borderRadius: '8px', overflow: 'hidden', background: '#000' }}>
+                          <div
+                            className="yt-facade"
+                            data-ytid={ytId}
+                            style={{ position: 'absolute', inset: 0, cursor: 'pointer' }}
+                          >
+                            <img
+                              src={`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`}
+                              alt=""
+                              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                             />
+                            <span className="yt-play-btn">
+                              <svg viewBox="0 0 68 48" width="68" height="48">
+                                <path d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55c-2.93.78-4.63 3.26-5.42 6.19C.06 13.05 0 24 0 24s.06 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C67.94 34.95 68 24 68 24s-.06-10.95-1.48-16.26z" fill="#ff0000"/>
+                                <path d="M45 24 27 14v20" fill="#fff"/>
+                              </svg>
+                            </span>
                           </div>
                         </div>
                       );
@@ -344,6 +388,33 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
           </section>
         </div>
       </article>
+
+      {/* View tracking (unique per browser) + YouTube facade init */}
+      <Script
+        id="page-init"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: [
+            '(function(){',
+            '  try{',
+            '    var k="vp_' + portfolio.id + '";',
+            '    if(!localStorage.getItem(k)){localStorage.setItem(k,"1");fetch("/api/portfolios/' + portfolio.id + '",{method:"PATCH"});}',
+            '  }catch(e){}',
+            '  document.querySelectorAll(".yt-facade").forEach(function(el){',
+            '    el.addEventListener("click",function(){',
+            '      var id=this.getAttribute("data-ytid");',
+            '      var f=document.createElement("iframe");',
+            '      f.src="https://www.youtube.com/embed/"+id+"?rel=0&modestbranding=1&autoplay=1";',
+            '      f.setAttribute("allow","autoplay;encrypted-media;fullscreen");',
+            '      f.setAttribute("allowfullscreen","");',
+            '      f.style.cssText="position:absolute;inset:0;width:100%;height:100%;border:none;display:block;";',
+            '      this.parentNode.replaceChild(f,this);',
+            '    });',
+            '  });',
+            '})();',
+          ].join('\n'),
+        }}
+      />
     </>
   );
 }

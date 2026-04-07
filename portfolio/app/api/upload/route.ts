@@ -83,6 +83,23 @@ export async function POST(request: NextRequest) {
     const linkUrl = formData.get('link_url') as string | null;
     const textContent = formData.get('text_content') as string | null;
 
+    const heroVideoUrl = formData.get('hero_video_url') as string | null;
+
+    if (heroVideoUrl) {
+      if (!portfolioId) {
+        return NextResponse.json({ error: 'portfolioId is required for hero video' }, { status: 400 });
+      }
+      const media = await addPortfolioMedia(portfolioId, {
+        media_type: 'video',
+        content_url: heroVideoUrl,
+        content_text: null,
+        title: null,
+        alt_text: 'hero-video',
+        sort_order: -1,
+      });
+      return NextResponse.json({ mediaId: media.id, url: heroVideoUrl });
+    }
+
     if (linkUrl || textContent) {
       if (!portfolioId) {
         return NextResponse.json({ error: 'portfolioId is required for links and text sections' }, { status: 400 });

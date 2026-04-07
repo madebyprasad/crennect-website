@@ -99,7 +99,7 @@ export default function PortfolioPage({ searchParams }: PageProps) {
           playsInline
           poster="/assets/images/hero-poster.webp"
         >
-          <source src="/assets/videos/hero-reel.mp4" type="video/mp4" />
+          <source src="/assets/video/hero-reel.mp4" type="video/mp4" />
         </video>
         <div className="portfolio-hero-overlay" />
         <div className="portfolio-hero-content" style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 40px' }}>

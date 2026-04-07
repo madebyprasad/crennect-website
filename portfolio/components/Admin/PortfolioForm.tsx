@@ -34,7 +34,15 @@ export default function PortfolioForm({ portfolio, tags }: PortfolioFormProps) {
   const [success, setSuccess] = useState('');
   const [thumbnailUploading, setThumbnailUploading] = useState(false);
   const [mediaUploading, setMediaUploading] = useState(false);
-  const [media, setMedia] = useState<PortfolioMedia[]>(portfolio?.media || []);
+  // Exclude hero video from gallery media
+  const [media, setMedia] = useState<PortfolioMedia[]>(
+    (portfolio?.media || []).filter((m) => m.alt_text !== 'hero-video')
+  );
+  const [heroVideo, setHeroVideo] = useState<PortfolioMedia | null>(
+    (portfolio?.media || []).find((m) => m.alt_text === 'hero-video') || null
+  );
+  const [heroVideoUrl, setHeroVideoUrl] = useState('');
+  const [heroVideoUploading, setHeroVideoUploading] = useState(false);
   const [linkUrl, setLinkUrl] = useState('');
   const [linkTitle, setLinkTitle] = useState('');
   const [linkAdding, setLinkAdding] = useState(false);
@@ -43,6 +51,7 @@ export default function PortfolioForm({ portfolio, tags }: PortfolioFormProps) {
   const [textAdding, setTextAdding] = useState(false);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const mediaInputRef = useRef<HTMLInputElement>(null);
+  const heroVideoInputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -118,6 +127,90 @@ export default function PortfolioForm({ portfolio, tags }: PortfolioFormProps) {
     } finally {
       setMediaUploading(false);
       if (mediaInputRef.current) mediaInputRef.current.value = '';
+    }
+  };
+
+  const isYouTube = (url: string) => /youtube\.com|youtu\.be/.test(url);
+
+  const handleHeroVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !portfolio?.id) return;
+    setHeroVideoUploading(true);
+    setError('');
+    try {
+      if (heroVideo?.id) {
+        await fetch(`/api/upload?mediaId=${heroVideo.id}`, { method: 'DELETE' });
+      }
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('portfolioId', portfolio.id);
+      fd.append('altText', 'hero-video');
+      const res = await fetch('/api/upload', { method: 'POST', body: fd });
+      if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || 'Upload failed'); }
+      const data = await res.json();
+      setHeroVideo({
+        id: data.mediaId,
+        portfolio_id: portfolio.id,
+        media_type: 'video',
+        content_url: data.url,
+        content_text: null,
+        title: null,
+        caption: null,
+        alt_text: 'hero-video',
+        embed_code: null,
+        sort_order: -1,
+        created_at: new Date().toISOString(),
+      });
+    } catch (err: any) {
+      setError(err.message || 'Hero video upload failed');
+    } finally {
+      setHeroVideoUploading(false);
+      if (heroVideoInputRef.current) heroVideoInputRef.current.value = '';
+    }
+  };
+
+  const handleHeroVideoUrl = async () => {
+    if (!heroVideoUrl.trim() || !portfolio?.id) return;
+    setHeroVideoUploading(true);
+    setError('');
+    try {
+      if (heroVideo?.id) {
+        await fetch(`/api/upload?mediaId=${heroVideo.id}`, { method: 'DELETE' });
+      }
+      const fd = new FormData();
+      fd.append('hero_video_url', heroVideoUrl.trim());
+      fd.append('portfolioId', portfolio.id);
+      const res = await fetch('/api/upload', { method: 'POST', body: fd });
+      if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || 'Failed to add video URL'); }
+      const data = await res.json();
+      setHeroVideo({
+        id: data.mediaId,
+        portfolio_id: portfolio.id,
+        media_type: 'video',
+        content_url: heroVideoUrl.trim(),
+        content_text: null,
+        title: null,
+        caption: null,
+        alt_text: 'hero-video',
+        embed_code: null,
+        sort_order: -1,
+        created_at: new Date().toISOString(),
+      });
+      setHeroVideoUrl('');
+    } catch (err: any) {
+      setError(err.message || 'Failed to add hero video URL');
+    } finally {
+      setHeroVideoUploading(false);
+    }
+  };
+
+  const removeHeroVideo = async () => {
+    if (!heroVideo?.id) return;
+    try {
+      await fetch(`/api/upload?mediaId=${heroVideo.id}`, { method: 'DELETE' });
+      setHeroVideo(null);
+    } catch {
+      setError('Failed to remove hero video');
     }
   };
 
@@ -441,6 +534,77 @@ export default function PortfolioForm({ portfolio, tags }: PortfolioFormProps) {
           <option value="full-width">Full Width (one per row)</option>
           <option value="2-column">2-Column Grid</option>
         </select>
+      </div>
+
+      {/* Hero Video — full width, before project gallery, no layout options */}
+      <div className="admin-form-group">
+        <label className="admin-form-label">Hero Video <span style={{ fontWeight: 400, color: 'var(--text-muted)', fontSize: '13px' }}>(optional · full width · shown before gallery)</span></label>
+        {!isEditing ? (
+          <p style={{ fontSize: '13px', color: 'var(--text-muted)', padding: '12px', background: 'var(--bg-off-white)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+            Save the portfolio as a draft first, then add a hero video.
+          </p>
+        ) : heroVideo ? (
+          <div style={{ padding: '12px', background: 'var(--bg-off-white)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+            <div style={{ marginBottom: '8px', fontSize: '13px', color: 'var(--text-muted)' }}>Current hero video:</div>
+            <div style={{ background: '#000', borderRadius: '6px', overflow: 'hidden', marginBottom: '12px', aspectRatio: '16/9' }}>
+              {isYouTube(heroVideo.content_url || '') ? (
+                <iframe
+                  src={`https://www.youtube.com/embed/${heroVideo.content_url?.match(/(?:v=|youtu\.be\/)([^&?/]+)/)?.[1]}?rel=0&modestbranding=1`}
+                  allow="autoplay; encrypted-media; fullscreen"
+                  allowFullScreen
+                  style={{ width: '100%', height: '100%', border: 'none' }}
+                />
+              ) : (
+                <video src={heroVideo.content_url || ''} controls style={{ width: '100%', height: '100%' }} />
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={removeHeroVideo}
+              style={{ fontSize: '13px', color: '#dc2626', background: 'transparent', border: '1px solid #fecaca', borderRadius: '6px', padding: '6px 12px', cursor: 'pointer' }}
+            >
+              Remove Hero Video
+            </button>
+          </div>
+        ) : (
+          <div style={{ padding: '16px', background: 'var(--bg-off-white)', borderRadius: '8px', border: '1px solid var(--border)' }}>
+            <input
+              ref={heroVideoInputRef}
+              type="file"
+              accept="video/mp4,video/webm,video/quicktime"
+              onChange={handleHeroVideoUpload}
+              style={{ display: 'none' }}
+            />
+            <button
+              type="button"
+              onClick={() => heroVideoInputRef.current?.click()}
+              disabled={heroVideoUploading}
+              className="portfolio-button portfolio-button-secondary"
+              style={{ marginBottom: '12px' }}
+            >
+              {heroVideoUploading ? 'Uploading...' : 'Upload Video File'}
+            </button>
+            <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '8px' }}>or paste a URL (YouTube, direct video link):</div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input
+                type="url"
+                className="admin-form-input"
+                placeholder="https://youtube.com/watch?v=... or direct video URL"
+                value={heroVideoUrl}
+                onChange={(e) => setHeroVideoUrl(e.target.value)}
+                style={{ flex: 1 }}
+              />
+              <button
+                type="button"
+                onClick={handleHeroVideoUrl}
+                disabled={heroVideoUploading || !heroVideoUrl.trim()}
+                className="portfolio-button portfolio-button-secondary"
+              >
+                {heroVideoUploading ? 'Adding...' : 'Add'}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Media Gallery — edit only (needs a saved portfolio ID) */}

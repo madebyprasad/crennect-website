@@ -234,12 +234,14 @@ button.portfolio-tag.active,
   }
 }
 
+
 @media (max-width: 768px) {
   .portfolio-grid {
     grid-template-columns: 1fr !important;
     gap: 20px !important;
   }
 }
+
 
 /* ================================
    PORTFOLIO CARD
@@ -502,6 +504,48 @@ h2.portfolio-section-title,
 
 .portfolio-section-content p {
   margin-bottom: 16px !important;
+}
+
+/* ================================
+   YOUTUBE FACADE (thumbnail → iframe on click)
+   ================================ */
+.yt-facade {
+  display: block !important;
+}
+
+.yt-play-btn {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  pointer-events: none !important;
+  transition: transform 0.15s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5)) !important;
+}
+
+.yt-facade:hover .yt-play-btn {
+  transform: translate(-50%, -50%) scale(1.12) !important;
+}
+
+/* ================================
+   PORTFOLIO HERO VIDEO
+   ================================ */
+.portfolio-hero-video {
+  width: 100% !important;
+  margin-bottom: 48px !important;
+}
+
+.portfolio-hero-video iframe,
+.portfolio-hero-video video {
+  width: 100% !important;
+  aspect-ratio: 16 / 9 !important;
+  display: block !important;
+  border: none !important;
+  border-radius: 8px !important;
+  background: #000 !important;
 }
 
 /* ================================

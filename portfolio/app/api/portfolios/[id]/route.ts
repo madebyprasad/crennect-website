@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { getPortfolioById, updatePortfolio, deletePortfolio } from '@/lib/db';
+import { getPortfolioById, updatePortfolio, deletePortfolio, incrementPortfolioView } from '@/lib/db';
 
 interface RouteParams {
   params: { id: string };
@@ -82,6 +82,16 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       { error: error?.message || 'Failed to update portfolio' },
       { status: 500 }
     );
+  }
+}
+
+// PATCH: increment view count (unique-viewer logic handled client-side via localStorage)
+export async function PATCH(request: NextRequest, { params }: RouteParams) {
+  try {
+    await incrementPortfolioView(params.id);
+    return NextResponse.json({ ok: true });
+  } catch {
+    return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }
 
