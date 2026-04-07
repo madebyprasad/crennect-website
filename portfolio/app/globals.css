@@ -362,6 +362,78 @@ h1.portfolio-detail-title,
   align-items: center !important;
 }
 
+/*    Newly added code to change fonts Open */
+/* Detail page only font system */
+.portfolio-detail {
+  font-family: 'DM Serif Display', serif !important; /* main font */
+}
+
+.portfolio-detail .portfolio-detail-meta,
+.portfolio-detail .portfolio-card-tag,
+.portfolio-detail .portfolio-button,
+.portfolio-detail .portfolio-media-link-card-domain {
+  font-family: 'DM Mono', monospace !important; /* secondary font */
+}
+
+/* Optional: force key headings/content explicitly */
+.portfolio-detail .portfolio-detail-title,
+.portfolio-detail .portfolio-section-title,
+.portfolio-detail .portfolio-section-content {
+  font-family: 'DM Serif Display', serif !important;
+}
+
+/* Portfolio detail typography split */
+.portfolio-detail {
+  font-family: 'DM Mono', monospace !important; /* secondary/default text */
+ 
+}
+
+/* Headings only = primary font */
+.portfolio-detail h1,
+.portfolio-detail h2,
+.portfolio-detail h3,
+.portfolio-detail .portfolio-detail-title,
+.portfolio-detail .portfolio-section-title {
+  font-family: 'DM Serif Display', serif !important;
+}
+
+/* Don't set letter-spacing on .portfolio-detail */
+
+.portfolio-detail .portfolio-section-content,
+.portfolio-detail .portfolio-section-content p,
+.portfolio-detail .portfolio-detail-meta,
+.portfolio-detail .portfolio-detail-meta span,
+.portfolio-detail .portfolio-card-tag,
+.portfolio-detail .portfolio-suggested-desc,
+.portfolio-detail .portfolio-button {
+  font-family: 'DM Mono', monospace !important;
+  letter-spacing: -0.08em;
+}
+
+/* Ensure headings stay normal */
+.portfolio-detail h1,
+.portfolio-detail h2,
+.portfolio-detail h3,
+.portfolio-detail .portfolio-detail-title,
+.portfolio-detail .portfolio-section-title {
+  font-family: 'DM Serif Display', serif !important;
+  letter-spacing: normal !important; /* or 0 */
+}
+
+
+/* Keep content blocks explicitly mono */
+.portfolio-detail .portfolio-section-content,
+.portfolio-detail .portfolio-section-content p,
+.portfolio-detail .portfolio-detail-meta,
+.portfolio-detail .portfolio-detail-meta span,
+.portfolio-detail .portfolio-card-tag,
+.portfolio-detail .portfolio-suggested-desc,
+.portfolio-detail .portfolio-button {
+  font-family: 'DM Mono', monospace !important;
+}
+
+/*    Newly added code to change fonts Close */
+
 .portfolio-featured-image {
   width: 100% !important;
   aspect-ratio: 21/9 !important;
@@ -382,6 +454,12 @@ h1.portfolio-detail-title,
   grid-template-columns: 1fr 1fr !important;
   gap: 48px !important;
   margin-bottom: 64px !important;
+}
+
+/* description paragraph under featured image */
+.portfolio-detail > .container > section > p {
+  font-family: 'DM Mono', monospace !important;
+  letter-spacing: -0.05em;
 }
 
 @media (max-width: 1024px) {

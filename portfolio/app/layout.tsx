@@ -44,7 +44,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;600;700;800;900&family=Playfair+Display:ital,wght@1,700&family=Jersey+20&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;600;700;800;900&family=Playfair+Display:ital,wght@1,700&family=Jersey+20&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap"
           rel="stylesheet"
         />
         {/* Parent site styles for header/footer - loaded first */}

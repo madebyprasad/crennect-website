@@ -130,7 +130,7 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
           {/* Description */}
           {portfolio.description && (
             <section style={{ marginBottom: '48px' }}>
-              <p style={{ fontSize: '18px', color: 'var(--text-light)', lineHeight: '1.8' }}>
+              <p style={{ fontSize: '16px', color: 'var(--text-light)', lineHeight: '1.8' }}>
                 {portfolio.description}
               </p>
             </section>
@@ -332,7 +332,7 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
               marginTop: '64px',
             }}
           >
-            <h3 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '16px' }}>
+            <h3 style={{ fontSize: '40px', fontWeight: '700', marginBottom: '5px' }}>
               Ready to create something amazing?
             </h3>
             <p style={{ color: 'var(--text-light)', marginBottom: '24px' }}>
