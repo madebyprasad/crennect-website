@@ -37,6 +37,15 @@
    HEADER — LIGHT BACKGROUND VARIANT
    Used on portfolio detail pages (white bg)
    ================================ */
+
+   /* Disable underline for portfolio links/cards */
+.portfolio-detail a:hover,
+.portfolio-detail a:focus,
+.portfolio-detail .portfolio-suggested-card:hover,
+.portfolio-detail .portfolio-suggested-card:focus {
+  text-decoration: none !important;
+}
+
 .header.header--light {
   background: rgba(255, 255, 255, 0.97) !important;
   backdrop-filter: blur(12px) !important;
@@ -460,6 +469,13 @@ h1.portfolio-detail-title,
 .portfolio-detail > .container > section > p {
   font-family: 'DM Mono', monospace !important;
   letter-spacing: -0.05em;
+}
+
+.portfolio-detail .portfolio-suggested-title {
+  font-family: 'DM Serif Display', serif !important;
+  letter-spacing: normal !important;
+  font-size: 24px !important;
+  line-height: 1.4 !important;
 }
 
 @media (max-width: 1024px) {

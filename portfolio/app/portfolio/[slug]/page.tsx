@@ -309,7 +309,7 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
                       <div style={{ aspectRatio: '16/10', background: 'var(--bg-off-white)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} />
                     )}
                     <div style={{ padding: '16px' }}>
-                      <div style={{ fontWeight: '600', fontSize: '16px' }}>{p.title}</div>
+                    <div className="portfolio-suggested-title" style={{ fontWeight: '600', fontSize: '16px' }}>  {p.title}</div>
                       {p.description && (
                         <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '4px' }} className="portfolio-suggested-desc">
                           {p.description}
@@ -332,7 +332,7 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
               marginTop: '64px',
             }}
           >
-            <h3 style={{ fontSize: '40px', fontWeight: '700', marginBottom: '5px' }}>
+            <h3 style={{ fontSize: '40px', fontWeight: '700', marginBottom: '10px', lineHeight: '1' }}>
               Ready to create something amazing?
             </h3>
             <p style={{ color: 'var(--text-light)', marginBottom: '24px' }}>
