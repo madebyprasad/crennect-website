@@ -163,7 +163,7 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
 
           {/* Hero Video — always full-width, no title */}
           {heroVideo && heroVideo.content_url && (
-            <section className="portfolio-hero-video">
+            <section className="portfolio-detail-hero-video">
               {isYouTube(heroVideo.content_url) ? (
                 <div style={{ aspectRatio: '16/9', position: 'relative', borderRadius: '8px', overflow: 'hidden', background: '#000' }}>
                   <div
@@ -188,6 +188,8 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
                 <video
                   src={heroVideo.content_url}
                   controls
+                  controlsList="nodownload noplaybackrate noplaybackrate noremoteplayback"
+                  disablePictureInPicture
                   playsInline
                   style={{ width: '100%', aspectRatio: '16/9', display: 'block', borderRadius: '8px', background: '#000' }}
                 />
@@ -285,7 +287,8 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
                               <img src={item.content_url!} alt={item.alt_text || item.title || ''} />
                             )}
                             {item.media_type === 'video' && (
-                              <video src={item.content_url!} controls />
+                              <video src={item.content_url!} controls controlsList="nodownload noplaybackrate noremoteplayback"
+                              disablePictureInPicture />
                             )}
                           </div>
                         </div>
@@ -393,8 +396,12 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
       <Script
         id="page-init"
         strategy="afterInteractive"
+       
         dangerouslySetInnerHTML={{
+          
           __html: [
+
+            
             '(function(){',
             '  try{',
             '    var k="vp_' + portfolio.id + '";',
@@ -411,6 +418,25 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
             '      this.parentNode.replaceChild(f,this);',
             '    });',
             '  });',
+            '  document.addEventListener("contextmenu", function(e){',
+'    var t = e.target;',
+'    if (!t) return;',
+'    if (t.closest(".portfolio-detail-hero-video video") || t.closest(".portfolio-media-item video") || t.closest(".media-modal-box video")) {',
+'      e.preventDefault();',
+'    }',
+'  });',
+
+'  var lastScrollY = 0;',
+'  document.querySelectorAll(\'a[href^="#media-"]\').forEach(function(a){',
+'    a.addEventListener("click", function(){',
+'      lastScrollY = window.scrollY || window.pageYOffset || 0;',
+'    });',
+'  });',
+'  window.addEventListener("hashchange", function(){',
+'    if (!location.hash) {',
+'      requestAnimationFrame(function(){ window.scrollTo(0, lastScrollY); });',
+'    }',
+'  });',
             '})();',
           ].join('\n'),
         }}

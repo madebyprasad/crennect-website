@@ -533,13 +533,13 @@ h2.portfolio-section-title,
 /* ================================
    PORTFOLIO HERO VIDEO
    ================================ */
-.portfolio-hero-video {
+   .portfolio-detail-hero-video {
   width: 100% !important;
   margin-bottom: 48px !important;
 }
 
-.portfolio-hero-video iframe,
-.portfolio-hero-video video {
+.portfolio-detail-hero-video iframe,
+.portfolio-detail-hero-video video {
   width: 100% !important;
   aspect-ratio: 16 / 9 !important;
   display: block !important;
@@ -691,6 +691,14 @@ h2.portfolio-section-title,
 
 .media-modal-close:hover {
   background: rgba(255, 255, 255, 0.3) !important;
+}
+
+.portfolio-detail-hero-video video,
+.portfolio-media-item video,
+.media-modal-box video {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 /* ================================
