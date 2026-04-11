@@ -188,7 +188,7 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
                 <video
                   src={heroVideo.content_url}
                   controls
-                  controlsList="nodownload noplaybackrate noplaybackrate noremoteplayback"
+                  controlsList="nodownload noplaybackrate noremoteplayback"
                   disablePictureInPicture
                   playsInline
                   style={{ width: '100%', aspectRatio: '16/9', display: 'block', borderRadius: '8px', background: '#000' }}
@@ -261,7 +261,10 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
                             <img src={item.content_url!} alt={item.alt_text || item.title || 'Portfolio media'} />
                           )}
                           {item.media_type === 'video' && (
-                            <video src={item.content_url!} muted playsInline preload="metadata" />
+                           <>
+                           <video src={item.content_url!} muted playsInline preload="metadata" />
+                           <span className="video-play-overlay" aria-hidden="true">▶</span>
+                         </>
                           )}
                           <span className="media-item-zoom-hint">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -437,6 +440,22 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
 '      requestAnimationFrame(function(){ window.scrollTo(0, lastScrollY); });',
 '    }',
 '  });',
+
+'  document.querySelectorAll(".video-wrap").forEach(function(w){',
+'    var v = w.querySelector("video");',
+'    var b = w.querySelector(".video-play-overlay");',
+'    if(!v || !b) return;',
+'    b.addEventListener("click", function(e){',
+'      e.preventDefault();',
+'      v.play();',
+'      w.classList.add("playing");',
+'    });',
+'    v.addEventListener("play", function(){ w.classList.add("playing"); });',
+'    v.addEventListener("pause", function(){ w.classList.remove("playing"); });',
+'    v.addEventListener("ended", function(){ w.classList.remove("playing"); });',
+'  });',
+
+
             '})();',
           ].join('\n'),
         }}
