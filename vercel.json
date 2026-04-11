@@ -2,7 +2,8 @@
   "cleanUrls": true,
   "redirects": [
     {
-      "source": "https://crennect.com/:path*",
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "crennect.com" }],
       "destination": "https://www.crennect.com/:path*",
       "permanent": true
     }
