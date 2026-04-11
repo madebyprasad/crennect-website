@@ -63,11 +63,12 @@ export default function Header() {
           </a>
 
           <nav className="nav">
-            <a href="/about.html" style={navLinkStyle}>About us</a>
-            <a href="https://www.behance.net/madebyprasad" style={navLinkStyle}>Our work</a>
+            <a href="/about.html" style={navLinkStyle}>About Us</a>
+            <a href="https://www.behance.net/madebyprasad" style={navLinkStyle}>Case Studies</a>
             <a href="/index.html#genai" style={navLinkStyle}>GenAI</a>
-            <a href="/services.html" style={navLinkStyle}>How We Help</a>
+            <a href="/services.html" style={navLinkStyle}>Services</a>
             <a href="/index.html#resources" style={navLinkStyle}>Resources</a>
+            <a href="/index.html#contact" style={navLinkStyle}>Contact Us</a>
             <a
               href="https://linktr.ee/crennect"
               className="btn-nav"
