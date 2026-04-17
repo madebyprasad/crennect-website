@@ -65,10 +65,10 @@ export default function Header() {
           <nav className="nav">
             <a href="/about.html" style={navLinkStyle}>About Us</a>
             <a href="https://portfolio.crennect.com/" style={navLinkStyle}>Case Studies</a>
-            <a href="/index.html#genai" style={navLinkStyle}>GenAI</a>
+            <a href="genai.html" style={navLinkStyle}>GenAI</a>
             <a href="/services.html" style={navLinkStyle}>Services</a>
-            <a href="/index.html#resources" style={navLinkStyle}>Resources</a>
-            <a href="/index.html#contact" style={navLinkStyle}>Contact Us</a>
+            <a href="#resources" style={navLinkStyle}>Resources</a>
+            <a href="contact.html" style={navLinkStyle}>Contact Us</a>
             <a
               href="https://linktr.ee/crennect"
               className="btn-nav"
@@ -99,9 +99,9 @@ export default function Header() {
           <div className="mobile-menu-links">
             <a href="/about.html" onClick={closeMobileMenu}>About us</a>
             <a href="https://portfolio.crennect.com/" onClick={closeMobileMenu}>Case Studies</a>
-            <a href="/index.html#genai" onClick={closeMobileMenu}>GenAI</a>
-            <a href="/services.html" onClick={closeMobileMenu}>How We Help</a>
-            <a href="/index.html#resources" onClick={closeMobileMenu}>Resources</a>
+            <a href="genai.html" onClick={closeMobileMenu}>GenAI</a>
+            <a href="/services.html" onClick={closeMobileMenu}>Services</a>
+            <a href="#resources" onClick={closeMobileMenu}>Resources</a>
           </div>
 
           <a href="https://linktr.ee/crennect"
