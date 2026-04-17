@@ -104,12 +104,12 @@ export default function PortfolioPage({ searchParams }: PageProps) {
         <div className="portfolio-hero-overlay" />
         <div className="portfolio-hero-content" style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 40px' }}>
           <h1 className="portfolio-hero-title">
-            <span className="font-primary">Our </span>
-            <span className="font-curvy">Work</span>
+            <span className="font-primary">Case </span>
+            <span className="font-curvy">Studies</span>
           </h1>
           <p className="portfolio-hero-subtitle">
-            Explore how we help brands define authority, break categories,
-            and scale with intelligent systems.
+            Explore how we help brands define authority,
+            break categories, and scale.
           </p>
         </div>
       </section>
