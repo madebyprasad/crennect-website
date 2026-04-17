@@ -65,7 +65,7 @@ export default function Header() {
           <nav className="nav">
             <a href="/about.html" style={navLinkStyle}>About Us</a>
             <a href="https://portfolio.crennect.com/" style={navLinkStyle}>Case Studies</a>
-            <a href="genai.html" style={navLinkStyle}>GenAI</a>
+            <a href="https://www.crennect.com/genai" style={navLinkStyle}>GenAI</a>
             <a href="/services.html" style={navLinkStyle}>Services</a>
             <a href="#resources" style={navLinkStyle}>Resources</a>
             <a href="contact.html" style={navLinkStyle}>Contact Us</a>
