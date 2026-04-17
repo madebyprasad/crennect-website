@@ -84,6 +84,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
           .eq('id', params.id);
         if (error && !error.message?.includes('sort_order')) throw error;
       }
+      invalidate();
       return NextResponse.json({ ok: true });
     }
 

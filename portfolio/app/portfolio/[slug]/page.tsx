@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function PortfolioDetailPage({ params }: PageProps) {
   const [portfolio, suggested] = await Promise.all([
     getPortfolioBySlug(params.slug),
-    getSuggestedPortfolios(params.slug, 12),
+    getSuggestedPortfolios(params.slug),
   ]);
 
   if (!portfolio) {
@@ -49,6 +49,7 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
   const media: PortfolioMedia[] = allMedia.filter((m) => m.alt_text !== 'hero-video');
 
   const isYouTube = (url: string) => /youtube\.com|youtu\.be/.test(url);
+  const isYouTubeShort = (url: string) => /youtube\.com\/shorts\//.test(url);
   const getYouTubeId = (url: string) => {
     const m = url.match(/(?:v=|youtu\.be\/|shorts\/)([^&?/]+)/);
     return m?.[1];
@@ -57,8 +58,7 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
   const isInstagram = (url: string) => /instagram\.com\/(reel|p|tv)\//.test(url);
   const getInstagramEmbedUrl = (url: string) => {
     const m = url.match(/instagram\.com\/(reel|p|tv)\/([^/?#]+)/);
-    // Use plain /embed/ (not /captioned/) — minimal chrome (no caption block)
-    return m ? `https://www.instagram.com/${m[1]}/${m[2]}/embed/?cr=1&v=14` : null;
+    return m ? `https://www.instagram.com/${m[1]}/${m[2]}/embed/` : null;
   };
 
   const layoutClass = `portfolio-media-grid portfolio-media-grid--${portfolio.gallery_layout || 'stack'}`;
@@ -173,6 +173,19 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
           {heroVideo && heroVideo.content_url && (
             <section className="portfolio-detail-hero-video">
               {isYouTube(heroVideo.content_url) ? (
+                isYouTubeShort(heroVideo.content_url) ? (
+                  <div className="yt-short-clip" style={{ maxWidth: '360px', margin: '0 auto' }}>
+                    <div className="yt-facade" data-ytid={getYouTubeId(heroVideo.content_url)} style={{ position: 'absolute', inset: 0, cursor: 'pointer' }}>
+                      <img src={`https://img.youtube.com/vi/${getYouTubeId(heroVideo.content_url)}/hqdefault.jpg`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                      <span className="yt-play-btn">
+                        <svg viewBox="0 0 68 48" width="68" height="48">
+                          <path d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55c-2.93.78-4.63 3.26-5.42 6.19C.06 13.05 0 24 0 24s.06 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C67.94 34.95 68 24 68 24s-.06-10.95-1.48-16.26z" fill="#ff0000"/>
+                          <path d="M45 24 27 14v20" fill="#fff"/>
+                        </svg>
+                      </span>
+                    </div>
+                  </div>
+                ) : (
                 <div style={{ aspectRatio: '16/9', position: 'relative', borderRadius: '8px', overflow: 'hidden', background: '#000' }}>
                   <div
                     className="yt-facade"
@@ -192,6 +205,7 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
                     </span>
                   </div>
                 </div>
+                )
               ) : (
                 <video
                   src={heroVideo.content_url}
@@ -216,22 +230,35 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
                   const modalId = `media-${item.id}`;
                   const isClickable = (item.media_type === 'image' || item.media_type === 'video') && item.content_url;
 
-                  if (item.media_type === 'link' && item.content_url) {
+                  // Catch YouTube/Instagram URLs saved under wrong media_type (e.g. 'embed', 'video')
+                  const urlToCheck = item.content_url || '';
+                  const forcedAsLink = item.media_type !== 'link' && urlToCheck &&
+                    (isYouTube(urlToCheck) || isInstagram(urlToCheck));
+
+                  if ((item.media_type === 'link' || forcedAsLink) && item.content_url) {
                     // YouTube (includes Shorts)
                     const ytId = isYouTube(item.content_url) ? getYouTubeId(item.content_url) : null;
                     if (ytId) {
+                      const isShort = isYouTubeShort(item.content_url);
+                      if (isShort) {
+                        return (
+                          <div key={item.id} className="yt-short-clip">
+                            <div className="yt-facade" data-ytid={ytId} style={{ position: 'absolute', inset: 0, cursor: 'pointer' }}>
+                              <img src={`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                              <span className="yt-play-btn">
+                                <svg viewBox="0 0 68 48" width="68" height="48">
+                                  <path d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55c-2.93.78-4.63 3.26-5.42 6.19C.06 13.05 0 24 0 24s.06 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C67.94 34.95 68 24 68 24s-.06-10.95-1.48-16.26z" fill="#ff0000"/>
+                                  <path d="M45 24 27 14v20" fill="#fff"/>
+                                </svg>
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      }
                       return (
                         <div key={item.id} style={{ aspectRatio: '16/9', position: 'relative', borderRadius: '8px', overflow: 'hidden', background: '#000' }}>
-                          <div
-                            className="yt-facade"
-                            data-ytid={ytId}
-                            style={{ position: 'absolute', inset: 0, cursor: 'pointer' }}
-                          >
-                            <img
-                              src={`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`}
-                              alt=""
-                              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                            />
+                          <div className="yt-facade" data-ytid={ytId} style={{ position: 'absolute', inset: 0, cursor: 'pointer' }}>
+                            <img src={`https://img.youtube.com/vi/${ytId}/hqdefault.jpg`} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                             <span className="yt-play-btn">
                               <svg viewBox="0 0 68 48" width="68" height="48">
                                 <path d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55c-2.93.78-4.63 3.26-5.42 6.19C.06 13.05 0 24 0 24s.06 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C67.94 34.95 68 24 68 24s-.06-10.95-1.48-16.26z" fill="#ff0000"/>
@@ -243,7 +270,7 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
                       );
                     }
 
-                    // Instagram Reel — CSS-clipped to pure 9:16 video, no header/footer chrome
+                    // Instagram Reel — clip header + footer, show video only
                     const igEmbedUrl = isInstagram(item.content_url) ? getInstagramEmbedUrl(item.content_url) : null;
                     if (igEmbedUrl) {
                       return (
@@ -436,7 +463,7 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
       </article>
 
       <Script
-        id="page-init"
+        id={"page-" + portfolio.id}
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: [
@@ -458,19 +485,24 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
             '    });',
             '  }',
 
-            // ── YouTube facade → iframe (pause others first) ────────────
-            '  document.querySelectorAll(".yt-facade").forEach(function(el){',
-            '    el.addEventListener("click",function(){',
+            // ── YouTube facade → iframe via event delegation ────────────
+            // Delegation means one listener always works regardless of navigation timing
+            '  if(!window.__ytDelegated){',
+            '    window.__ytDelegated=true;',
+            '    document.addEventListener("click",function(e){',
+            '      var el=e.target.closest(".yt-facade");',
+            '      if(!el||el.dataset.loading)return;',
+            '      el.dataset.loading="1";',
             '      pauseAllExcept(null);',
-            '      var id=this.getAttribute("data-ytid");',
+            '      var id=el.getAttribute("data-ytid");',
             '      var f=document.createElement("iframe");',
             '      f.src="https://www.youtube.com/embed/"+id+"?rel=0&modestbranding=1&autoplay=1&enablejsapi=1";',
             '      f.setAttribute("allow","autoplay;encrypted-media;fullscreen");',
             '      f.setAttribute("allowfullscreen","");',
             '      f.style.cssText="position:absolute;inset:0;width:100%;height:100%;border:none;display:block;";',
-            '      this.parentNode.replaceChild(f,this);',
+            '      el.parentNode.replaceChild(f,el);',
             '    });',
-            '  });',
+            '  }',
 
             // ── Native video play → pause all others ───────────────────
             '  document.querySelectorAll("video").forEach(function(v){',
@@ -492,7 +524,7 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
             '    if(!location.hash){requestAnimationFrame(function(){window.scrollTo(0,lastScrollY);});}',
             '  });',
 
-            // ── Track this portfolio as viewed + filter suggestions ─────
+            // ── Track this portfolio as viewed + reorder suggestions (unseen first) ─
             '  try{',
             '    var seenKey="crennect_seen";',
             '    var seen=JSON.parse(localStorage.getItem(seenKey)||"[]");',
@@ -502,13 +534,12 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
             '    var grid=document.getElementById("suggested-grid");',
             '    if(grid){',
             '      var cards=Array.from(grid.children);',
-            '      var shown=0;',
+            '      var unseen=[],seenCards=[];',
             '      cards.forEach(function(c){',
             '        var pid=c.getAttribute("data-pid");',
-            '        if(shown<4&&seen.indexOf(pid)===-1){shown++;}',
-            '        else{c.style.display="none";}',
+            '        if(seen.indexOf(pid)===-1){unseen.push(c);}else{seenCards.push(c);}',
             '      });',
-            '      if(shown===0){var cnt=0;cards.forEach(function(c){c.style.display=cnt<4?"":"none";if(cnt<4)cnt++;});}',
+            '      unseen.concat(seenCards).forEach(function(c){grid.appendChild(c);});',
             '    }',
             '  }catch(e){}',
 

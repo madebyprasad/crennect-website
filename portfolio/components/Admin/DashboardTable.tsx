@@ -26,6 +26,8 @@ export default function DashboardTable({ portfolios: rawPortfolios }: DashboardT
   const [trashTarget, setTrashTarget] = useState<{ id: string; title: string } | null>(null);
   const [trashing, setTrashing] = useState(false);
   const [bulkTrashPending, setBulkTrashPending] = useState(false);
+  const [pendingOrder, setPendingOrder] = useState(false);
+  const [savingOrder, setSavingOrder] = useState(false);
 
   // Sync when server re-renders with new data (after router.refresh)
   useEffect(() => {
@@ -39,7 +41,7 @@ export default function DashboardTable({ portfolios: rawPortfolios }: DashboardT
       body: JSON.stringify(body),
     });
 
-  // ── Sort: instant optimistic swap, background persist ───────────────
+  // ── Sort: local-only swap; persist via Lock button ──────────────────
   const moveUp = (idx: number) => {
     if (idx === 0) return;
     setLocal(prev => {
@@ -50,10 +52,9 @@ export default function DashboardTable({ portfolios: rawPortfolios }: DashboardT
       const oC = curr.sort_order ?? idx * 10;
       arr[idx - 1] = { ...curr, sort_order: oA };
       arr[idx] = { ...above, sort_order: oC };
-      patch(curr.id, { sort_order: oA }).catch(() => {});
-      patch(above.id, { sort_order: oC }).catch(() => {});
       return arr;
     });
+    setPendingOrder(true);
   };
 
   const moveDown = (idx: number) => {
@@ -66,10 +67,27 @@ export default function DashboardTable({ portfolios: rawPortfolios }: DashboardT
       const oB = below.sort_order ?? (idx + 1) * 10;
       arr[idx] = { ...below, sort_order: oC };
       arr[idx + 1] = { ...curr, sort_order: oB };
-      patch(curr.id, { sort_order: oB }).catch(() => {});
-      patch(below.id, { sort_order: oC }).catch(() => {});
       return arr;
     });
+    setPendingOrder(true);
+  };
+
+  const saveOrder = async () => {
+    setSavingOrder(true);
+    try {
+      const res = await fetch('/api/admin/save-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order: local.map(p => p.id) }),
+      });
+      if (!res.ok) throw new Error('Save failed');
+      setPendingOrder(false);
+      router.refresh();
+    } catch {
+      alert('Failed to save order. Please try again.');
+    } finally {
+      setSavingOrder(false);
+    }
   };
 
   // ── Visibility toggle ────────────────────────────────────────────────
@@ -174,6 +192,12 @@ export default function DashboardTable({ portfolios: rawPortfolios }: DashboardT
                       style={{ padding: '3px 8px', background: 'var(--bg-off-white)', border: '1px solid var(--border)', borderRadius: '4px', fontSize: '11px', cursor: idx === 0 ? 'not-allowed' : 'pointer', opacity: idx === 0 ? 0.3 : 1, lineHeight: 1 }}>▲</button>
                     <button type="button" onClick={() => moveDown(idx)} disabled={idx === local.length - 1} title="Move down"
                       style={{ padding: '3px 8px', background: 'var(--bg-off-white)', border: '1px solid var(--border)', borderRadius: '4px', fontSize: '11px', cursor: idx === local.length - 1 ? 'not-allowed' : 'pointer', opacity: idx === local.length - 1 ? 0.3 : 1, lineHeight: 1 }}>▼</button>
+                    {pendingOrder && (
+                      <button type="button" onClick={saveOrder} disabled={savingOrder} title="Lock & publish order"
+                        style={{ padding: '3px 8px', background: '#fef3c7', color: '#92400e', border: '1px solid #fcd34d', borderRadius: '4px', fontSize: '11px', cursor: savingOrder ? 'not-allowed' : 'pointer', lineHeight: 1 }}>
+                        {savingOrder ? '…' : '🔒'}
+                      </button>
+                    )}
                   </div>
                 </td>
                 <td>

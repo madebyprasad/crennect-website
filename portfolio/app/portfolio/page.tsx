@@ -44,11 +44,7 @@ async function PortfolioContent({ searchParams }: PageProps) {
     getAllTags(),
   ]);
 
-  const portfolios = [...rawPortfolios].sort((a: any, b: any) => {
-    const aO = a.sort_order ?? Number.MAX_SAFE_INTEGER;
-    const bO = b.sort_order ?? Number.MAX_SAFE_INTEGER;
-    return aO - bO;
-  });
+  const portfolios = rawPortfolios;
 
   return (
     <>

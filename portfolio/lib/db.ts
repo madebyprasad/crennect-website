@@ -169,7 +169,9 @@ export async function getPublishedPortfolios(params?: {
   }
   if (error) throw error;
 
-  return { portfolios: data || [], total: count || 0, page, totalPages: Math.ceil((count || 0) / limit) };
+  const order = await getPortfolioOrder();
+  const portfolios = order ? applyStoredOrder(data || [], order) : (data || []);
+  return { portfolios, total: count || 0, page, totalPages: Math.ceil((count || 0) / limit) };
 }
 
 export async function getPortfolioBySlug(slug: string): Promise<Portfolio | null> {
@@ -214,30 +216,60 @@ export async function incrementPortfolioView(id: string): Promise<void> {
   }
 }
 
+// ── Storage-based portfolio ordering ────────────────────────────────
+const ORDER_BUCKET = 'crennect-config';
+const ORDER_FILE = 'portfolio-order.json';
+
+export async function savePortfolioOrder(ids: string[]): Promise<void> {
+  if (!supabaseAdmin) return;
+  await supabaseAdmin.storage.createBucket(ORDER_BUCKET, { public: false }).catch(() => {});
+  const content = JSON.stringify({ order: ids });
+  const blob = new Blob([content], { type: 'application/json' });
+  await supabaseAdmin.storage.from(ORDER_BUCKET).upload(ORDER_FILE, blob, { upsert: true });
+}
+
+export async function getPortfolioOrder(): Promise<string[] | null> {
+  if (!supabaseAdmin) return null;
+  try {
+    const { data, error } = await supabaseAdmin.storage.from(ORDER_BUCKET).download(ORDER_FILE);
+    if (error || !data) return null;
+    const text = await data.text();
+    const parsed = JSON.parse(text);
+    return Array.isArray(parsed.order) ? parsed.order : null;
+  } catch {
+    return null;
+  }
+}
+
+function applyStoredOrder<T extends { id: string }>(items: T[], order: string[]): T[] {
+  const orderMap = new Map(order.map((id, idx) => [id, idx]));
+  return [...items].sort((a, b) => {
+    const aIdx = orderMap.get(a.id) ?? Number.MAX_SAFE_INTEGER;
+    const bIdx = orderMap.get(b.id) ?? Number.MAX_SAFE_INTEGER;
+    return aIdx - bIdx;
+  });
+}
+// ────────────────────────────────────────────────────────────────────
+
 export async function getSuggestedPortfolios(
-  excludeSlug: string,
-  limit = 2
+  excludeSlug: string
 ): Promise<Portfolio[]> {
   if (!supabase) {
-    return DEMO_PORTFOLIOS
-      .filter((p) => p.status === 'published' && p.slug !== excludeSlug)
-      .slice(0, limit);
+    return DEMO_PORTFOLIOS.filter(
+      (p) => p.status === 'published' && p.slug !== excludeSlug
+    );
   }
 
   const { data, error } = await supabase
     .from('portfolios')
-    .select(`
-      *,
-      portfolio_tags(tag_id),
-      tags:portfolio_tags(tags(*))
-    `)
+    .select(`*, portfolio_tags(tag_id), tags:portfolio_tags(tags(*))`)
     .eq('status', 'published')
     .neq('slug', excludeSlug)
-    .order('published_at', { ascending: false })
-    .limit(limit);
+    .order('published_at', { ascending: false });
 
   if (error) return [];
-  return data || [];
+  const order = await getPortfolioOrder();
+  return order ? applyStoredOrder(data || [], order) : (data || []);
 }
 
 export async function getAllPortfolios(): Promise<Portfolio[]> {
@@ -259,10 +291,12 @@ export async function getAllPortfolios(): Promise<Portfolio[]> {
       .not('status', 'eq', 'trashed')
       .order('created_at', { ascending: false });
     if (r.error) throw r.error;
-    return r.data || [];
+    const order = await getPortfolioOrder();
+    return order ? applyStoredOrder(r.data || [], order) : (r.data || []);
   }
   if (error) throw error;
-  return data || [];
+  const order = await getPortfolioOrder();
+  return order ? applyStoredOrder(data || [], order) : (data || []);
 }
 
 export async function getTrashedPortfolios(): Promise<Portfolio[]> {

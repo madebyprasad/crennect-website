@@ -3,7 +3,8 @@
     "allow": [
       "Bash(ls:*)",
       "Bash(node *)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(curl -s \"https://www.instagram.com/reel/test/embed/\" -H \"User-Agent: Mozilla/5.0\")"
     ]
   }
 }

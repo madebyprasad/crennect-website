@@ -1181,27 +1181,41 @@ a.portfolio-page-btn.active,
 }
 
 /* ================================
-   INSTAGRAM REEL EMBED — CSS clip technique
-   Container = exact 9:16 (pure video), iframe shifted up to hide header/footer
-   360 × 640 at standard width; header ≈ 62px, footer ≈ 60px
+   INSTAGRAM REEL EMBED — video-only clip
+   Container = strict 9:16. Iframe offset -100px (clears header ≈82-100px).
+   Horizontal bleed 6% each side fills Instagram's internal side padding.
+   Footer/actions clipped by overflow:hidden on container bottom.
    ================================ */
 .ig-reel-clip {
-  width: 360px !important;
-  height: 640px !important;        /* 360 × 16/9 = 640 — pure video area */
+  width: min(360px, 100%) !important;
+  aspect-ratio: 9/16 !important;
   overflow: hidden !important;
-  border-radius: 16px !important;
+  border-radius: 12px !important;
   position: relative !important;
   margin: 0 auto !important;
-  background: #0a0a0a !important;  /* dark while loading — no flash of white */
+  background: #000 !important;
   box-shadow: 0 4px 24px rgba(0,0,0,0.18) !important;
 }
 
 .ig-reel-iframe {
   position: absolute !important;
-  top: -62px !important;           /* push up to hide ≈62 px Instagram header */
+  top: -56px !important;
   left: 0 !important;
-  width: 360px !important;
-  height: 762px !important;        /* 640 + 62 header + 60 footer = 762 */
+  width: 100% !important;
+  height: calc(100% + 136px) !important;
   border: none !important;
   background: transparent !important;
+}
+
+/* ================================
+   YOUTUBE SHORTS — same size as Instagram reel
+   ================================ */
+.yt-short-clip {
+  width: min(360px, 100%);
+  aspect-ratio: 9/16;
+  overflow: hidden;
+  border-radius: 8px;
+  position: relative;
+  margin: 0 auto;
+  background: #000;
 }
