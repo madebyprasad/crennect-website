@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function PortfolioDetailPage({ params }: PageProps) {
   const [portfolio, suggested] = await Promise.all([
     getPortfolioBySlug(params.slug),
-    getSuggestedPortfolios(params.slug, 4),
+    getSuggestedPortfolios(params.slug, 12),
   ]);
 
   if (!portfolio) {
@@ -57,7 +57,8 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
   const isInstagram = (url: string) => /instagram\.com\/(reel|p|tv)\//.test(url);
   const getInstagramEmbedUrl = (url: string) => {
     const m = url.match(/instagram\.com\/(reel|p|tv)\/([^/?#]+)/);
-    return m ? `https://www.instagram.com/${m[1]}/${m[2]}/embed/` : null;
+    // Use plain /embed/ (not /captioned/) — minimal chrome (no caption block)
+    return m ? `https://www.instagram.com/${m[1]}/${m[2]}/embed/?cr=1&v=14` : null;
   };
 
   const layoutClass = `portfolio-media-grid portfolio-media-grid--${portfolio.gallery_layout || 'stack'}`;
@@ -242,18 +243,18 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
                       );
                     }
 
-                    // Instagram Reel / Post
+                    // Instagram Reel — CSS-clipped to pure 9:16 video, no header/footer chrome
                     const igEmbedUrl = isInstagram(item.content_url) ? getInstagramEmbedUrl(item.content_url) : null;
                     if (igEmbedUrl) {
                       return (
-                        <div key={item.id} className="ig-embed-wrap">
+                        <div key={item.id} className="ig-reel-clip">
                           <iframe
                             src={igEmbedUrl}
-                            className="ig-embed-frame"
+                            className="ig-reel-iframe"
                             allowFullScreen
                             loading="lazy"
                             scrolling="no"
-                            title={item.title || 'Instagram'}
+                            title={item.title || 'Instagram Reel'}
                           />
                         </div>
                       );
@@ -491,13 +492,24 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
             '    if(!location.hash){requestAnimationFrame(function(){window.scrollTo(0,lastScrollY);});}',
             '  });',
 
-            // ── Track this portfolio as viewed in localStorage ─────────
+            // ── Track this portfolio as viewed + filter suggestions ─────
             '  try{',
             '    var seenKey="crennect_seen";',
             '    var seen=JSON.parse(localStorage.getItem(seenKey)||"[]");',
             '    var cur="' + portfolio.id + '";',
             '    if(seen.indexOf(cur)===-1)seen.push(cur);',
             '    localStorage.setItem(seenKey,JSON.stringify(seen.slice(-200)));',
+            '    var grid=document.getElementById("suggested-grid");',
+            '    if(grid){',
+            '      var cards=Array.from(grid.children);',
+            '      var shown=0;',
+            '      cards.forEach(function(c){',
+            '        var pid=c.getAttribute("data-pid");',
+            '        if(shown<4&&seen.indexOf(pid)===-1){shown++;}',
+            '        else{c.style.display="none";}',
+            '      });',
+            '      if(shown===0){var cnt=0;cards.forEach(function(c){c.style.display=cnt<4?"":"none";if(cnt<4)cnt++;});}',
+            '    }',
             '  }catch(e){}',
 
             '})();',
