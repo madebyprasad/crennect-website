@@ -59,7 +59,7 @@ export default function Footer() {
                 <a href="/index.html">Home</a>
                 <a href="/contact.html">Contact</a>
                 <a href="/services.html">Services</a>
-                <a href="https://www.behance.net/madebyprasad">Case Studies</a>
+                <a href="https://portfolio.crennect.com/portfolio">Case Studies</a>
                 <a href="/about.html">About Us</a>
                 <a href="/index.html#blogs">Blogs</a>
               </nav>
