@@ -12,6 +12,7 @@ export default function AdminSidebar() {
     { href: '/admin', label: 'Dashboard', icon: '📊' },
     { href: '/admin/new', label: 'New Portfolio', icon: '➕' },
     { href: '/admin/tags', label: 'Manage Tags', icon: '🏷️' },
+    { href: '/admin/trash', label: 'Trash', icon: '🗑️' },
   ];
 
   return (

@@ -5,8 +5,7 @@ import Script from 'next/script';
 import { getPortfolioBySlug, getSuggestedPortfolios } from '@/lib/db';
 import type { PortfolioMedia } from '@/lib/types';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 300;
 
 interface PageProps {
   params: { slug: string };
@@ -37,7 +36,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function PortfolioDetailPage({ params }: PageProps) {
   const [portfolio, suggested] = await Promise.all([
     getPortfolioBySlug(params.slug),
-    getSuggestedPortfolios(params.slug, 2),
+    getSuggestedPortfolios(params.slug, 4),
   ]);
 
   if (!portfolio) {
@@ -46,14 +45,19 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
 
   const tags = portfolio.tags || [];
   const allMedia: PortfolioMedia[] = portfolio.media || (portfolio as any).portfolio_media || [];
-  // Separate hero video (always full-width, before gallery) from gallery media
   const heroVideo = allMedia.find((m) => m.alt_text === 'hero-video') || null;
   const media: PortfolioMedia[] = allMedia.filter((m) => m.alt_text !== 'hero-video');
 
   const isYouTube = (url: string) => /youtube\.com|youtu\.be/.test(url);
   const getYouTubeId = (url: string) => {
-    const m = url.match(/(?:v=|youtu\.be\/)([^&?/]+)/);
+    const m = url.match(/(?:v=|youtu\.be\/|shorts\/)([^&?/]+)/);
     return m?.[1];
+  };
+
+  const isInstagram = (url: string) => /instagram\.com\/(reel|p|tv)\//.test(url);
+  const getInstagramEmbedUrl = (url: string) => {
+    const m = url.match(/instagram\.com\/(reel|p|tv)\/([^/?#]+)/);
+    return m ? `https://www.instagram.com/${m[1]}/${m[2]}/embed/` : null;
   };
 
   const layoutClass = `portfolio-media-grid portfolio-media-grid--${portfolio.gallery_layout || 'stack'}`;
@@ -65,6 +69,9 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
       month: 'long',
     });
   };
+
+  // Image-only list for lightbox prev/next navigation
+  const imageMedia = media.filter((m) => m.media_type === 'image' && m.content_url);
 
   return (
     <>
@@ -161,7 +168,7 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
             </div>
           )}
 
-          {/* Hero Video — always full-width, no title */}
+          {/* Hero Video */}
           {heroVideo && heroVideo.content_url && (
             <section className="portfolio-detail-hero-video">
               {isYouTube(heroVideo.content_url) ? (
@@ -209,6 +216,7 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
                   const isClickable = (item.media_type === 'image' || item.media_type === 'video') && item.content_url;
 
                   if (item.media_type === 'link' && item.content_url) {
+                    // YouTube (includes Shorts)
                     const ytId = isYouTube(item.content_url) ? getYouTubeId(item.content_url) : null;
                     if (ytId) {
                       return (
@@ -233,6 +241,25 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
                         </div>
                       );
                     }
+
+                    // Instagram Reel / Post
+                    const igEmbedUrl = isInstagram(item.content_url) ? getInstagramEmbedUrl(item.content_url) : null;
+                    if (igEmbedUrl) {
+                      return (
+                        <div key={item.id} className="ig-embed-wrap">
+                          <iframe
+                            src={igEmbedUrl}
+                            className="ig-embed-frame"
+                            allowFullScreen
+                            loading="lazy"
+                            scrolling="no"
+                            title={item.title || 'Instagram'}
+                          />
+                        </div>
+                      );
+                    }
+
+                    // Plain link card
                     let domain = '';
                     try { domain = new URL(item.content_url).hostname.replace('www.', ''); } catch {}
                     return (
@@ -261,10 +288,10 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
                             <img src={item.content_url!} alt={item.alt_text || item.title || 'Portfolio media'} />
                           )}
                           {item.media_type === 'video' && (
-                           <>
-                           <video src={item.content_url!} muted playsInline preload="metadata" />
-                           <span className="video-play-overlay" aria-hidden="true">▶</span>
-                         </>
+                            <>
+                              <video src={item.content_url!} muted playsInline preload="metadata" />
+                              <span className="video-play-overlay" aria-hidden="true">▶</span>
+                            </>
                           )}
                           <span className="media-item-zoom-hint">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -280,22 +307,33 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
                         </div>
                       )}
 
-                      {/* CSS :target modal — closes on overlay click via href="#" */}
-                      {isClickable && (
-                        <div id={modalId} className="media-modal-target">
-                          <a href="#" className="media-modal-backdrop" aria-label="Close" />
-                          <div className="media-modal-box">
-                            <a href="#" className="media-modal-close" aria-label="Close">✕</a>
-                            {item.media_type === 'image' && (
-                              <img src={item.content_url!} alt={item.alt_text || item.title || ''} />
+                      {/* CSS :target modal */}
+                      {isClickable && (() => {
+                        const imgIdx = item.media_type === 'image' ? imageMedia.findIndex((m) => m.id === item.id) : -1;
+                        const prevImg = imgIdx > 0 ? imageMedia[imgIdx - 1] : null;
+                        const nextImg = imgIdx >= 0 && imgIdx < imageMedia.length - 1 ? imageMedia[imgIdx + 1] : null;
+                        return (
+                          <div id={modalId} className="media-modal-target">
+                            <a href="#" className="media-modal-backdrop" aria-label="Close" />
+                            {prevImg && (
+                              <a href={`#media-${prevImg.id}`} className="media-modal-arrow media-modal-prev" aria-label="Previous image">&#8249;</a>
                             )}
-                            {item.media_type === 'video' && (
-                              <video src={item.content_url!} controls controlsList="nodownload noplaybackrate noremoteplayback"
-                              disablePictureInPicture />
+                            {nextImg && (
+                              <a href={`#media-${nextImg.id}`} className="media-modal-arrow media-modal-next" aria-label="Next image">&#8250;</a>
                             )}
+                            <div className="media-modal-box">
+                              <a href="#" className="media-modal-close" aria-label="Close">✕</a>
+                              {item.media_type === 'image' && (
+                                <img src={item.content_url!} alt={item.alt_text || item.title || ''} />
+                              )}
+                              {item.media_type === 'video' && (
+                                <video src={item.content_url!} controls controlsList="nodownload noplaybackrate noremoteplayback"
+                                disablePictureInPicture />
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        );
+                      })()}
                     </div>
                   );
                 })}
@@ -303,18 +341,7 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
             </section>
           )}
 
-          {/* Closing Content */}
-          {portfolio.closing_content && (
-            <section style={{ marginBottom: '64px' }}>
-              <h2 className="portfolio-section-title">Results & Impact</h2>
-              <div
-                className="portfolio-section-content"
-                dangerouslySetInnerHTML={{ __html: formatContent(portfolio.closing_content) }}
-              />
-            </section>
-          )}
-
-          {/* Custom Text Sections */}
+          {/* Custom Text Sections — rendered before Results & Impact */}
           {media.filter((m: any) => m.media_type === 'text').map((item: any) =>
             item.content_text ? (
               <section key={item.id} style={{ marginBottom: '48px' }}>
@@ -327,17 +354,29 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
             ) : null
           )}
 
-          {/* Suggested Portfolios */}
+          {/* Closing Content — always last */}
+          {portfolio.closing_content && (
+            <section style={{ marginBottom: '64px' }}>
+              <h2 className="portfolio-section-title">Results &amp; Impact</h2>
+              <div
+                className="portfolio-section-content"
+                dangerouslySetInnerHTML={{ __html: formatContent(portfolio.closing_content) }}
+              />
+            </section>
+          )}
+
+          {/* Suggested Portfolios — up to 8 candidates, JS filters to 4 unseen */}
           {suggested.length > 0 && (
             <section style={{ marginBottom: '64px' }}>
               <h2 className="portfolio-section-title" style={{ marginBottom: '24px' }}>
                 More Work
               </h2>
-              <div className="portfolio-suggested-grid">
+              <div className="portfolio-suggested-grid" id="suggested-grid">
                 {suggested.map((p) => (
                   <Link
                     key={p.id}
                     href={`/portfolio/${p.slug}`}
+                    data-pid={p.id}
                     style={{
                       display: 'block',
                       borderRadius: 'var(--radius-md)',
@@ -359,7 +398,7 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
                       <div style={{ aspectRatio: '16/10', background: 'var(--bg-off-white)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} />
                     )}
                     <div style={{ padding: '16px' }}>
-                    <div className="portfolio-suggested-title" style={{ fontWeight: '600', fontSize: '16px' }}>  {p.title}</div>
+                      <div className="portfolio-suggested-title" style={{ fontWeight: '600', fontSize: '16px' }}>{p.title}</div>
                       {p.description && (
                         <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '4px' }} className="portfolio-suggested-desc">
                           {p.description}
@@ -395,66 +434,71 @@ export default async function PortfolioDetailPage({ params }: PageProps) {
         </div>
       </article>
 
-      {/* View tracking (unique per browser) + YouTube facade init */}
       <Script
         id="page-init"
         strategy="afterInteractive"
-       
         dangerouslySetInnerHTML={{
-          
           __html: [
-
-            
             '(function(){',
+
+            // ── View tracking ───────────────────────────────────────────
             '  try{',
-            '    var k="vp_' + portfolio.id + '";',
-            '    if(!localStorage.getItem(k)){localStorage.setItem(k,"1");fetch("/api/portfolios/' + portfolio.id + '",{method:"PATCH"});}',
+            '    var vk="vp_' + portfolio.id + '";',
+            '    if(!localStorage.getItem(vk)){localStorage.setItem(vk,"1");fetch("/api/portfolios/' + portfolio.id + '",{method:"PATCH"});}',
             '  }catch(e){}',
+
+            // ── One video at a time helper ──────────────────────────────
+            '  function pauseAllExcept(except){',
+            '    document.querySelectorAll("video").forEach(function(v){',
+            '      if(v!==except){try{v.pause();}catch(e){}}',
+            '    });',
+            '    document.querySelectorAll(\'iframe[src*="youtube.com/embed"]\').forEach(function(f){',
+            '      if(f!==except){try{f.contentWindow.postMessage(\'{"event":"command","func":"pauseVideo","args":""}\',\'*\');}catch(e){}}',
+            '    });',
+            '  }',
+
+            // ── YouTube facade → iframe (pause others first) ────────────
             '  document.querySelectorAll(".yt-facade").forEach(function(el){',
             '    el.addEventListener("click",function(){',
+            '      pauseAllExcept(null);',
             '      var id=this.getAttribute("data-ytid");',
             '      var f=document.createElement("iframe");',
-            '      f.src="https://www.youtube.com/embed/"+id+"?rel=0&modestbranding=1&autoplay=1";',
+            '      f.src="https://www.youtube.com/embed/"+id+"?rel=0&modestbranding=1&autoplay=1&enablejsapi=1";',
             '      f.setAttribute("allow","autoplay;encrypted-media;fullscreen");',
             '      f.setAttribute("allowfullscreen","");',
             '      f.style.cssText="position:absolute;inset:0;width:100%;height:100%;border:none;display:block;";',
             '      this.parentNode.replaceChild(f,this);',
             '    });',
             '  });',
-            '  document.addEventListener("contextmenu", function(e){',
-'    var t = e.target;',
-'    if (!t) return;',
-'    if (t.closest(".portfolio-detail-hero-video video") || t.closest(".portfolio-media-item video") || t.closest(".media-modal-box video")) {',
-'      e.preventDefault();',
-'    }',
-'  });',
 
-'  var lastScrollY = 0;',
-'  document.querySelectorAll(\'a[href^="#media-"]\').forEach(function(a){',
-'    a.addEventListener("click", function(){',
-'      lastScrollY = window.scrollY || window.pageYOffset || 0;',
-'    });',
-'  });',
-'  window.addEventListener("hashchange", function(){',
-'    if (!location.hash) {',
-'      requestAnimationFrame(function(){ window.scrollTo(0, lastScrollY); });',
-'    }',
-'  });',
+            // ── Native video play → pause all others ───────────────────
+            '  document.querySelectorAll("video").forEach(function(v){',
+            '    v.addEventListener("play",function(){ pauseAllExcept(v); });',
+            '  });',
 
-'  document.querySelectorAll(".video-wrap").forEach(function(w){',
-'    var v = w.querySelector("video");',
-'    var b = w.querySelector(".video-play-overlay");',
-'    if(!v || !b) return;',
-'    b.addEventListener("click", function(e){',
-'      e.preventDefault();',
-'      v.play();',
-'      w.classList.add("playing");',
-'    });',
-'    v.addEventListener("play", function(){ w.classList.add("playing"); });',
-'    v.addEventListener("pause", function(){ w.classList.remove("playing"); });',
-'    v.addEventListener("ended", function(){ w.classList.remove("playing"); });',
-'  });',
+            // ── Context menu block ──────────────────────────────────────
+            '  document.addEventListener("contextmenu",function(e){',
+            '    var t=e.target;if(!t)return;',
+            '    if(t.closest(".portfolio-detail-hero-video video")||t.closest(".portfolio-media-item video")||t.closest(".media-modal-box video")){e.preventDefault();}',
+            '  });',
 
+            // ── Modal scroll restoration ────────────────────────────────
+            '  var lastScrollY=0;',
+            '  document.querySelectorAll(\'a[href^="#media-"]\').forEach(function(a){',
+            '    a.addEventListener("click",function(){ lastScrollY=window.scrollY||window.pageYOffset||0; });',
+            '  });',
+            '  window.addEventListener("hashchange",function(){',
+            '    if(!location.hash){requestAnimationFrame(function(){window.scrollTo(0,lastScrollY);});}',
+            '  });',
+
+            // ── Track this portfolio as viewed in localStorage ─────────
+            '  try{',
+            '    var seenKey="crennect_seen";',
+            '    var seen=JSON.parse(localStorage.getItem(seenKey)||"[]");',
+            '    var cur="' + portfolio.id + '";',
+            '    if(seen.indexOf(cur)===-1)seen.push(cur);',
+            '    localStorage.setItem(seenKey,JSON.stringify(seen.slice(-200)));',
+            '  }catch(e){}',
 
             '})();',
           ].join('\n'),

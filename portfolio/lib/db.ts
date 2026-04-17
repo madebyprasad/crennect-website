@@ -110,7 +110,6 @@ export async function getPublishedPortfolios(params?: {
 
   if (!supabase) {
     let filtered = DEMO_PORTFOLIOS.filter(p => p.status === 'published');
-    
     if (search) {
       const s = search.toLowerCase();
       filtered = filtered.filter(p =>
@@ -121,32 +120,18 @@ export async function getPublishedPortfolios(params?: {
         p.closing_content?.toLowerCase().includes(s)
       );
     }
-    
     if (tags && tags.length > 0) {
-      filtered = filtered.filter(p => 
-        p.tags?.some(t => tags.includes(t.slug))
-      );
+      filtered = filtered.filter(p => p.tags?.some(t => tags.includes(t.slug)));
     }
-    
     const total = filtered.length;
-    const paged = filtered.slice(offset, offset + limit);
-    
-    return {
-      portfolios: paged,
-      total,
-      page,
-      totalPages: Math.ceil(total / limit),
-    };
+    return { portfolios: filtered.slice(offset, offset + limit), total, page, totalPages: Math.ceil(total / limit) };
   }
 
   let query = supabase
     .from('portfolios')
-    .select(`
-      *,
-      portfolio_tags(tag_id),
-      tags:portfolio_tags(tags(*))
-    `, { count: 'exact' })
+    .select(`*, tags:portfolio_tags(tags(*))`, { count: 'exact' })
     .eq('status', 'published')
+    .order('sort_order', { ascending: true, nullsFirst: false })
     .order('published_at', { ascending: false });
 
   if (search) {
@@ -156,36 +141,35 @@ export async function getPublishedPortfolios(params?: {
   }
 
   if (tags && tags.length > 0) {
-    const { data: tagData } = await supabase
-      .from('tags')
-      .select('id')
-      .in('slug', tags);
-    
-    if (tagData && tagData.length > 0) {
-      const tagIds = tagData.map(t => t.id);
-      const { data: portfolioIds } = await supabase
-        .from('portfolio_tags')
-        .select('portfolio_id')
-        .in('tag_id', tagIds);
-      const ids = Array.from(new Set((portfolioIds || []).map((r: { portfolio_id: string }) => r.portfolio_id)));
-      if (ids.length > 0) {
-        query = query.in('id', ids);
-      } else {
-        return { portfolios: [], total: 0, page, totalPages: 0 };
-      }
-    }
+    // Resolve tag slugs → portfolio IDs in two parallel-friendly queries
+    const { data: tagData } = await supabase.from('tags').select('id').in('slug', tags);
+    if (!tagData?.length) return { portfolios: [], total: 0, page, totalPages: 0 };
+
+    const tagIds = tagData.map((t: any) => t.id);
+    const { data: portfolioIds } = await supabase
+      .from('portfolio_tags')
+      .select('portfolio_id')
+      .in('tag_id', tagIds);
+    const ids = Array.from(new Set((portfolioIds || []).map((r: any) => r.portfolio_id)));
+    if (!ids.length) return { portfolios: [], total: 0, page, totalPages: 0 };
+    query = query.in('id', ids);
   }
 
-  const { data, error, count } = await query.range(offset, offset + limit - 1);
-
+  // Supabase query with sort_order may fail if column doesn't exist — fall back gracefully
+  let { data, error, count } = await query.range(offset, offset + limit - 1);
+  if (error?.message?.includes('sort_order')) {
+    const fallback = supabase
+      .from('portfolios')
+      .select(`*, tags:portfolio_tags(tags(*))`, { count: 'exact' })
+      .eq('status', 'published')
+      .order('published_at', { ascending: false });
+    if (search) fallback.or(`title.ilike.%${search}%,description.ilike.%${search}%,challenge_content.ilike.%${search}%,strategy_content.ilike.%${search}%,closing_content.ilike.%${search}%`);
+    const r = await fallback.range(offset, offset + limit - 1);
+    data = r.data; error = r.error; count = r.count;
+  }
   if (error) throw error;
 
-  return {
-    portfolios: data || [],
-    total: count || 0,
-    page,
-    totalPages: Math.ceil((count || 0) / limit),
-  };
+  return { portfolios: data || [], total: count || 0, page, totalPages: Math.ceil((count || 0) / limit) };
 }
 
 export async function getPortfolioBySlug(slug: string): Promise<Portfolio | null> {
@@ -263,15 +247,42 @@ export async function getAllPortfolios(): Promise<Portfolio[]> {
 
   const { data, error } = await supabaseAdmin
     .from('portfolios')
-    .select(`
-      *,
-      tags:portfolio_tags(tags(*)),
-      media:portfolio_media(*)
-    `)
+    .select(`*, tags:portfolio_tags(tags(*)), media:portfolio_media(*)`)
+    .not('status', 'eq', 'trashed')
+    .order('sort_order', { ascending: true, nullsFirst: false })
     .order('created_at', { ascending: false });
 
+  if (error?.message?.includes('sort_order')) {
+    const r = await supabaseAdmin
+      .from('portfolios')
+      .select(`*, tags:portfolio_tags(tags(*)), media:portfolio_media(*)`)
+      .not('status', 'eq', 'trashed')
+      .order('created_at', { ascending: false });
+    if (r.error) throw r.error;
+    return r.data || [];
+  }
   if (error) throw error;
   return data || [];
+}
+
+export async function getTrashedPortfolios(): Promise<Portfolio[]> {
+  if (!supabaseAdmin) return [];
+  const { data, error } = await supabaseAdmin
+    .from('portfolios')
+    .select(`*, tags:portfolio_tags(tags(*))`)
+    .eq('status', 'trashed')
+    .order('updated_at', { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
+
+export async function restorePortfolio(id: string): Promise<void> {
+  if (!supabaseAdmin) throw new Error('Database not configured');
+  const { error } = await supabaseAdmin
+    .from('portfolios')
+    .update({ status: 'draft', updated_at: new Date().toISOString() })
+    .eq('id', id);
+  if (error) throw error;
 }
 
 export async function getPortfolioById(id: string): Promise<Portfolio | null> {
@@ -403,18 +414,20 @@ export async function deletePortfolio(id: string): Promise<void> {
   if (error) throw error;
 }
 
-export async function getAllTags(): Promise<Tag[]> {
-  if (!supabase) {
-    return DEMO_TAGS;
-  }
-
-  const { data, error } = await supabase
-    .from('tags')
-    .select('*')
-    .order('name', { ascending: true });
-
+async function _getAllTags(): Promise<Tag[]> {
+  if (!supabase) return DEMO_TAGS;
+  const { data, error } = await supabase.from('tags').select('*').order('name', { ascending: true });
   if (error) throw error;
   return data || [];
+}
+
+export async function getAllTags(): Promise<Tag[]> {
+  try {
+    const { unstable_cache } = await import('next/cache');
+    return unstable_cache(_getAllTags, ['all-tags'], { revalidate: 300 })();
+  } catch {
+    return _getAllTags();
+  }
 }
 
 export async function createTag(name: string): Promise<Tag> {

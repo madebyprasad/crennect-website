@@ -9,8 +9,9 @@ export interface Portfolio {
   strategy_content: string | null;
   closing_content: string | null;
   featured_image_url: string | null;
-  status: 'draft' | 'published' | 'archived';
+  status: 'draft' | 'published' | 'archived' | 'trashed';
   gallery_layout?: 'stack' | 'uniform' | 'full-width' | '2-column';
+  sort_order?: number | null;
   view_count: number;
   created_at: string;
   updated_at: string;

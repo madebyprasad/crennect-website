@@ -21,15 +21,34 @@ interface PageProps {
   };
 }
 
+async function getCachedPortfolios(search?: string, tags?: string[]) {
+  try {
+    const { unstable_cache } = await import('next/cache');
+    const key = `portfolios:${search || ''}:${(tags || []).join(',')}`;
+    return unstable_cache(
+      () => getPublishedPortfolios({ search, tags, page: 1, limit: 1000 }),
+      [key],
+      { revalidate: 60, tags: ['portfolios'] }
+    )();
+  } catch {
+    return getPublishedPortfolios({ search, tags, page: 1, limit: 1000 });
+  }
+}
+
 async function PortfolioContent({ searchParams }: PageProps) {
   const search = searchParams.search;
   const tags = searchParams.tags?.split(',').filter(Boolean);
-  const page = parseInt(searchParams.page || '1', 10);
 
-  const [{ portfolios, total, totalPages }, allTags] = await Promise.all([
-    getPublishedPortfolios({ search, tags, page, limit: 12 }),
+  const [{ portfolios: rawPortfolios }, allTags] = await Promise.all([
+    getCachedPortfolios(search, tags),
     getAllTags(),
   ]);
+
+  const portfolios = [...rawPortfolios].sort((a: any, b: any) => {
+    const aO = a.sort_order ?? Number.MAX_SAFE_INTEGER;
+    const bO = b.sort_order ?? Number.MAX_SAFE_INTEGER;
+    return aO - bO;
+  });
 
   return (
     <>
@@ -53,21 +72,6 @@ async function PortfolioContent({ searchParams }: PageProps) {
                   <PortfolioCard key={portfolio.id} portfolio={portfolio} />
                 ))}
               </div>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="portfolio-pagination">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-                    <a
-                      key={pageNum}
-                      href={`/portfolio?page=${pageNum}${search ? `&search=${search}` : ''}${tags ? `&tags=${tags.join(',')}` : ''}`}
-                      className={`portfolio-page-btn ${pageNum === page ? 'active' : ''}`}
-                    >
-                      {pageNum}
-                    </a>
-                  ))}
-                </div>
-              )}
             </>
           ) : (
             <div className="portfolio-empty">

@@ -190,6 +190,24 @@ p.portfolio-hero-subtitle {
   display: flex !important;
   flex-wrap: wrap !important;
   gap: 8px !important;
+  align-items: center !important;
+  position: relative !important;
+}
+
+.portfolio-tags--loading button.portfolio-tag {
+  opacity: 0.6 !important;
+  cursor: wait !important;
+}
+
+.portfolio-tags-loader {
+  display: inline-block !important;
+  width: 16px !important;
+  height: 16px !important;
+  border: 2px solid #e5e5e5 !important;
+  border-top-color: #00ff00 !important;
+  border-radius: 50% !important;
+  animation: spin 0.7s linear infinite !important;
+  flex-shrink: 0 !important;
 }
 
 button.portfolio-tag,
@@ -716,6 +734,36 @@ h2.portfolio-section-title,
   background: rgba(255, 255, 255, 0.3) !important;
 }
 
+/* Lightbox prev/next arrows */
+.media-modal-arrow {
+  position: absolute !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 2 !important;
+  color: #fff !important;
+  font-size: 52px !important;
+  font-weight: 300 !important;
+  line-height: 1 !important;
+  padding: 12px 20px !important;
+  background: rgba(0, 0, 0, 0.45) !important;
+  border-radius: 6px !important;
+  text-decoration: none !important;
+  user-select: none !important;
+  transition: background 0.15s ease !important;
+}
+
+.media-modal-arrow:hover {
+  background: rgba(0, 0, 0, 0.7) !important;
+  text-decoration: none !important;
+}
+
+.media-modal-prev { left: 16px !important; }
+.media-modal-next { right: 16px !important; }
+
+@media (max-width: 600px) {
+  .media-modal-arrow { font-size: 36px !important; padding: 8px 14px !important; }
+}
+
 .portfolio-detail-hero-video video,
 .portfolio-media-item video,
 .media-modal-box video {
@@ -1130,4 +1178,27 @@ a.portfolio-page-btn.active,
   .portfolio-suggested-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ================================
+   INSTAGRAM EMBED
+   ================================ */
+.ig-embed-wrap {
+  max-width: 400px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(0,0,0,0.1) !important;
+  background: #ffffff !important;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08) !important;
+}
+
+.ig-embed-frame {
+  display: block !important;
+  width: 1px !important;
+  min-width: 100% !important;
+  height: 580px !important;
+  border: none !important;
+  background: #ffffff !important;
 }
