@@ -97,7 +97,7 @@ export default function Header() {
           </div>
 
           <div className="mobile-menu-links">
-            <a href="/about.html" onClick={closeMobileMenu}>About us</a>
+            <a href="/about.html" onClick={closeMobileMenu}>About Us</a>
             <a href="https://portfolio.crennect.com/" onClick={closeMobileMenu}>Case Studies</a>
             <a href="genai.html" onClick={closeMobileMenu}>GenAI</a>
             <a href="/services.html" onClick={closeMobileMenu}>Services</a>
