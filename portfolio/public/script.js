@@ -490,7 +490,7 @@ function debounce(func, wait) {
 
 // About Us Section - Content Data
 const aboutUsContentData = {
-    who: `<p>Crennect is an independent creative advertising agency built to help ambitious brands stay relevant, differentiated, and culturally aligned in a rapidly evolving market.</p>
+    who: `<p>Crennect is an independent Brand and Creative Company built to help ambitious brands stay relevant, differentiated, and culturally aligned in a rapidly evolving market.</p>
 <p>Founded with the belief that relevance decays faster than most businesses realise, Crennect exists to bridge the gap between brand ambition and market perception.</p>
 <p>We work with New-age brands, startups, scaling businesses, and established enterprises that are ready to lead their category.</p>
 <p>From brand positioning and identity to campaigns, digital experiences, and AI-powered creative systems, we build brands that don’t just get noticed but also get remembered.
