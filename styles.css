@@ -3675,3 +3675,173 @@ overflow-y: auto;
 }
 
 .game-hidden { display:none; }
+
+
+/* =================================================
+   LEGAL PAGES (Privacy Policy, Terms & Conditions)
+   Self-contained — does not affect existing styles
+================================================= */
+.legal-page {
+  background: #ffffff;
+  color: #1a1a1a;
+}
+.legal-page .legal-hero {
+  background: #000;
+  color: #fff;
+  padding: 160px 24px 80px;
+  text-align: center;
+  border-bottom: 1px solid #111;
+}
+.legal-page .legal-hero .eyebrow {
+  display: inline-block;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: #00ff00;
+  margin-bottom: 18px;
+}
+.legal-page .legal-hero h1 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: clamp(40px, 6vw, 72px);
+  line-height: 1.05;
+  letter-spacing: -.02em;
+  margin: 0 0 14px;
+}
+.legal-page .legal-hero h1 .font-curvy {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-weight: 700;
+  color: #00ff00;
+}
+.legal-page .legal-hero .legal-meta {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: #b8b8b8;
+  letter-spacing: .04em;
+  margin-top: 8px;
+}
+
+.legal-page .legal-wrap {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 80px 24px 120px;
+  font-family: 'Inter', sans-serif;
+}
+
+.legal-page .legal-wrap p,
+.legal-page .legal-wrap li {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #2a2a2a;
+}
+.legal-page .legal-wrap ul {
+  padding-left: 22px;
+  margin: 14px 0 22px;
+}
+.legal-page .legal-wrap li { margin-bottom: 10px; }
+
+.legal-page .legal-wrap h2 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: clamp(22px, 2.4vw, 28px);
+  line-height: 1.25;
+  letter-spacing: -.005em;
+  color: #0e0e0e;
+  margin: 56px 0 14px;
+  padding-top: 8px;
+}
+.legal-page .legal-wrap h3 {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  color: #0e0e0e;
+  margin: 28px 0 8px;
+}
+.legal-page .legal-wrap a {
+  color: #0e8a1a;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(14,138,26,.25);
+  transition: color .15s ease, border-color .15s ease;
+}
+.legal-page .legal-wrap a:hover {
+  color: #0e0e0e;
+  border-bottom-color: #0e0e0e;
+  text-decoration: none;
+}
+.legal-page .legal-wrap strong { color: #0e0e0e; font-weight: 700; }
+
+.legal-page .legal-toc {
+  background: #f6f6f4;
+  border: 1px solid #e7e7e3;
+  border-radius: 14px;
+  padding: 26px 30px;
+  margin: 30px 0 10px;
+}
+.legal-page .legal-toc h2 {
+  font-size: 12px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: #6a6a66;
+  margin: 0 0 14px;
+  font-weight: 700;
+  padding-top: 0;
+}
+.legal-page .legal-toc ol {
+  margin: 0;
+  padding-left: 22px;
+  columns: 2;
+  column-gap: 36px;
+}
+.legal-page .legal-toc li {
+  margin-bottom: 8px;
+  font-size: 15px;
+  break-inside: avoid;
+}
+.legal-page .legal-toc a {
+  color: #1a1a1a;
+  border-bottom: none;
+  font-weight: 500;
+}
+.legal-page .legal-toc a:hover { color: #0e8a1a; }
+
+.legal-page .legal-intro {
+  font-size: 17px;
+  color: #2a2a2a;
+}
+
+.legal-page .legal-callout {
+  background: #fafaf7;
+  border: 1px solid #e7e7e3;
+  border-left: 4px solid #00ff00;
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin: 28px 0;
+  font-size: 15px;
+  color: #2a2a2a;
+}
+
+.legal-page .legal-card {
+  background: #0e0e0e;
+  color: #f4f4f1;
+  border-radius: 14px;
+  padding: 28px 32px;
+  margin-top: 28px;
+}
+.legal-page .legal-card p { color: #d5d5d0; margin: 6px 0; }
+.legal-page .legal-card strong { color: #fff; }
+.legal-page .legal-card a {
+  color: #00ff00;
+  border-bottom: 1px solid rgba(0,255,0,.3);
+}
+.legal-page .legal-card a:hover { color: #fff; border-bottom-color: #fff; }
+
+@media (max-width: 700px) {
+  .legal-page .legal-hero { padding: 130px 20px 64px; }
+  .legal-page .legal-wrap { padding: 56px 20px 96px; }
+  .legal-page .legal-toc ol { columns: 1; }
+  .legal-page .legal-wrap h2 { margin-top: 44px; }
+}

@@ -82,9 +82,9 @@ export default function Footer() {
           </div>
           
           <div className="footer-bottom">
-            <a href="#terms">Terms & Conditions</a>
+            <a href="https://www.crennect.com/terms-and-conditions.html">Terms & Conditions</a>
             <span>©2025 All Rights Reserved</span>
-            <a href="#privacy">Privacy Policy</a>
+            <a href="https://www.crennect.com/privacy-policy.html">Privacy Policy</a>
           </div>
         </div>
       </footer>
