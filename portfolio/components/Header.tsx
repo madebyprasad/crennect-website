@@ -59,6 +59,7 @@ export default function Header() {
             <img
               src={isLightBg ? '/assets/images/crennect-logo.svg' : '/assets/images/logo.svg'}
               alt="Crennect Logo"
+              decoding="async"
             />
           </a>
 
@@ -81,6 +82,7 @@ export default function Header() {
             <img
               src={isLightBg ? '/assets/images/hamburger-reverse.svg' : '/assets/images/hamburger.svg'}
               alt="Menu"
+              decoding="async"
             />
           </button>
         </div>
@@ -93,7 +95,7 @@ export default function Header() {
         <div className="mobile-menu-content">
 
           <div className="mobile-menu-logo">
-            <img src="/assets/images/logo.svg" alt="Crennect" />
+            <img src="/assets/images/logo.svg" alt="Crennect" loading="lazy" decoding="async" />
           </div>
 
           <div className="mobile-menu-links">

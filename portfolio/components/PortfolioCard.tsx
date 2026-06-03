@@ -39,6 +39,8 @@ export default function PortfolioCard({ portfolio }: PortfolioCardProps) {
           <img
             src={portfolio.featured_image_url}
             alt={portfolio.title}
+            loading="lazy"
+            decoding="async"
           />
         ) : (
           <div className="portfolio-card-placeholder">

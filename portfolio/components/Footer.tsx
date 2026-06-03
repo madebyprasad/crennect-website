@@ -34,10 +34,10 @@ export default function Footer() {
             {/* Left: Explore Box */}
             <div className="footer-explore">
               <div className="explore-box">
-                <video src="/assets/video/hero-bg.webm" autoPlay loop muted playsInline></video>
+                <video src="/assets/video/hero-bg.webm" autoPlay loop muted playsInline preload="none"></video>
                 <div className="explore-overlay">
                   <span>Explore more</span>
-                  <img src="/assets/images/arrow.webp" alt="Arrow" />
+                  <img src="/assets/images/arrow.webp" alt="Arrow" width="48" height="48" loading="lazy" decoding="async" />
                 </div>
               </div>
             </div>
@@ -77,7 +77,7 @@ export default function Footer() {
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.04c-5.5 0-10 4.49-10 10.02 0 5 3.66 9.15 8.44 9.9v-7H7.9v-2.9h2.54V9.85c0-2.52 1.49-3.91 3.78-3.91 1.09 0 2.23.19 2.23.19v2.47h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.9h-2.33v7a10 10 0 0 0 8.44-9.9c0-5.53-4.5-10.02-10-10.02z"/></svg>
                 </a>
               </div>
-              <img src="/assets/images/logo.svg" alt="Crennect" className="footer-logo" />
+              <img src="/assets/images/logo.svg" alt="Crennect" className="footer-logo" loading="lazy" decoding="async" />
             </div>
           </div>
           
@@ -93,7 +93,7 @@ export default function Footer() {
       <div className="quiz-modal" id="quizModal">
         <div className="quiz-modal-content">
           <div className="quiz-modal-image">
-            <img src="/assets/images/footer-popup.webp" alt="" />
+            <img src="/assets/images/footer-popup.webp" alt="" width="1000" height="1000" loading="lazy" decoding="async" />
           </div>
           <div className="quiz-modal-text">
             <h2>

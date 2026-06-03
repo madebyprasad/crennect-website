@@ -52,6 +52,53 @@ export default function RootLayout({
         <link rel="icon" type="image/x-icon" href="/assets/favicon/favicon.ico" />
         <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png" />
+
+        {/* Google Analytics */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-QQNDVCPK3X"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-QQNDVCPK3X');
+            `,
+          }}
+        />
+
+        {/* Organization schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              name: 'Crennect',
+              legalName: 'Crennect LLP',
+              url: 'https://www.crennect.com',
+              logo: 'https://www.crennect.com/assets/images/logo.svg',
+              image: 'https://www.crennect.com/assets/images/og-image.jpg',
+              description:
+                'Crennect is a brand and creative agency helping new-age, high-aspiration brands become the obvious choice in their category through strategy, design, content, and AI capabilities.',
+              email: 'reach@crennect.com',
+              telephone: '+91-79774-93025',
+              address: {
+                '@type': 'PostalAddress',
+                streetAddress:
+                  '13, Embassy 247 Park, Tower B, Lal Bahadur Shastri Marg, Vikhroli West',
+                addressLocality: 'Mumbai',
+                addressRegion: 'Maharashtra',
+                postalCode: '400083',
+                addressCountry: 'IN',
+              },
+              sameAs: [
+                'https://www.instagram.com/crennectmedia/',
+                'https://www.linkedin.com/company/crennect/',
+                'https://www.youtube.com/@prasaddanie',
+              ],
+            }),
+          }}
+        />
       </head>
       <body>
         <div className="page">
