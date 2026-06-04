@@ -56,12 +56,25 @@ export default function Footer() {
             {/* Right: Links */}
             <div className="footer-links">
               <nav>
-                <a href="/index.html">Home</a>
-                <a href="/contact.html">Contact</a>
-                <a href="/services.html">Services</a>
+                <a href="https://www.crennect.com/index.html">Home</a>
+                <a href="https://www.crennect.com/contact.html">Contact</a>
+                <a href="https://www.crennect.com/services.html">Services</a>
                 <a href="https://portfolio.crennect.com/portfolio">Case Studies</a>
-                <a href="/about.html">About Us</a>
-                <a href="/index.html#blogs">Blogs</a>
+                <a href="https://www.crennect.com/about.html">About Us</a>
+                <a href="https://www.crennect.com/index.html#blogs">Blogs</a>
+              </nav>
+              <span className="footer-services-label">Capabilities</span>
+              <nav>
+                <a href="https://www.crennect.com/brand-strategy.html">Brand Strategy</a>
+                <a href="https://www.crennect.com/creative-campaigns.html">Creative Campaigns</a>
+                <a href="https://www.crennect.com/content-production.html">Content Production</a>
+                <a href="https://www.crennect.com/design-animation.html">Design &amp; Animation</a>
+                <a href="https://www.crennect.com/ai-capabilities.html">AI Capabilities</a>
+              </nav>
+              <span className="footer-services-label">Resources</span>
+              <nav>
+                <a href="https://www.crennect.com/brand-positioning-canvas.html">Brand Positioning Canvas</a>
+                <a href="https://www.crennect.com/modern-brand-playbook.html">Modern Brand Playbook</a>
               </nav>
               <div className="social-icons">
                 <a href="https://www.linkedin.com/company/crennect/" target="_blank" rel="noopener noreferrer" aria-label="Visit us on LinkedIn">
@@ -84,25 +97,4 @@ export default function Footer() {
           <div className="footer-bottom">
             <a href="https://www.crennect.com/terms-and-conditions.html">Terms & Conditions</a>
             <span>©2025 All Rights Reserved</span>
-            <a href="https://www.crennect.com/privacy-policy.html">Privacy Policy</a>
-          </div>
-        </div>
-      </footer>
-
-      {/* Quiz Modal - exact copy from homepage */}
-      <div className="quiz-modal" id="quizModal">
-        <div className="quiz-modal-content">
-          <div className="quiz-modal-image">
-            <img src="/assets/images/footer-popup.webp" alt="" width="1000" height="1000" loading="lazy" decoding="async" />
-          </div>
-          <div className="quiz-modal-text">
-            <h2>
-              It&apos;s when brands fail to <span>position</span> themselves in the market.
-            </h2>
-            <button id="quizAgreeBtn">yeah, I agree.</button>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-}
+            <a href="https://www.crennect.com/privacy-policy.ht

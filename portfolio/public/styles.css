@@ -3356,3 +3356,16 @@ ________________________________________________________________________________
 }
 
 }
+
+/* Footer capabilities sub-nav label (sits above the 5 service links) */
+.footer-services-label {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin-top: 16px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}

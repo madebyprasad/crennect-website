@@ -2873,6 +2873,7 @@ ________________________________________________________________________________
 
 .contact-arrow {
   width: 18px;
+  height: auto;
 }
 
 
@@ -3848,4 +3849,366 @@ overflow-y: auto;
   .legal-page .legal-wrap { padding: 56px 20px 96px; }
   .legal-page .legal-toc ol { columns: 1; }
   .legal-page .legal-wrap h2 { margin-top: 44px; }
+}
+
+/* GenAI page: enforce standard header/nav sizing to match all other pages */
+body.genai-page .header { padding: 25px 0 !important; }
+body.genai-page .header .header-container {
+  max-width: 1600px !important;
+  padding: 10px 50px !important;
+  gap: 40px !important;
+}
+body.genai-page .header .logo img { height: 40px !important; width: auto !important; }
+body.genai-page .header .nav { gap: 30px !important; }
+body.genai-page .header .nav a {
+  font-size: 17px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+  letter-spacing: normal !important;
+}
+body.genai-page .header .nav a.btn-nav {
+  font-size: 14px !important;
+  padding: 10px 25px !important;
+}
+
+
+/* =================================================
+   BRAND STRATEGY PAGE — service spoke page
+   bs- prefix prevents any conflict with existing classes
+================================================= */
+
+.bs-pillars {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+  margin: 32px 0 48px;
+}
+.bs-pillar {
+  background: #f6f6f4;
+  border: 1px solid #e7e7e3;
+  border-radius: 18px;
+  padding: 26px 26px;
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.bs-pillar:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.06);
+  border-color: #cfcfc9;
+}
+.bs-pillar h4 {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  color: #0e0e0e;
+  margin: 0 0 10px;
+  letter-spacing: -.005em;
+}
+.bs-pillar p {
+  font-size: 15px;
+  line-height: 1.65;
+  color: #4a4a4a;
+  margin: 0;
+}
+
+.bs-process {
+  display: grid;
+  gap: 14px;
+  margin: 28px 0 48px;
+}
+.bs-step {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  gap: 20px;
+  align-items: start;
+  background: #ffffff;
+  border: 1px solid #ececea;
+  border-radius: 16px;
+  padding: 22px 26px;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.bs-step:hover { border-color: #d4d4d0; box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
+.bs-step-number {
+  width: 34px;
+  height: 34px;
+  background: #0e0e0e;
+  color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  font-family: 'Inter', sans-serif;
+  margin-top: 4px;
+  flex: none;
+}
+.bs-step h4 {
+  font-family: 'Inter', sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  color: #0e0e0e;
+  margin: 0 0 6px;
+}
+.bs-step p {
+  font-size: 15px;
+  line-height: 1.65;
+  color: #4a4a4a;
+  margin: 0;
+}
+
+.bs-checks {
+  list-style: none;
+  padding: 0;
+  margin: 24px 0 40px;
+  display: grid;
+  gap: 12px;
+}
+.bs-checks li {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  background: #fafaf7;
+  border: 1px solid #eeeeec;
+  border-radius: 12px;
+  padding: 18px 22px;
+  font-size: 15.5px;
+  line-height: 1.6;
+  color: #2a2a2a;
+}
+.bs-checks li img.bs-check-icon {
+  flex: none;
+  width: 20px;
+  height: auto;
+  margin-top: 2px;
+}
+
+.bs-faq {
+  display: grid;
+  gap: 12px;
+  margin: 28px 0 36px;
+}
+.bs-faq details {
+  border: 1px solid #ececea;
+  border-radius: 14px;
+  background: #ffffff;
+  overflow: hidden;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.bs-faq details[open] {
+  border-color: #c8c8c4;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.04);
+}
+.bs-faq summary {
+  cursor: pointer;
+  padding: 20px 60px 20px 26px;
+  font-weight: 700;
+  font-size: 16.5px;
+  color: #0e0e0e;
+  position: relative;
+  list-style: none;
+  user-select: none;
+}
+.bs-faq summary::-webkit-details-marker { display: none; }
+.bs-faq summary::after {
+  content: "+";
+  position: absolute;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 26px;
+  font-weight: 300;
+  color: #0e8a1a;
+  line-height: 1;
+  transition: transform .2s ease;
+}
+.bs-faq details[open] summary::after { content: "−"; }
+.bs-faq details > div,
+.bs-faq details > p {
+  padding: 0 26px 22px;
+  font-size: 15.5px;
+  line-height: 1.7;
+  color: #3a3a3a;
+  margin: 0;
+}
+
+.bs-cta-card {
+  background: linear-gradient(135deg, #0e0e0e 0%, #1a1a1a 100%);
+  border-radius: 24px;
+  padding: 56px 48px;
+  margin: 56px 0 24px;
+  color: #fff;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.bs-cta-card::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(0,255,0,0.18) 0%, transparent 60%);
+  pointer-events: none;
+}
+.bs-cta-card h3 {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(26px, 2.8vw, 36px);
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 14px;
+  position: relative;
+  line-height: 1.2;
+  letter-spacing: -.01em;
+}
+.bs-cta-card h3 .accent {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-weight: 700;
+  color: #00ff00;
+}
+.bs-cta-card p {
+  font-size: 16px;
+  color: #c8c8c8;
+  max-width: 560px;
+  margin: 0 auto 28px;
+  line-height: 1.6;
+  position: relative;
+}
+.bs-cta-btn {
+  display: inline-block;
+  background: #00ff00;
+  color: #000 !important;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 16px 34px;
+  border-radius: 100px;
+  text-decoration: none !important;
+  border-bottom: none !important;
+  transition: transform .2s ease, box-shadow .2s ease;
+  position: relative;
+}
+.bs-cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0,255,0,0.3);
+  color: #000 !important;
+  border-bottom: none !important;
+}
+
+.bs-pull {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(20px, 2.2vw, 26px);
+  font-weight: 700;
+  line-height: 1.4;
+  color: #0e0e0e;
+  border-left: 4px solid #00ff00;
+  padding: 18px 0 18px 22px;
+  margin: 36px 0;
+  letter-spacing: -.01em;
+}
+
+@media (max-width: 700px) {
+  .bs-step { grid-template-columns: 44px 1fr; gap: 14px; padding: 18px 20px; }
+  .bs-step-number { width: 38px; height: 38px; font-size: 15px; }
+  .bs-cta-card { padding: 40px 24px; border-radius: 18px; }
+  .bs-faq summary { padding: 18px 52px 18px 22px; font-size: 15.5px; }
+  .bs-faq summary::after { right: 20px; }
+  .bs-faq details > p { padding: 0 22px 18px; }
+}
+
+/* Specificity overrides — .legal-page .legal-wrap was darkening text inside dark cards */
+.legal-page .bs-cta-card h3 { color: #ffffff; }
+.legal-page .bs-cta-card h3 .accent { color: #00ff00; font-family: 'Playfair Display', serif; font-style: italic; font-weight: 700; }
+.legal-page .bs-cta-card p { color: #c8c8c8; }
+.legal-page .bs-step h4 { color: #0e0e0e; }
+.legal-page .bs-step p { color: #4a4a4a; }
+.legal-page .bs-pillar h4 { color: #0e0e0e; }
+.legal-page .bs-pillar p { color: #4a4a4a; }
+.legal-page .bs-checks li { color: #2a2a2a; }
+.legal-page .bs-faq summary { color: #0e0e0e; }
+.legal-page .bs-faq details > p { color: #3a3a3a; }
+.legal-page .bs-pull { color: #0e0e0e; }
+
+/* Service-page hero variant — replaces black patch with playful grid pattern */
+.legal-hero.bs-hero {
+  background: #ffffff;
+  color: #0e0e0e;
+  position: relative;
+  overflow: hidden;
+  padding: 160px 24px 100px;
+  border-bottom: none !important;
+}
+.legal-hero.bs-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(14,14,14,0.14) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(14,14,14,0.14) 1px, transparent 1px);
+  background-size: 36px 36px;
+  pointer-events: none;
+  z-index: 0;
+}
+.legal-hero.bs-hero::after {
+  content: "";
+  position: absolute;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,255,0,0.22) 0%, transparent 70%);
+  top: 30%;
+  right: 6%;
+  pointer-events: none;
+  z-index: 0;
+}
+.legal-hero.bs-hero h1 {
+  color: #0e0e0e;
+  position: relative;
+  z-index: 1;
+}
+.legal-hero.bs-hero h1 .font-curvy {
+  color: #0e8a1a;
+}
+
+/* Service-spoke pages: disable the global scroll-fade-in effect
+   (script.js sets section.style.opacity=0; we win with !important
+   so all text on these dense content pages renders instantly) */
+body.service-spoke section {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* Service-spoke pages (white hero) — dark nav + dark logo to stay visible */
+body.service-spoke .header .nav a,
+body.service-spoke .header .nav a:visited {
+  color: #0e0e0e;
+}
+body.service-spoke .header .nav a:hover {
+  color: #0e8a1a;
+}
+body.service-spoke .header .btn-nav {
+  background: #0e0e0e;
+  color: #ffffff !important;
+}
+body.service-spoke .header .btn-nav:hover {
+  background: #0e8a1a;
+  color: #ffffff !important;
+}
+
+/* Footer capabilities sub-nav label (sits above the 5 service links) */
+.footer-services-label {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin-top: 16px;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+@media (max-width: 700px) {
+  .legal-hero.bs-hero { padding: 130px 20px 70px; }
+  .legal-hero.bs-hero::before { background-size: 28px 28px; }
+  .legal-hero.bs-hero::after { width: 220px; height: 220px; right: -10%; }
 }
