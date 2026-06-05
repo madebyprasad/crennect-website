@@ -4185,14 +4185,9 @@ body.service-spoke .header .nav a:visited {
 body.service-spoke .header .nav a:hover {
   color: #0e8a1a;
 }
-body.service-spoke .header .btn-nav {
-  background: #0e0e0e;
-  color: #ffffff !important;
-}
-body.service-spoke .header .btn-nav:hover {
-  background: #0e8a1a;
-  color: #ffffff !important;
-}
+/* Breaking Brands button on service-spoke pages keeps the default
+   .btn-nav styling (white bg, dark text, dark border, green on hover)
+   so it matches the home page exactly. No override needed here. */
 
 /* Footer capabilities sub-nav label (sits above the 5 service links) */
 .footer-services-label {
