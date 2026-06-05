@@ -97,4 +97,25 @@ export default function Footer() {
           <div className="footer-bottom">
             <a href="https://www.crennect.com/terms-and-conditions.html">Terms & Conditions</a>
             <span>©2025 All Rights Reserved</span>
-            <a href="https://www.crennect.com/privacy-policy.ht
+            <a href="https://www.crennect.com/privacy-policy.html">Privacy Policy</a>
+          </div>
+        </div>
+      </footer>
+
+      {/* Quiz Modal - exact copy from homepage */}
+      <div className="quiz-modal" id="quizModal">
+        <div className="quiz-modal-content">
+          <div className="quiz-modal-image">
+            <img src="/assets/images/footer-popup.webp" alt="" width="1000" height="1000" loading="lazy" decoding="async" />
+          </div>
+          <div className="quiz-modal-text">
+            <h2>
+              It&apos;s when brands fail to <span>position</span> themselves in the market.
+            </h2>
+            <button id="quizAgreeBtn">yeah, I agree.</button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
