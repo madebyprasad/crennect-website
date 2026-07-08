@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>This Week in Brands: Campaigns, Brand News, AI Tools & the Heat Board | Breaking Brands</title>
+<meta name="description" content="Your weekly brand intelligence page: the campaigns worth stealing from, what India's brands did this week, new AI tools for marketers, and the Heat Board showing who's up, who's down, and why.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="author" content="Prasad Danie">
+<meta name="theme-color" content="#F4F1EA">
+<link rel="canonical" href="https://www.crennect.com/breakingbrands/heat-index">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Breaking Brands">
+<meta property="og:title" content="This Week in Brands | Breaking Brands">
+<meta property="og:description" content="The campaigns, the brand moves, the new AI tools, and the Heat Board. One page, once a week.">
+<meta property="og:url" content="https://www.crennect.com/breakingbrands/heat-index">
+<meta property="og:locale" content="en_IN">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "url": "https://www.crennect.com/breakingbrands/heat-index",
+  "name": "This Week in Brands",
+  "description": "A weekly brand intelligence page for India: notable campaigns, brand updates, new AI tools for marketers, and the Heat Board ranking who's up and who's down.",
+  "isPartOf": {"@id": "https://www.crennect.com/breakingbrands/#site"},
+  "breadcrumb": {
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.crennect.com/breakingbrands/"},
+      {"@type": "ListItem", "position": 2, "name": "This Week in Brands", "item": "https://www.crennect.com/breakingbrands/heat-index"}
+    ]
+  }
+}
+</script>
+<style>
+/* ---------- this-week page ---------- */
+.preview-note{
+  display:inline-flex;align-items:center;gap:8px;margin-top:22px;
+  font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;
+  color:var(--muted);border:1px dashed #C9C3B4;border-radius:999px;padding:8px 16px;
+}
+.sec-label{
+  display:flex;align-items:baseline;justify-content:space-between;gap:20px;
+  border-top:1px solid rgba(19,18,17,.18);padding-top:18px;margin-bottom:44px;
+}
+.sec-label span{
+  font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;
+  text-transform:uppercase;letter-spacing:0.2em;color:var(--muted);
+}
+
+/* campaign cards */
+.camp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.camp-card{
+  background:var(--card);border:1px solid #E6E1D5;border-radius:18px;overflow:hidden;
+  display:flex;flex-direction:column;transition:transform .2s ease, box-shadow .2s ease;
+}
+.camp-card:hover{transform:translateY(-5px);box-shadow:0 18px 40px rgba(19,18,17,.1)}
+.camp-cover{
+  aspect-ratio:16/9;display:flex;align-items:flex-end;padding:20px;position:relative;
+}
+.camp-cover img.blogo{
+  position:absolute;top:16px;left:16px;width:44px;height:44px;border-radius:10px;
+  background:#fff;padding:6px;object-fit:contain;box-shadow:0 4px 14px rgba(0,0,0,.18);
+}
+.camp-cover .cover-title{
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:21px;line-height:1.15;
+  color:#fff;letter-spacing:-0.01em;text-shadow:0 2px 12px rgba(0,0,0,.25);
+}
+.cv-1{background:linear-gradient(135deg,#1E1C1A 0%,#4A3B2E 60%,#B0763B 100%)}
+.cv-2{background:linear-gradient(135deg,#12100F 0%,#2E1E3F 60%,#FF4B33 100%)}
+.cv-3{background:linear-gradient(135deg,#101820 0%,#1F3D33 60%,#9FD41F 100%)}
+.camp-body{padding:20px 22px 24px;display:flex;flex-direction:column;gap:10px;flex:1}
+.camp-body .meta{font-family:'Space Grotesk',sans-serif;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--red)}
+.camp-body p{font-size:14.5px;color:var(--ink-2)}
+.camp-body .steal{font-size:13.5px;color:var(--muted);border-top:1px dashed #E0DACB;padding-top:12px;margin-top:auto}
+.camp-body .steal b{color:var(--ink)}
+
+/* news feed */
+.news-list{border-top:1px solid rgba(19,18,17,.15)}
+.news-item{
+  display:flex;align-items:center;gap:18px;width:100%;
+  padding:20px 6px;border-bottom:1px solid rgba(19,18,17,.12);
+}
+.news-item img{flex:0 0 44px;width:44px;height:44px;border-radius:10px;background:#fff;padding:5px;object-fit:contain;border:1px solid #E6E1D5}
+.news-item > div{flex:1 1 auto;min-width:0}
+.news-item h4{font-size:16.5px;font-weight:600;letter-spacing:-0.01em}
+.news-item p{font-size:13.5px;color:var(--muted);margin-top:2px;max-width:none}
+.news-item .chip{flex:0 0 auto;margin-left:auto}
+.news-item .chip{
+  font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.08em;padding:5px 12px;border-radius:999px;white-space:nowrap;
+}
+.chip-launch{background:var(--lime)}
+.chip-move{background:#BFE9F2}
+.chip-ouch{background:var(--red);color:#fff}
+.chip-money{background:#F9E793}
+@media(max-width:620px){.news-item .chip{display:none}}
+
+/* ai tools */
+.tool-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.tool-card{
+  background:var(--card);border:1px solid #E6E1D5;border-radius:16px;padding:22px;
+  transition:transform .2s;display:flex;flex-direction:column;gap:10px;
+}
+.tool-card:hover{transform:translateY(-4px)}
+.tool-head{display:flex;align-items:center;gap:12px}
+.tool-head img{width:38px;height:38px;border-radius:9px;background:#fff;padding:4px;object-fit:contain;border:1px solid #E6E1D5}
+.tool-head h4{font-size:16px}
+.tool-card p{font-size:13.5px;color:var(--muted)}
+.tool-card .use{font-size:13px;color:var(--ink-2)}
+.tool-card .use b{font-family:'Space Grotesk',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--red)}
+
+/* heat board */
+.how-line{max-width:660px;color:var(--muted);font-size:16px;margin-top:16px}
+.weights{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.weight{
+  font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:600;
+  border:1.5px solid var(--ink);border-radius:999px;padding:8px 16px;background:var(--cream);
+}
+.weight b{color:var(--red)}
+table.index td img.blogo{width:30px;height:30px;border-radius:7px;background:#fff;padding:3px;object-fit:contain;vertical-align:middle;margin-right:12px;border:1px solid #2E2C29}
+.brand-cell{display:flex;align-items:center}
+</style>
+</head>
+<body>
+
+<div class="nav-shell">
+  <nav>
+    <a class="logo" href="./"><img src="assets/bb-logo.svg" alt="Breaking Brands"></a>
+    <div class="nav-links">
+      <a href="watch">Watch</a>
+      <a href="heat-index">This Week</a>
+      <a href="arena">Arena</a>
+      <a href="autopsies">Autopsies</a>
+      <a href="series">Series</a>
+      <a href="newsletter">Newsletter</a>
+    </div>
+    <a class="nav-cta" href="apply">Apply</a>
+  </nav>
+</div>
+
+<header class="page-hero">
+  <div class="wrap">
+    <span class="kicker">This Week in Brands</span>
+    <h1 class="h-xl">Everything your industry<br>did while you were <span class="serif-i">in meetings.</span></h1>
+    <p class="sub">The campaigns worth stealing from, the brand moves that matter, the AI tools your team should try this week, and the Heat Board. One page. Ten minutes. You're caught up.</p>
+    <span class="preview-note">⚑ Preview edition. This page refreshes every Monday once we're live</span>
+  </div>
+</header>
+
+<!-- ============ CAMPAIGNS ============ -->
+<section style="padding-top:40px;">
+  <div class="wrap reveal">
+    <div class="sec-label"><span>① Campaigns worth stealing from</span><span>3 picks, not 30</span></div>
+    <div class="camp-grid">
+      <div class="camp-card">
+        <div class="camp-cover cv-1">
+          <img class="blogo" src="https://logo.clearbit.com/amul.com" alt="Amul logo" loading="lazy" onerror="this.style.display='none'">
+          <span class="cover-title">The 60-year topical machine strikes again</span>
+        </div>
+        <div class="camp-body">
+          <span class="meta">Amul · Print + Social</span>
+          <p>One news event, one pun, one butter girl, on every timeline within hours. No brief, no 6-week approval chain, no agency ping-pong.</p>
+          <span class="steal"><b>Steal this:</b> speed is a creative strategy. Build a format so strong you can ship in a day.</span>
+        </div>
+      </div>
+      <div class="camp-card">
+        <div class="camp-cover cv-2">
+          <img class="blogo" src="https://logo.clearbit.com/zomato.com" alt="Zomato logo" loading="lazy" onerror="this.style.display='none'">
+          <span class="cover-title">Two brands, one billboard fight everyone watched</span>
+        </div>
+        <div class="camp-body">
+          <span class="meta">Zomato × Blinkit · OOH + Social</span>
+          <p>A staged sibling rivalry across billboards that wrote its own social coverage. Media spend: modest. Earned reach: absurd.</p>
+          <span class="steal"><b>Steal this:</b> conversation beats coverage. Design campaigns people finish for you.</span>
+        </div>
+      </div>
+      <div class="camp-card">
+        <div class="camp-cover cv-3">
+          <img class="blogo" src="https://logo.clearbit.com/cred.club" alt="CRED logo" loading="lazy" onerror="this.style.display='none'">
+          <span class="cover-title">The ad that refused to look like an ad</span>
+        </div>
+        <div class="camp-body">
+          <span class="meta">CRED · Video</span>
+          <p>Celebrities doing things no brand manager would approve, which is exactly why it worked. Weird is memorable. Safe is invisible.</p>
+          <span class="steal"><b>Steal this:</b> distinctiveness compounds. Being liked is nice; being remembered pays.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BRAND UPDATES ============ -->
+<section style="padding-top:30px;">
+  <div class="wrap reveal">
+    <div class="sec-label"><span>② What brands did this week</span><span>The moves that matter</span></div>
+    <div class="news-list">
+      <div class="news-item">
+        <img src="https://logo.clearbit.com/zeptonow.com" alt="Zepto" loading="lazy" onerror="this.style.display='none'">
+        <div><h4>Zepto pushes deeper into café and food brands</h4><p>Quick commerce isn't a delivery war anymore. It's a private-label brand war. Watch this space.</p></div>
+        <span class="chip chip-move">Brand move</span>
+      </div>
+      <div class="news-item">
+        <img src="https://logo.clearbit.com/tatamotors.com" alt="Tata Motors" loading="lazy" onerror="this.style.display='none'">
+        <div><h4>Tata keeps owning "sensible electric"</h4><p>While rivals chase spec-sheet wars, Tata's EV story stays boringly consistent. Boring, in branding, is a superpower.</p></div>
+        <span class="chip chip-move">Brand move</span>
+      </div>
+      <div class="news-item">
+        <img src="https://logo.clearbit.com/mamaearth.in" alt="Mamaearth" loading="lazy" onerror="this.style.display='none'">
+        <div><h4>Mamaearth's trust wobble continues</h4><p>When your brand is built on "honest," every question about honesty costs double. A live case study in trust debt.</p></div>
+        <span class="chip chip-ouch">Rough week</span>
+      </div>
+      <div class="news-item">
+        <img src="https://logo.clearbit.com/rapido.bike" alt="Rapido" loading="lazy" onerror="this.style.display='none'">
+        <div><h4>Rapido keeps eating the ride-hailing map</h4><p>The challenger playbook, executed patiently: cheaper, faster, everywhere the giants aren't looking.</p></div>
+        <span class="chip chip-move">Brand move</span>
+      </div>
+      <div class="news-item">
+        <img src="https://logo.clearbit.com/airindia.com" alt="Air India" loading="lazy" onerror="this.style.display='none'">
+        <div><h4>Air India's rebrand meets reality, weekly</h4><p>New livery, new identity. But a rebrand is a promise, and promises get graded on operations, not design awards.</p></div>
+        <span class="chip chip-move">Watching</span>
+      </div>
+      <div class="news-item">
+        <img src="https://logo.clearbit.com/nykaa.com" alt="Nykaa" loading="lazy" onerror="this.style.display='none'">
+        <div><h4>Nykaa doubles down on owned brands</h4><p>The retailer-to-brand-house play: margin lives in brands you own, not brands you sell.</p></div>
+        <span class="chip chip-money">Money move</span>
+      </div>
+    </div>
+    <p class="method-note" style="color:var(--muted);margin-top:20px;">Preview edition with sample entries showing the format. The live page carries each week's real updates, refreshed every Monday.</p>
+  </div>
+</section>
+
+<!-- ============ AI TOOLS ============ -->
+<section style="padding-top:30px;">
+  <div class="wrap reveal">
+    <div class="sec-label"><span>③ AI tools your team should try</span><span>Tested, not hyped</span></div>
+    <div class="tool-grid">
+      <div class="tool-card">
+        <div class="tool-head"><img src="https://logo.clearbit.com/heygen.com" alt="HeyGen" loading="lazy" onerror="this.style.display='none'"><h4>HeyGen</h4></div>
+        <p>AI avatar video: turn a script into a presenter-led video without a shoot.</p>
+        <span class="use"><b>Use it for:</b> product explainers and multilingual founder messages.</span>
+      </div>
+      <div class="tool-card">
+        <div class="tool-head"><img src="https://logo.clearbit.com/elevenlabs.io" alt="ElevenLabs" loading="lazy" onerror="this.style.display='none'"><h4>ElevenLabs</h4></div>
+        <p>Voice AI that actually sounds human, in Indian languages too.</p>
+        <span class="use"><b>Use it for:</b> ad voiceovers, dubbing reels across languages.</span>
+      </div>
+      <div class="tool-card">
+        <div class="tool-head"><img src="https://logo.clearbit.com/runwayml.com" alt="Runway" loading="lazy" onerror="this.style.display='none'"><h4>Runway</h4></div>
+        <p>Generative video: b-roll, motion and VFX from a text prompt.</p>
+        <span class="use"><b>Use it for:</b> concept films and storyboards before you spend on a shoot.</span>
+      </div>
+      <div class="tool-card">
+        <div class="tool-head"><img src="https://logo.clearbit.com/suno.com" alt="Suno" loading="lazy" onerror="this.style.display='none'"><h4>Suno</h4></div>
+        <p>Full songs from a prompt: vocals, music, the lot.</p>
+        <span class="use"><b>Use it for:</b> jingle drafts and sonic branding experiments.</span>
+      </div>
+      <div class="tool-card">
+        <div class="tool-head"><img src="https://logo.clearbit.com/gamma.app" alt="Gamma" loading="lazy" onerror="this.style.display='none'"><h4>Gamma</h4></div>
+        <p>Decks that design themselves while you focus on the argument.</p>
+        <span class="use"><b>Use it for:</b> pitch decks and internal strategy docs, fast.</span>
+      </div>
+      <div class="tool-card">
+        <div class="tool-head"><img src="https://logo.clearbit.com/midjourney.com" alt="Midjourney" loading="lazy" onerror="this.style.display='none'"><h4>Midjourney</h4></div>
+        <p>Still the visual benchmark for campaign-grade imagery.</p>
+        <span class="use"><b>Use it for:</b> moodboards, key visual explorations, social creatives.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HEAT BOARD ============ -->
+<section style="padding-top:30px;">
+  <div class="wrap reveal">
+    <div class="sec-label"><span>④ The Heat Board</span><span>Who's up, who's down</span></div>
+    <h2 class="h-lg">The week's winners and losers, <span class="serif-i">argued honestly.</span></h2>
+    <p class="how-line">Let's be straight about what this is: not lab science, but a scored, transparent argument. Every Monday we rate the week's brand activity using four ingredients, published weights, and reasons you can disagree with. That's the point. Disagree loudly.</p>
+    <div class="weights">
+      <span class="weight"><b>40%</b> campaign quality: was the work actually good?</span>
+      <span class="weight"><b>25%</b> consumer sentiment: what people said, shared, mocked</span>
+      <span class="weight"><b>20%</b> Arena predictions: the crowd's calls, weighted by accuracy</span>
+      <span class="weight"><b>15%</b> Circle votes: CMOs and founders, on the record</span>
+    </div>
+  </div>
+  <div class="index-section" style="margin-top:44px;">
+    <div class="wrap reveal" style="padding:60px 0;">
+      <table class="index">
+        <thead>
+          <tr><th></th><th>Brand</th><th class="cat-col">Category</th><th>Heat</th><th>This week</th><th class="cat-col">The reason</th></tr>
+        </thead>
+        <tbody id="index-body"></tbody>
+      </table>
+      <p class="method-note">Preview board with sample scores. The live board covers 50+ Indian brands, updated every Monday. Want your vote to count? <a href="apply.html#circle">Join The Circle.</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="news-band" style="padding-top:40px;">
+  <div class="wrap reveal">
+    <h2 class="h-lg">Get this page in your inbox,<br>every <span class="serif-i">Wednesday.</span></h2>
+    <form class="subscribe" onsubmit="return subscribe(event)">
+      <input type="email" required id="sub-email" placeholder="you@company.com">
+      <button class="btn btn-lime" type="submit">Subscribe free</button>
+    </form>
+    <p class="sub-note" id="sub-note">Campaigns, brand moves, AI tools, the Heat Board. Under 5 minutes.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-logo"><img src="assets/bb-logo.svg" alt="Breaking Brands"></div>
+        <p class="foot-tag">Where India's brands get built, judged and broken down. By Prasad Danie.</p>
+      </div>
+      <div class="foot-links">
+        <div>
+          <h4>Watch</h4>
+          <a href="watch">The show</a>
+          <a href="series">All series</a>
+          <a href="autopsies">Autopsies</a>
+        </div>
+        <div>
+          <h4>Play</h4>
+          <a href="heat-index">This Week</a>
+          <a href="arena">Prediction Arena</a>
+        </div>
+        <div>
+          <h4>Join</h4>
+          <a href="apply">Get featured</a>
+          <a href="apply.html#built">Get built</a>
+          <a href="apply.html#circle">The Circle</a>
+          <a href="newsletter">Newsletter</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Breaking Brands · by Prasad Danie</span>
+      <span>Built with Crennect</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/main.js"></script>
+</body>
+</html>

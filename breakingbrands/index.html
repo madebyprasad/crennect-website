@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Breaking Brands: India's Brand Show, Autopsies & Heat Index | by Prasad Danie</title>
+<meta name="description" content="Breaking Brands is a weekly YouTube show and live scoreboard where India's brands get built, judged and broken down. Brand autopsies, the Brand Heat Index, hit-or-flop predictions and brand stories, for CMOs, founders and marketers. New episodes every Wednesday.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="author" content="Prasad Danie">
+<meta name="theme-color" content="#F4F1EA">
+<link rel="canonical" href="https://www.crennect.com/breakingbrands/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Breaking Brands">
+<meta property="og:title" content="Breaking Brands: Where India's brands get built, judged & broken down">
+<meta property="og:description" content="A weekly show + live scoreboard for CMOs and founders. Brand autopsies, the Heat Index, predictions and brand stories. Every Wednesday.">
+<meta property="og:url" content="https://www.crennect.com/breakingbrands/">
+<meta property="og:locale" content="en_IN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Breaking Brands: Where India's brands get built, judged & broken down">
+<meta name="twitter:description" content="A weekly show + live scoreboard for CMOs and founders. Every Wednesday. No noise.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.crennect.com/breakingbrands/#org",
+      "name": "Breaking Brands",
+      "url": "https://www.crennect.com/breakingbrands/",
+      "description": "Breaking Brands is a weekly show and live scoreboard where India's brands get built, judged and broken down: brand autopsies, the Brand Heat Index, hit-or-flop campaign predictions and brand stories for CMOs, founders and marketers.",
+      "founder": {"@id": "https://www.crennect.com/breakingbrands/#prasad"},
+      "sameAs": ["https://www.youtube.com/@prasaddanie"]
+    },
+    {
+      "@type": "Person",
+      "@id": "https://www.crennect.com/breakingbrands/#prasad",
+      "name": "Prasad Danie",
+      "url": "https://www.crennect.com/breakingbrands/",
+      "jobTitle": "Founder & Host, Breaking Brands",
+      "knowsAbout": ["branding", "brand strategy", "consumer psychology", "marketing case studies", "AI in marketing"],
+      "sameAs": ["https://www.youtube.com/@prasaddanie"]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.crennect.com/breakingbrands/#site",
+      "url": "https://www.crennect.com/breakingbrands/",
+      "name": "Breaking Brands",
+      "publisher": {"@id": "https://www.crennect.com/breakingbrands/#org"},
+      "inLanguage": "en-IN"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://www.crennect.com/breakingbrands/#home",
+      "url": "https://www.crennect.com/breakingbrands/",
+      "name": "Breaking Brands: Where India's brands get built, judged & broken down",
+      "isPartOf": {"@id": "https://www.crennect.com/breakingbrands/#site"},
+      "about": {"@id": "https://www.crennect.com/breakingbrands/#org"},
+      "description": "Weekly show and live brand scoreboard for India: brand autopsies, the Brand Heat Index, the Prediction Arena and brand stories."
+    }
+  ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=Jersey+20&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+<link rel="stylesheet" href="assets/home.css">
+</head>
+<body data-index-limit="5">
+
+<div class="nav-shell">
+  <nav>
+    <a class="logo" href="./"><img src="assets/bb-white.svg" alt="Breaking Brands"></a>
+    <div class="nav-links">
+      <a href="watch">Watch</a>
+      <a href="heat-index">This Week</a>
+      <a href="arena">Arena</a>
+      <a href="autopsies">Autopsies</a>
+      <a href="series">Series</a>
+      <a href="newsletter">Newsletter</a>
+    </div>
+    <a class="nav-cta" href="apply">Apply</a>
+  </nav>
+</div>
+
+<!-- ============ HERO (curved shorts carousel) ============ -->
+<header class="flow-hero">
+  <div class="flow-stage" id="flow-stage">
+    <span class="flow-arrow fa-l">‹</span>
+    <span class="flow-arrow fa-r">›</span>
+    <div class="flow-track" id="flow-track"></div>
+  </div>
+  <div class="hero-vignette hv-l"></div>
+  <div class="hero-vignette hv-r"></div>
+  <span class="cursor-tag" id="cursor-tag">Refresh</span>
+  <div class="hero-top">
+    <h1 class="future-title">
+      <span class="title-back">The Future of Brands</span>
+      <span class="title-front">The Future of Brands</span>
+    </h1>
+  </div>
+  <p class="tagline">Real insights into consumer behavior, brand growth, and market disruption with lessons from the brands shaping tomorrow's economy, and those left behind.</p>
+  <div class="cta-row">
+    <a class="btn-step" href="#watch">Step Inside</a>
+  </div>
+</header>
+
+<!-- shorts modal -->
+<div class="short-modal" id="short-modal" onclick="closeShort(event)">
+  <button class="sm-close" onclick="closeShort(event, true)">✕ Close</button>
+  <div class="sm-frame"><iframe id="short-frame" src="about:blank" title="Breaking Brands short" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+</div>
+
+<script>
+/* ---------- shorts carousel ----------
+   Each card: a local thumbnail (assets folder) + optionally the YouTube
+   video ID (the part after /shorts/). With an id, clicking plays the short
+   in a popup. Without one, clicking opens the channel's Shorts tab. */
+const CARDS_CONFIG = [
+  {img: "assets/sample1.webp", id: "2jHzzpuhbAc"},
+  {img: "assets/sample2.webp", id: ""},
+  {img: "assets/sample3.webp", id: ""},
+  {img: "assets/sample4.webp", id: ""},
+  {img: "assets/sample5.webp", id: ""},
+  {img: "assets/sample6.webp", id: ""},
+];
+const SHORTS_TAB = "https://www.youtube.com/@prasaddanie/shorts";
+(function(){
+  const track = document.getElementById("flow-track");
+  const stage = document.getElementById("flow-stage");
+  if(!track) return;
+
+  const cards = CARDS_CONFIG;
+  const makeCard = (c) => {
+    return `<div class="flow-card">
+      <img src="${c.img}" alt="Breaking Brands short" loading="lazy">
+    </div>`;
+  };
+
+  /* two copies of the set, arranged around a virtual cylinder */
+  track.innerHTML = cards.map(makeCard).join("") + cards.map(makeCard).join("");
+  const els = Array.from(track.children);
+  const N = els.length;             /* 12 positions on the cylinder */
+  const STEP = 228 / N;             /* degrees between neighbouring cards */
+  const RANGE = N * STEP;           /* full turn of our virtual cylinder */
+  const VISIBLE = 58;               /* cards beyond this angle are hidden */
+  const DRIFT = 0.045;              /* auto-rotation, degrees per frame */
+
+  let angle = 0;
+  let dragging = false, dragStartX = 0, dragStartAngle = 0, moved = 0, velocity = 0, lastX = 0;
+  const degPerPx = () => 220 / stage.clientWidth;
+
+  /* drag rotates the cylinder */
+  stage.addEventListener("pointerdown", (e)=>{
+    dragging = true; moved = 0; velocity = 0;
+    dragStartX = e.clientX; dragStartAngle = angle; lastX = e.clientX;
+    stage.classList.add("dragging");
+    stage.setPointerCapture(e.pointerId);
+  });
+  stage.addEventListener("pointermove", (e)=>{
+    if(!dragging) return;
+    const dx = e.clientX - dragStartX;
+    angle = dragStartAngle + dx * degPerPx();
+    moved = Math.max(moved, Math.abs(dx));
+    velocity = (e.clientX - lastX) * degPerPx(); lastX = e.clientX;
+  });
+  const endDrag = ()=>{ dragging = false; stage.classList.remove("dragging"); };
+  stage.addEventListener("pointerup", endDrag);
+  stage.addEventListener("pointercancel", endDrag);
+  /* click = booster: the wheel accelerates like a car, then eases back */
+  let boostStart = -1;
+  const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+  const easeInOutQuad = t => t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 2;
+  function boostFactor(){
+    if(boostStart < 0) return 1;
+    const t = (performance.now() - boostStart) / 1000;
+    const ACCEL = 0.35, DECAY = 2.4, MAX = 9;   /* 10x for ~2.75s total */
+    if(t < ACCEL) return 1 + MAX * easeOutCubic(t / ACCEL);
+    if(t < ACCEL + DECAY) return 1 + MAX * (1 - easeInOutQuad((t - ACCEL) / DECAY));
+    boostStart = -1;
+    return 1;
+  }
+  stage.addEventListener("click", (e)=>{
+    if(moved > 8){ e.stopPropagation(); e.preventDefault(); return; }
+    boostStart = performance.now();
+  }, true);
+
+  function frame(){
+    if(!dragging){
+      if(Math.abs(velocity) > 0.01){ angle += velocity; velocity *= 0.95; }
+      else{ angle -= DRIFT * boostFactor(); }
+    }
+    /* project each card from its position on the cylinder onto the screen:
+       x = F*tan(a) spreads cards apart toward the edges,
+       scaleX = 1/cos^1.6 stretches them horizontally (curved-screen distortion),
+       scaleY = 1/cos^0.85 grows them gently. No per-card rotation: the cards
+       stay upright and the curvature comes entirely from the projection. */
+    const F = stage.clientWidth * 0.37;
+    for(let i = 0; i < N; i++){
+      let a = angle + i * STEP;
+      a = ((a % RANGE) + RANGE) % RANGE;
+      if(a > RANGE / 2) a -= RANGE;
+      const el = els[i];
+      if(Math.abs(a) > VISIBLE){ el.style.display = "none"; continue; }
+      el.style.display = "";
+      const rad = a * Math.PI / 180;
+      const cos = Math.cos(rad);
+      const x = F * Math.tan(rad);
+      const sx = 1 / Math.pow(cos, 2.2);
+      const sy = 1 / Math.pow(cos, 1.5);
+      el.style.transform = `translate(calc(-50% + ${x.toFixed(1)}px), -50%) scale(${sx.toFixed(3)}, ${sy.toFixed(3)})`;
+      el.style.zIndex = String(100 + Math.round(Math.abs(a)));
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  /* nav: transparent over the hero, dark once the user scrolls */
+  const navShell = document.querySelector(".nav-shell");
+  const onScroll = ()=> navShell.classList.toggle("scrolled", window.scrollY > 40);
+  onScroll();
+  window.addEventListener("scroll", onScroll, {passive:true});
+
+  /* "Step Inside" tag follows the cursor over cards */
+  const tag = document.getElementById("cursor-tag");
+  stage.addEventListener("mousemove", (e)=>{
+    const overCard = e.target.closest && e.target.closest(".flow-card");
+    tag.classList.toggle("on", !!overCard && !dragging);
+    tag.style.left = e.clientX + "px";
+    tag.style.top = e.clientY + "px";
+  });
+  stage.addEventListener("mouseleave", ()=> tag.classList.remove("on"));
+  stage.addEventListener("pointerdown", ()=> tag.classList.remove("on"));
+})();
+
+function openShort(id){
+  const m = document.getElementById("short-modal");
+  document.getElementById("short-frame").src = `https://www.youtube.com/embed/${id}?autoplay=1&rel=0&playsinline=1`;
+  m.classList.add("open");
+}
+function closeShort(e, force){
+  if(!force && e.target.closest(".sm-frame")) return;
+  const m = document.getElementById("short-modal");
+  m.classList.remove("open");
+  document.getElementById("short-frame").src = "about:blank";
+}
+</script>
+
+<!-- ============ WATCH ============ -->
+<section id="watch" style="padding-top:96px;">
+  <div class="wrap reveal">
+    <div class="sec-label"><span>① The Show</span><span>New episodes Wednesdays</span></div>
+    <div class="watch-wrap">
+      <div>
+        <div class="frame frame-main">
+          <iframe src="https://www.youtube.com/embed/videoseries?list=UUQZbsX5B4lOdqetVJG7RCvw" title="Breaking Brands latest episodes" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe>
+        </div>
+        <div class="frame-cap"><span><b>Latest episodes</b> · straight from the channel</span><span>16:9</span></div>
+      </div>
+      <div>
+        <div class="frame frame-tall">
+          <iframe src="https://www.youtube.com/embed/videoseries?list=UUSHQZbsX5B4lOdqetVJG7RCvw" title="Breaking Brands shorts" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe>
+        </div>
+        <div class="frame-cap"><span><b>Shorts</b></span><span>9:16</span></div>
+      </div>
+    </div>
+    <div style="margin-top:44px;">
+      <a class="link-arrow" href="https://www.youtube.com/@prasaddanie?sub_confirmation=1" target="_blank" rel="noopener">Subscribe on YouTube ↗</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SERIES INDEX ============ -->
+<section>
+  <div class="wrap reveal">
+    <div class="sec-label"><span>② The Series</span><span>Five ways in</span></div>
+    <div class="big-list">
+      <a class="big-row" href="series">
+        <span class="br-num">01</span>
+        <span class="br-name">Brand <span class="serif-i">Stories</span></span>
+        <span class="br-desc">How the world's most addictive brands were built.</span>
+      </a>
+      <a class="big-row" href="autopsies">
+        <span class="br-num">02</span>
+        <span class="br-name">Brand <span class="serif-i">Autopsies</span></span>
+        <span class="br-desc">Why brands break. The post-mortems no one else does.</span>
+      </a>
+      <a class="big-row" href="series">
+        <span class="br-num">03</span>
+        <span class="br-name">Consumer <span class="serif-i">Mind</span></span>
+        <span class="br-desc">The psychology working on you right now.</span>
+      </a>
+      <a class="big-row" href="series">
+        <span class="br-num">04</span>
+        <span class="br-name">Brand <span class="serif-i">Fixes</span></span>
+        <span class="br-desc">Why your brand sounds like everyone else, and how to fix it.</span>
+      </a>
+      <a class="big-row" href="series">
+        <span class="br-num">05</span>
+        <span class="br-name">AI for <span class="serif-i">Brands</span></span>
+        <span class="br-desc">What actually changes for brand builders. No hype.</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HEAT INDEX ============ -->
+<section style="padding-top:40px;">
+  <div class="wrap reveal">
+    <div class="sec-label"><span>③ This Week in Brands</span><span>Updated Mondays</span></div>
+  </div>
+  <div class="index-section">
+    <div class="wrap reveal" style="padding:70px 0;">
+      <div class="index-head">
+        <h2 class="h-lg">Who had a week, <span class="serif-i">who had a rough one.</span></h2>
+        <p class="sub">The Heat Board: the week's brand winners and losers, scored openly, argued honestly. The top five:</p>
+      </div>
+      <table class="index">
+        <thead>
+          <tr><th></th><th>Brand</th><th class="cat-col">Category</th><th>Heat</th><th>This week</th><th class="cat-col">Why</th></tr>
+        </thead>
+        <tbody id="index-body"></tbody>
+      </table>
+      <p class="method-note"><a href="heat-index">See the full week: campaigns, brand moves, AI tools + the whole board →</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATEMENT ============ -->
+<section class="statement">
+  <div class="wrap reveal">
+    <p>Everyone studies winners.<br>We do the <span class="serif-i">post-mortems.</span></p>
+    <a class="link-arrow" href="autopsies" style="margin-top:44px;">Read the post-mortems →</a>
+  </div>
+</section>
+
+<!-- ============ APPLY ============ -->
+<section style="padding-top:0;">
+  <div class="wrap reveal">
+    <div class="sec-label"><span>④ For CMOs & Founders</span><span>Reviewed personally</span></div>
+    <div class="apply-rows">
+      <a class="apply-row" href="apply">
+        <h3>Tell your brand story on the show</h3>
+        <p>A limited number of brand stories are featured each quarter.</p>
+        <span class="arr">→</span>
+      </a>
+      <a class="apply-row" href="apply.html#built">
+        <h3>Build your personal brand</h3>
+        <p>For leaders who should be visible and aren't. Selective by design.</p>
+        <span class="arr">→</span>
+      </a>
+      <a class="apply-row" href="apply.html#circle">
+        <h3>Join The Circle</h3>
+        <p>A vetted membership. Weighted Index votes, private roundtables, your name on the wall.</p>
+        <span class="arr">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ NEWSLETTER ============ -->
+<section class="news-band" style="padding-top:60px;">
+  <div class="wrap reveal">
+    <p class="ed-label" style="justify-content:center;">The newsletter</p>
+    <h2 class="h-lg" style="margin-top:24px;">India's brand week,<br><span class="serif-i">decoded</span> every Wednesday.</h2>
+    <p class="sub" style="margin:20px auto 0;text-align:center;">One campaign worth copying. One failure worth learning from. One AI tool worth testing. Five minutes, and you're the sharpest person in the room.</p>
+    <form class="subscribe" onsubmit="return subscribe(event)">
+      <input type="email" required id="sub-email" placeholder="you@company.com">
+      <button class="btn btn-lime" type="submit">Subscribe free</button>
+    </form>
+    <p class="sub-note" id="sub-note">Free, every Wednesday. Unsubscribe whenever, no hard feelings.</p>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-logo"><img src="assets/bb-logo.svg" alt="Breaking Brands"></div>
+        <p class="foot-tag">Where India's brands get built, judged and broken down. By Prasad Danie.</p>
+      </div>
+      <div class="foot-links">
+        <div>
+          <h4>Watch</h4>
+          <a href="watch">The show</a>
+          <a href="series">All series</a>
+          <a href="autopsies">Autopsies</a>
+        </div>
+        <div>
+          <h4>Play</h4>
+          <a href="heat-index">This Week</a>
+          <a href="arena">Prediction Arena</a>
+        </div>
+        <div>
+          <h4>Join</h4>
+          <a href="apply">Get featured</a>
+          <a href="apply.html#built">Get built</a>
+          <a href="apply.html#circle">The Circle</a>
+          <a href="newsletter">Newsletter</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Breaking Brands · by Prasad Danie</span>
+      <span>Built with Crennect</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/main.js"></script>
+</body>
+</html>

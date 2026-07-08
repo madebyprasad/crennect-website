@@ -71,7 +71,7 @@ export default function Header() {
             <a href="#resources" style={navLinkStyle}>Resources</a>
             <a href="contact.html" style={navLinkStyle}>Contact Us</a>
             <a
-              href="https://linktr.ee/crennect"
+              href="https://www.crennect.com/breakingbrands/"
               className="btn-nav"
               style={isLightBg ? { color: '#1a1a1a', borderColor: '#1a1a1a' } : {}}
             >
@@ -106,7 +106,7 @@ export default function Header() {
             <a href="#resources" onClick={closeMobileMenu}>Resources</a>
           </div>
 
-          <a href="https://linktr.ee/crennect"
+          <a href="https://www.crennect.com/breakingbrands/"
             className="mobile-cta primary clickable bb-image-only"
             aria-label="Breaking Brands"
             onClick={closeMobileMenu}>

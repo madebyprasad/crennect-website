@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apply: Get Featured, Get Built or Join The Circle | Breaking Brands</title>
+<meta name="description" content="For CMOs, C-suite and founders: apply to tell your brand story on the Breaking Brands show, get your personal brand built by Prasad Danie, or join The Circle, a vetted membership of senior brand leaders in India.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="author" content="Prasad Danie">
+<meta name="theme-color" content="#F4F1EA">
+<link rel="canonical" href="https://www.crennect.com/breakingbrands/apply">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Breaking Brands">
+<meta property="og:title" content="Apply to Breaking Brands">
+<meta property="og:description" content="Get your brand story featured, get your personal brand built, or join The Circle. Reviewed personally.">
+<meta property="og:url" content="https://www.crennect.com/breakingbrands/apply">
+<meta property="og:locale" content="en_IN">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "url": "https://www.crennect.com/breakingbrands/apply",
+  "name": "Apply to Breaking Brands",
+  "description": "Application page for founders and CMOs: get featured on the show, get your personal brand built, or join The Circle membership.",
+  "isPartOf": {"@id": "https://www.crennect.com/breakingbrands/#site"},
+  "breadcrumb": {
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.crennect.com/breakingbrands/"},
+      {"@type": "ListItem", "position": 2, "name": "Apply", "item": "https://www.crennect.com/breakingbrands/apply"}
+    ]
+  }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<div class="nav-shell">
+  <nav>
+    <a class="logo" href="./"><img src="assets/bb-logo.svg" alt="Breaking Brands"></a>
+    <div class="nav-links">
+      <a href="watch">Watch</a>
+      <a href="heat-index">This Week</a>
+      <a href="arena">Arena</a>
+      <a href="autopsies">Autopsies</a>
+      <a href="series">Series</a>
+      <a href="newsletter">Newsletter</a>
+    </div>
+    <a class="nav-cta" href="apply">Apply to join</a>
+  </nav>
+</div>
+
+<header class="page-hero">
+  <div class="wrap">
+    <span class="kicker">Apply</span>
+    <h1 class="h-xl">This part is <span class="serif-i">invite-only.</span><br>The invite is an application.</h1>
+    <p class="sub">For CMOs, C-suite and founders who want in: three doors, all reviewed personally. We respond to every application. We don't accept every one.</p>
+  </div>
+</header>
+
+<section class="apply-section" style="margin-top:30px;">
+  <div class="wrap reveal">
+    <div class="tabs" style="margin-top:0;">
+      <button class="tab-btn active" data-tab="featured" onclick="showTab(event,'featured')">🎬 Get Featured</button>
+      <button class="tab-btn" data-tab="built" onclick="showTab(event,'built')">🚀 Get Built</button>
+      <button class="tab-btn" data-tab="circle" onclick="showTab(event,'circle')">⭕ The Circle</button>
+    </div>
+
+    <!-- FORM A -->
+    <div class="form-panel active" id="panel-featured">
+      <div class="card">
+        <h3 class="h-md">Tell your brand story on Breaking Brands</h3>
+        <p class="form-desc">A limited number of brand stories are featured each quarter. If yours is worth telling, we'll craft it into an episode and put it in front of the people who matter.</p>
+        <form onsubmit="return submitForm(event,'featured')">
+          <div class="field-row">
+            <div class="field"><label>Name</label><input required name="name" placeholder="Your full name"></div>
+            <div class="field"><label>Role & company</label><input required name="role" placeholder="Founder, Acme Foods"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label>LinkedIn</label><input name="linkedin" placeholder="linkedin.com/in/…"></div>
+            <div class="field"><label>Brand website / Instagram</label><input name="site" placeholder="yourbrand.com"></div>
+          </div>
+          <div class="field"><label>Your brand's story in 5 sentences. What makes it worth telling?</label><textarea required name="story"></textarea></div>
+          <div class="field"><label>The hardest brand decision you ever made?</label><textarea name="decision"></textarea></div>
+          <div class="field"><label>Stage</label>
+            <select name="stage"><option>Pre-launch</option><option>Early</option><option selected>Growth</option><option>Established</option></select>
+          </div>
+          <button class="btn btn-dark" type="submit">Submit application</button>
+          <p class="form-note">Applications are reviewed personally. We respond to every one, but we don't accept every one.</p>
+          <div class="form-success" id="success-featured">✔ Application received. If the story fits, you'll hear from Prasad directly.</div>
+        </form>
+      </div>
+    </div>
+
+    <!-- FORM B -->
+    <div class="form-panel" id="panel-built">
+      <div class="card">
+        <h3 class="h-md">Build your personal brand</h3>
+        <p class="form-desc">For leaders who should be visible and aren't. Content engine, positioning, personal brand, all built for you, in your voice. Selective by design.</p>
+        <form onsubmit="return submitForm(event,'built')">
+          <div class="field-row">
+            <div class="field"><label>Name</label><input required name="name" placeholder="Your full name"></div>
+            <div class="field"><label>Role & company</label><input required name="role" placeholder="CMO, Acme Corp"></div>
+          </div>
+          <div class="field"><label>LinkedIn</label><input name="linkedin" placeholder="linkedin.com/in/…"></div>
+          <div class="field"><label>Where do you want to be visible?</label><input name="channels" placeholder="LinkedIn / YouTube / stage / press"></div>
+          <div class="field"><label>What's your point of view the industry needs to hear?</label><textarea required name="pov"></textarea></div>
+          <div class="field"><label>Current content effort</label>
+            <select name="effort"><option>None</option><option selected>Occasional</option><option>Consistent</option></select>
+          </div>
+          <button class="btn btn-dark" type="submit">Submit application</button>
+          <p class="form-note">Applications are reviewed personally. We respond to every one, but we don't accept every one.</p>
+          <div class="form-success" id="success-built">✔ Application received. Expect a personal reply, not an automated funnel.</div>
+        </form>
+      </div>
+    </div>
+
+    <!-- FORM C -->
+    <div class="form-panel" id="panel-circle">
+      <div class="card">
+        <h3 class="h-md">Join The Circle</h3>
+        <p class="form-desc">A vetted, free membership for senior brand leaders. Weighted Index votes, private roundtables, your name on the members page, and your voice quoted in autopsies.</p>
+        <form onsubmit="return submitForm(event,'circle')">
+          <div class="field-row">
+            <div class="field"><label>Name</label><input required name="name" placeholder="Your full name"></div>
+            <div class="field"><label>Role & company</label><input required name="role" placeholder="CMO, Acme Corp"></div>
+          </div>
+          <div class="field"><label>LinkedIn</label><input name="linkedin" placeholder="linkedin.com/in/…"></div>
+          <div class="field"><label>Which brand's collapse taught you the most, and why?</label><textarea required name="collapse"></textarea></div>
+          <div class="field"><label>Nominate one brand for an autopsy</label><input name="nominate" placeholder="Brand name"></div>
+          <div class="field"><label>One prediction: which current campaign will flop?</label><input name="prediction" placeholder="Your call…"></div>
+          <button class="btn btn-dark" type="submit">Apply for membership</button>
+          <p class="form-note">Scarcity is the point. Members are listed publicly; applications are not.</p>
+          <div class="form-success" id="success-circle">✔ Application received. The Circle reviews new members monthly.</div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap reveal" style="text-align:center;">
+    <h2 class="h-md">Not sure which door is yours?</h2>
+    <p class="sub" style="margin:14px auto 26px;">Featured = your brand's story on the show. Built = your personal brand, engineered. Circle = a seat at the table where brands get judged.</p>
+    <a class="btn btn-ghost" href="watch">Watch the show first</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-logo"><img src="assets/bb-logo.svg" alt="Breaking Brands"></div>
+        <p class="foot-tag">Where India's brands get built, judged and broken down. By Prasad Danie.</p>
+      </div>
+      <div class="foot-links">
+        <div>
+          <h4>Watch</h4>
+          <a href="watch">The show</a>
+          <a href="series">All series</a>
+          <a href="autopsies">Autopsies</a>
+        </div>
+        <div>
+          <h4>Play</h4>
+          <a href="heat-index">This Week</a>
+          <a href="arena">Prediction Arena</a>
+        </div>
+        <div>
+          <h4>Join</h4>
+          <a href="apply">Get featured</a>
+          <a href="apply.html#built">Get built</a>
+          <a href="apply.html#circle">The Circle</a>
+          <a href="newsletter">Newsletter</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Breaking Brands · by Prasad Danie</span>
+      <span>Built with Crennect</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/main.js"></script>
+</body>
+</html>

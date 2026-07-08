@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prediction Arena: Will This Campaign Work? Vote Hit or Flop | Breaking Brands</title>
+<meta name="description" content="One Indian ad campaign goes on trial every week. Predict hit or flop before the market decides, get scored when the verdict lands, and climb the leaderboard of India's sharpest marketing minds.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="author" content="Prasad Danie">
+<meta name="theme-color" content="#F4F1EA">
+<link rel="canonical" href="https://www.crennect.com/breakingbrands/arena">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Breaking Brands">
+<meta property="og:title" content="Prediction Arena: Will This Campaign Work?">
+<meta property="og:description" content="Vote hit or flop on this week's campaign. Get scored when the verdict lands.">
+<meta property="og:url" content="https://www.crennect.com/breakingbrands/arena">
+<meta property="og:locale" content="en_IN">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "url": "https://www.crennect.com/breakingbrands/arena",
+  "name": "Prediction Arena: Will This Campaign Work?",
+  "description": "A weekly game where marketers predict whether Indian ad campaigns will hit or flop, scored against real market outcomes.",
+  "isPartOf": {"@id": "https://www.crennect.com/breakingbrands/#site"},
+  "breadcrumb": {
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.crennect.com/breakingbrands/"},
+      {"@type": "ListItem", "position": 2, "name": "Prediction Arena", "item": "https://www.crennect.com/breakingbrands/arena"}
+    ]
+  }
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+<div class="nav-shell">
+  <nav>
+    <a class="logo" href="./"><img src="assets/bb-logo.svg" alt="Breaking Brands"></a>
+    <div class="nav-links">
+      <a href="watch">Watch</a>
+      <a href="heat-index">This Week</a>
+      <a href="arena">Arena</a>
+      <a href="autopsies">Autopsies</a>
+      <a href="series">Series</a>
+      <a href="newsletter">Newsletter</a>
+    </div>
+    <a class="nav-cta" href="apply">Apply to join</a>
+  </nav>
+</div>
+
+<header class="page-hero">
+  <div class="wrap">
+    <span class="kicker">The Prediction Arena</span>
+    <h1 class="h-xl">You saw the campaign.<br>Will it <span class="serif-i">work?</span></h1>
+    <p class="sub">One live prediction a week. Vote hit or flop before the market decides. When the verdict lands, you get scored, and the sharpest predictors get named, ranked and scouted for The Circle.</p>
+  </div>
+</header>
+
+<section style="padding-top:30px;">
+  <div class="wrap reveal">
+    <div class="arena-grid">
+      <div class="card">
+        <span class="tag tag-live">● live prediction</span>
+        <h3 class="h-md">A legacy Indian FMCG brand just rebranded for Gen Z: new logo, new tone, memes and all.</h3>
+        <p style="color:var(--muted);margin-top:12px;font-size:15px;">Complete identity overhaul, influencer-first launch, ₹40Cr estimated spend. The internet is split. Verdict drops in 6 weeks, scored against sentiment, sales signals and recall.</p>
+        <div class="vote-row">
+          <button class="vote-btn hit" onclick="vote('hit')">📈 HIT</button>
+          <button class="vote-btn flop" onclick="vote('flop')">📉 FLOP</button>
+        </div>
+        <div class="vote-result" id="vote-result">
+          <div class="bar"><div class="hit-fill" id="hit-fill"></div><div class="flop-fill" id="flop-fill"></div></div>
+          <div class="bar-labels"><span class="up" id="hit-label"></span><span class="down" id="flop-label"></span></div>
+          <p style="font-size:13px;color:var(--muted);margin-top:10px;">Your vote is in. Come back for the verdict. Accurate predictors get named in the newsletter.</p>
+        </div>
+      </div>
+      <div class="card last-verdict">
+        <span class="tag tag-verdict">how it works</span>
+        <h3 class="h-md">Judgment is a skill.<br>Prove yours.</h3>
+        <p style="margin-top:12px;">Every week, one campaign goes on trial. You call it before the market does. Verdicts are scored against sentiment, sales signals and recall data 4–8 weeks later.</p>
+        <div class="accuracy">
+          🏆 <b>The leaderboard:</b> accuracy is tracked over time. Top predictors get named in the newsletter, and their votes start counting toward the Heat Board.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:20px;">
+  <div class="wrap reveal">
+    <span class="kicker">Past verdicts</span>
+    <h2 class="h-lg">The record so <span class="serif-i">far.</span></h2>
+    <div class="verdict-list">
+      <div class="verdict-item">
+        <div>
+          <h4>The quick-commerce ad blitz</h4>
+          <p class="meta">Crowd said HIT (68%) · Verdict: orders up, recall up, one jingle stuck in everyone's head</p>
+        </div>
+        <span class="badge badge-hit">HIT · crowd was right</span>
+      </div>
+      <div class="verdict-item">
+        <div>
+          <h4>The luxury watch brand's meme pivot</h4>
+          <p class="meta">Crowd said FLOP (74%) · Verdict: engagement spiked, sales didn't, brand equity took the bill</p>
+        </div>
+        <span class="badge badge-flop">FLOP · crowd was right</span>
+      </div>
+      <div class="verdict-item">
+        <div>
+          <h4>The airline's apology campaign</h4>
+          <p class="meta">Crowd said FLOP (55%) · Verdict: sentiment recovered within a month. The crowd got this one wrong</p>
+        </div>
+        <span class="badge badge-hit">HIT · crowd was wrong</span>
+      </div>
+    </div>
+    <p class="method-note" style="color:var(--muted);">Demo verdicts for launch preview. The live Arena archive builds week by week.</p>
+    <div class="cta-row" style="margin-top:30px;">
+      <a class="btn btn-dark" href="heat-index">See how your predictions feed the Heat Board</a>
+      <a class="btn btn-ghost" href="newsletter">Get each week's prediction by email</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-logo"><img src="assets/bb-logo.svg" alt="Breaking Brands"></div>
+        <p class="foot-tag">Where India's brands get built, judged and broken down. By Prasad Danie.</p>
+      </div>
+      <div class="foot-links">
+        <div>
+          <h4>Watch</h4>
+          <a href="watch">The show</a>
+          <a href="series">All series</a>
+          <a href="autopsies">Autopsies</a>
+        </div>
+        <div>
+          <h4>Play</h4>
+          <a href="heat-index">This Week</a>
+          <a href="arena">Prediction Arena</a>
+        </div>
+        <div>
+          <h4>Join</h4>
+          <a href="apply">Get featured</a>
+          <a href="apply.html#built">Get built</a>
+          <a href="apply.html#circle">The Circle</a>
+          <a href="newsletter">Newsletter</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Breaking Brands · by Prasad Danie</span>
+      <span>Built with Crennect</span>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/main.js"></script>
+</body>
+</html>

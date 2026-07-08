@@ -30,7 +30,7 @@ We work across six service lines:
 - [GenAI](https://www.crennect.com/genai.html): How we use generative AI to build intelligent brand systems
 - [Contact](https://www.crennect.com/contact.html): Start a conversation with us
 - [Case Studies](https://portfolio.crennect.com/): Our portfolio and client work
-- [Breaking Brands](https://linktr.ee/crennect): Our IP studying how brands break through
+- [Breaking Brands](https://www.crennect.com/breakingbrands/): Our IP studying how brands break through
 
 ## Legal
 

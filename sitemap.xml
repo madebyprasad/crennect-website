@@ -1,86 +1,104 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
+  <!-- ===== Main Crennect site ===== -->
   <url>
     <loc>https://www.crennect.com/</loc>
     <lastmod>2026-02-01</lastmod>
   </url>
-
   <url>
     <loc>https://www.crennect.com/about</loc>
     <lastmod>2026-02-01</lastmod>
   </url>
-
   <url>
     <loc>https://www.crennect.com/services</loc>
     <lastmod>2026-06-05</lastmod>
   </url>
-
   <url>
     <loc>https://www.crennect.com/contact</loc>
     <lastmod>2026-02-01</lastmod>
   </url>
-
-    <url>
+  <url>
     <loc>https://www.crennect.com/genai</loc>
     <lastmod>2026-03-02</lastmod>
   </url>
-
-    <url>
+  <url>
     <loc>https://portfolio.crennect.com/portfolio</loc>
     <lastmod>2026-06-05</lastmod>
   </url>
-
-    <url>
+  <url>
     <loc>https://www.crennect.com/brand-strategy</loc>
     <lastmod>2026-06-05</lastmod>
   </url>
-
-    <url>
+  <url>
     <loc>https://www.crennect.com/creative-campaigns</loc>
     <lastmod>2026-06-05</lastmod>
   </url>
-
-    <url>
+  <url>
     <loc>https://www.crennect.com/content-production</loc>
     <lastmod>2026-06-05</lastmod>
   </url>
-
-    <url>
+  <url>
     <loc>https://www.crennect.com/design-animation</loc>
     <lastmod>2026-06-05</lastmod>
   </url>
-
-    <url>
+  <url>
     <loc>https://www.crennect.com/ai-capabilities</loc>
     <lastmod>2026-06-05</lastmod>
   </url>
-
-    <url>
+  <url>
     <loc>https://www.crennect.com/brand-positioning-canvas</loc>
     <lastmod>2026-06-05</lastmod>
   </url>
-
-    <url>
+  <url>
     <loc>https://www.crennect.com/modern-brand-playbook</loc>
     <lastmod>2026-06-05</lastmod>
   </url>
-
-    <url>
+  <url>
     <loc>https://www.crennect.com/terms-and-conditions</loc>
     <lastmod>2026-06-05</lastmod>
   </url>
-
-    <url>
+  <url>
     <loc>https://www.crennect.com/privacy-policy</loc>
     <lastmod>2026-06-05</lastmod>
   </url>
-
-    <url>
-    <loc>https://https://www.crennect.com/prasad-dani</loc>
+  <url>
+    <loc>https://www.crennect.com/prasad-dani</loc>
     <lastmod>2026-06-05</lastmod>
   </url>
 
-
+  <!-- ===== Breaking Brands (subsite at /breakingbrands/) ===== -->
+  <url>
+    <loc>https://www.crennect.com/breakingbrands/</loc>
+    <lastmod>2026-07-08</lastmod>
+  </url>
+  <url>
+    <loc>https://www.crennect.com/breakingbrands/watch</loc>
+    <lastmod>2026-07-08</lastmod>
+  </url>
+  <url>
+    <loc>https://www.crennect.com/breakingbrands/heat-index</loc>
+    <lastmod>2026-07-08</lastmod>
+  </url>
+  <url>
+    <loc>https://www.crennect.com/breakingbrands/autopsies</loc>
+    <lastmod>2026-07-08</lastmod>
+  </url>
+  <url>
+    <loc>https://www.crennect.com/breakingbrands/arena</loc>
+    <lastmod>2026-07-08</lastmod>
+  </url>
+  <url>
+    <loc>https://www.crennect.com/breakingbrands/series</loc>
+    <lastmod>2026-07-08</lastmod>
+  </url>
+  <url>
+    <loc>https://www.crennect.com/breakingbrands/apply</loc>
+    <lastmod>2026-07-08</lastmod>
+  </url>
+  <url>
+    <loc>https://www.crennect.com/breakingbrands/newsletter</loc>
+    <lastmod>2026-07-08</lastmod>
+  </url>
 
 </urlset>
