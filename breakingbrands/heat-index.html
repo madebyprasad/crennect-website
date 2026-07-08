@@ -304,9 +304,12 @@ table.index td img.blogo{width:30px;height:30px;border-radius:7px;background:#ff
 <section class="news-band" style="padding-top:40px;">
   <div class="wrap reveal">
     <h2 class="h-lg">Get this page in your inbox,<br>every <span class="serif-i">Wednesday.</span></h2>
-    <form class="subscribe" onsubmit="return subscribe(event)">
-      <input type="email" required id="sub-email" placeholder="you@company.com">
-      <button class="btn btn-lime" type="submit">Subscribe free</button>
+    <form class="sub-form" onsubmit="return subscribe(event)">
+      <div class="subscribe">
+        <input type="email" required id="sub-email" placeholder="you@company.com">
+        <button class="btn btn-lime" type="submit">Subscribe free</button>
+      </div>
+      <label class="form-agree"><input type="checkbox" required> I agree to the <a href="terms">Terms</a> and <a href="privacy">Privacy Policy</a>.</label>
     </form>
     <p class="sub-note" id="sub-note">Campaigns, brand moves, AI tools, the Heat Board. Under 5 minutes.</p>
   </div>
@@ -342,6 +345,7 @@ table.index td img.blogo{width:30px;height:30px;border-radius:7px;background:#ff
     </div>
     <div class="foot-bottom">
       <span>© 2026 Breaking Brands · by Prasad Danie</span>
+      <span class="foot-legal"><a href="terms">Terms</a> · <a href="privacy">Privacy</a></span>
       <span>Built with Crennect</span>
     </div>
   </div>
