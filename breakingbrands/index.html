@@ -256,11 +256,19 @@ function closeShort(e, force){
 <section id="watch" style="padding-top:96px;">
   <div class="wrap reveal">
     <div class="sec-label"><span>① The Show</span><span>New episodes Wednesdays</span></div>
-    <div class="watch-single">
-      <div class="frame frame-main">
-        <iframe src="https://www.youtube.com/embed/videoseries?list=UUQZbsX5B4lOdqetVJG7RCvw" title="Breaking Brands — latest full episodes" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe>
+    <div class="watch-two">
+      <div>
+        <div class="frame frame-main">
+          <iframe src="https://www.youtube.com/embed/E1otxMe1zA0?start=2&rel=0" title="Breaking Brands — featured episode" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe>
+        </div>
+        <div class="frame-cap"><span><b>Featured</b> · Breaking Brands</span><span>16:9</span></div>
       </div>
-      <div class="frame-cap"><span><b>Latest full episodes</b> · straight from the channel</span><span>16:9</span></div>
+      <div>
+        <div class="frame frame-main">
+          <iframe src="https://www.youtube.com/embed/Ivx0GFSLReQ?start=4&rel=0" title="Breaking Brands — featured episode" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe>
+        </div>
+        <div class="frame-cap"><span><b>Featured</b> · Breaking Brands</span><span>16:9</span></div>
+      </div>
     </div>
     <div style="margin-top:44px;">
       <a class="link-arrow" href="https://www.youtube.com/@prasaddanie?sub_confirmation=1" target="_blank" rel="noopener">Subscribe on YouTube ↗</a>
@@ -362,9 +370,12 @@ function closeShort(e, force){
     <p class="ed-label" style="justify-content:center;">The newsletter</p>
     <h2 class="h-lg" style="margin-top:24px;">India's brand week,<br><span class="serif-i">decoded</span> every Wednesday.</h2>
     <p class="sub" style="margin:20px auto 0;text-align:center;">One campaign worth copying. One failure worth learning from. One AI tool worth testing. Five minutes, and you're the sharpest person in the room.</p>
-    <form class="subscribe" onsubmit="return subscribe(event)">
-      <input type="email" required id="sub-email" placeholder="you@company.com">
-      <button class="btn btn-lime" type="submit">Subscribe free</button>
+    <form class="sub-form" onsubmit="return subscribe(event)">
+      <div class="subscribe">
+        <input type="email" required id="sub-email" placeholder="you@company.com">
+        <button class="btn btn-lime" type="submit">Subscribe free</button>
+      </div>
+      <label class="form-agree"><input type="checkbox" required> I agree to the <a href="terms">Terms</a> and <a href="privacy">Privacy Policy</a>.</label>
     </form>
     <p class="sub-note" id="sub-note">Free, every Wednesday. Unsubscribe whenever, no hard feelings.</p>
   </div>

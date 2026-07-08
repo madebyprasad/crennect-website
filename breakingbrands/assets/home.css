@@ -196,6 +196,9 @@
 @media(max-width:900px){.watch-wrap{grid-template-columns:1fr}}
 /* single centered full-frame episode player */
 .watch-single{max-width:940px;margin:0 auto}
+/* two featured 16:9 videos side by side (stack on mobile) */
+.watch-two{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+@media(max-width:760px){.watch-two{grid-template-columns:1fr}}
 .frame{
   border-radius:18px;overflow:hidden;background:var(--ink);position:relative;
 }
