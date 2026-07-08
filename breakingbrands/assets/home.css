@@ -67,6 +67,8 @@
   transition:background .2s ease,color .2s ease,transform .15s ease;
 }
 .btn-step:hover{background:#fff;color:var(--ink);transform:translateY(-2px)}
+/* mobile-only "Watch the show" CTA that sits under the hero title */
+.hero-cta-mobile{display:none}
 
 /* --- the cylinder stage: fills the whole hero, arc wraps the text --- */
 .flow-stage{
@@ -146,6 +148,8 @@
   .statement{padding:58px 0}
   /* footer stacked margin-top + big top padding on the newsletter's gap */
   footer{margin-top:0;padding-top:40px}
+  /* show the "Watch the show" CTA under the hero title (mobile only) */
+  .hero-cta-mobile{display:block;width:fit-content;margin:16px auto 0;background:transparent;color:#fff;border-color:#fff}
 }
 @media(max-width:460px){
   .future-title{font-size:clamp(30px,9vw,44px)}

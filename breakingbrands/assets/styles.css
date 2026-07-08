@@ -58,6 +58,10 @@ nav{
 }
 .nav-links a:hover{color:var(--ink)}
 .nav-links a.active{color:var(--ink);border-bottom:1.5px solid var(--red);padding-bottom:2px}
+/* highlight Watch as an orange button — it's the flagship page */
+.nav-links a[href="watch"]{background:var(--red);color:#fff;padding:6px 15px;border-radius:999px;transition:background .2s,color .2s}
+.nav-links a[href="watch"]:hover{background:#d8431d;color:#fff}
+.nav-links a[href="watch"].active{border-bottom:none;padding-bottom:6px}
 .nav-cta{
   color:var(--ink);text-decoration:none;
   font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:12.5px;
@@ -108,7 +112,7 @@ nav{
 
 /* ---------- shorts: horizontal scrolling strip of vertical cards ---------- */
 .shorts-strip{
-  display:flex;gap:14px;overflow-x:auto;margin-top:34px;padding-bottom:14px;
+  display:flex;align-items:flex-start;gap:14px;overflow-x:auto;margin-top:34px;padding-bottom:14px;
   scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
 }
 .shorts-strip::-webkit-scrollbar{height:8px}
@@ -128,7 +132,13 @@ nav{
   width:42px;height:42px;border-radius:50%;background:rgba(244,241,234,.95);
   display:flex;align-items:center;justify-content:center;color:var(--ink);font-size:15px;padding-left:3px;
 }
-@media(max-width:600px){.short-card{width:150px}}
+@media(max-width:760px){
+  .video-frame{box-shadow:0 14px 28px rgba(19,18,17,0.13)}
+  .watch-grid-2{gap:18px;margin-top:18px}
+  .shorts-strip{margin-top:26px}
+  .short-card{width:150px}
+}
+@media(max-width:430px){.short-card{width:140px}}
 
 /* ---------- shorts player modal ---------- */
 .short-modal{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;background:rgba(10,9,8,.88);backdrop-filter:blur(8px)}
