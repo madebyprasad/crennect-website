@@ -95,8 +95,8 @@
   <span class="cursor-tag" id="cursor-tag">Refresh</span>
   <div class="hero-top">
     <h1 class="future-title">
-      <span class="title-back">The Future of Brands</span>
-      <span class="title-front">The Future of Brands</span>
+      <span class="title-back">The Future of<br class="mbr"> Brands</span>
+      <span class="title-front">The Future of<br class="mbr"> Brands</span>
     </h1>
   </div>
   <p class="tagline">Real insights into consumer behavior, brand growth, and market disruption with lessons from the brands shaping tomorrow's economy, and those left behind.</p>
@@ -143,8 +143,8 @@ const SHORTS_TAB = "https://www.youtube.com/@prasaddanie/shorts";
   const N = els.length;             /* 12 positions on the cylinder */
   const STEP = 228 / N;             /* degrees between neighbouring cards */
   const RANGE = N * STEP;           /* full turn of our virtual cylinder */
-  const VISIBLE = 58;               /* cards beyond this angle are hidden */
   const DRIFT = 0.045;              /* auto-rotation, degrees per frame */
+  /* VISIBLE angle & stretch are width-aware — set per frame (see below) */
 
   let angle = 0;
   let dragging = false, dragStartX = 0, dragStartAngle = 0, moved = 0, velocity = 0, lastX = 0;
@@ -195,19 +195,25 @@ const SHORTS_TAB = "https://www.youtube.com/@prasaddanie/shorts";
        scaleX = 1/cos^1.6 stretches them horizontally (curved-screen distortion),
        scaleY = 1/cos^0.85 grows them gently. No per-card rotation: the cards
        stay upright and the curvature comes entirely from the projection. */
-    const F = stage.clientWidth * 0.37;
+    const cw = stage.clientWidth;
+    /* match the CSS card-size breakpoint (700px) so size & spacing switch together */
+    const narrow = (window.innerWidth || cw) <= 700;
+    const VIS = narrow ? 47 : 58;            /* show fewer cards when narrow */
+    const SXP = narrow ? 1.85 : 2.2;         /* gentler horizontal stretch */
+    const SYP = narrow ? 1.44 : 1.5;         /* gentler vertical growth */
+    const F = cw * (narrow ? 0.59 : 0.37);
     for(let i = 0; i < N; i++){
       let a = angle + i * STEP;
       a = ((a % RANGE) + RANGE) % RANGE;
       if(a > RANGE / 2) a -= RANGE;
       const el = els[i];
-      if(Math.abs(a) > VISIBLE){ el.style.display = "none"; continue; }
+      if(Math.abs(a) > VIS){ el.style.display = "none"; continue; }
       el.style.display = "";
       const rad = a * Math.PI / 180;
       const cos = Math.cos(rad);
       const x = F * Math.tan(rad);
-      const sx = 1 / Math.pow(cos, 2.2);
-      const sy = 1 / Math.pow(cos, 1.5);
+      const sx = 1 / Math.pow(cos, SXP);
+      const sy = 1 / Math.pow(cos, SYP);
       el.style.transform = `translate(calc(-50% + ${x.toFixed(1)}px), -50%) scale(${sx.toFixed(3)}, ${sy.toFixed(3)})`;
       el.style.zIndex = String(100 + Math.round(Math.abs(a)));
     }
@@ -250,19 +256,11 @@ function closeShort(e, force){
 <section id="watch" style="padding-top:96px;">
   <div class="wrap reveal">
     <div class="sec-label"><span>① The Show</span><span>New episodes Wednesdays</span></div>
-    <div class="watch-wrap">
-      <div>
-        <div class="frame frame-main">
-          <iframe src="https://www.youtube.com/embed/videoseries?list=UUQZbsX5B4lOdqetVJG7RCvw" title="Breaking Brands latest episodes" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe>
-        </div>
-        <div class="frame-cap"><span><b>Latest episodes</b> · straight from the channel</span><span>16:9</span></div>
+    <div class="watch-single">
+      <div class="frame frame-main">
+        <iframe src="https://www.youtube.com/embed/videoseries?list=UUQZbsX5B4lOdqetVJG7RCvw" title="Breaking Brands — latest full episodes" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe>
       </div>
-      <div>
-        <div class="frame frame-tall">
-          <iframe src="https://www.youtube.com/embed/videoseries?list=UUSHQZbsX5B4lOdqetVJG7RCvw" title="Breaking Brands shorts" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe>
-        </div>
-        <div class="frame-cap"><span><b>Shorts</b></span><span>9:16</span></div>
-      </div>
+      <div class="frame-cap"><span><b>Latest full episodes</b> · straight from the channel</span><span>16:9</span></div>
     </div>
     <div style="margin-top:44px;">
       <a class="link-arrow" href="https://www.youtube.com/@prasaddanie?sub_confirmation=1" target="_blank" rel="noopener">Subscribe on YouTube ↗</a>
@@ -310,7 +308,7 @@ function closeShort(e, force){
     <div class="sec-label"><span>③ This Week in Brands</span><span>Updated Mondays</span></div>
   </div>
   <div class="index-section">
-    <div class="wrap reveal" style="padding:70px 0;">
+    <div class="wrap reveal" style="padding:clamp(44px,7vw,70px) clamp(22px,5.5vw,34px);">
       <div class="index-head">
         <h2 class="h-lg">Who had a week, <span class="serif-i">who had a rough one.</span></h2>
         <p class="sub">The Heat Board: the week's brand winners and losers, scored openly, argued honestly. The top five:</p>
@@ -344,12 +342,12 @@ function closeShort(e, force){
         <p>A limited number of brand stories are featured each quarter.</p>
         <span class="arr">→</span>
       </a>
-      <a class="apply-row" href="apply.html#built">
+      <a class="apply-row" href="apply#built">
         <h3>Build your personal brand</h3>
         <p>For leaders who should be visible and aren't. Selective by design.</p>
         <span class="arr">→</span>
       </a>
-      <a class="apply-row" href="apply.html#circle">
+      <a class="apply-row" href="apply#circle">
         <h3>Join The Circle</h3>
         <p>A vetted membership. Weighted Index votes, private roundtables, your name on the wall.</p>
         <span class="arr">→</span>
@@ -359,7 +357,7 @@ function closeShort(e, force){
 </section>
 
 <!-- ============ NEWSLETTER ============ -->
-<section class="news-band" style="padding-top:60px;">
+<section class="news-band" style="padding-top:clamp(24px,5vw,60px);">
   <div class="wrap reveal">
     <p class="ed-label" style="justify-content:center;">The newsletter</p>
     <h2 class="h-lg" style="margin-top:24px;">India's brand week,<br><span class="serif-i">decoded</span> every Wednesday.</h2>
@@ -395,8 +393,8 @@ function closeShort(e, force){
         <div>
           <h4>Join</h4>
           <a href="apply">Get featured</a>
-          <a href="apply.html#built">Get built</a>
-          <a href="apply.html#circle">The Circle</a>
+          <a href="apply#built">Get built</a>
+          <a href="apply#circle">The Circle</a>
           <a href="newsletter">Newsletter</a>
         </div>
       </div>

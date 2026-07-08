@@ -56,6 +56,8 @@
 .future-title span{white-space:nowrap}
 .title-back{position:absolute;left:6px;top:5px;color:var(--red);z-index:1}
 .title-front{position:relative;color:#fff;z-index:2}
+/* mobile-only line break inside the headline (both layers break together) */
+.mbr{display:none}
 /* step-inside button: small white outline */
 .btn-step{
   display:inline-block;background:transparent;color:#fff;
@@ -115,8 +117,39 @@
 .flow-arrow.fa-l{left:4%}
 .flow-arrow.fa-r{right:4%}
 .flow-stage:hover .flow-arrow{opacity:1}
+/* ---- mobile: smaller, tidier hero so the whole first screen fits ---- */
 @media(max-width:700px){
-  .flow-card{width:calc(30vh * 0.5625)}
+  /* use the *small* viewport height so the CTA is never hidden behind
+     the mobile browser's address bar */
+  .flow-hero{height:100svh;min-height:520px}
+  /* headline sits lower so it's closer to the cards (may wrap to 2 lines) */
+  .hero-top{top:22%}
+  /* headline breaks into 2 lines; both layers break at the same point and
+     stay centered so the offset shadow effect stays aligned */
+  .future-title{font-size:clamp(30px,8.5vw,46px);line-height:1.06;text-align:center}
+  .title-back{width:100%}
+  .mbr{display:inline}
+  .flow-hero .tagline{bottom:21%;width:90vw;font-size:13.5px}
+  .flow-hero .cta-row{bottom:7%}
+  .btn-step{font-size:17px;padding:9px 26px}
+  /* cards sized by viewport WIDTH so they stay proportionate on any phone */
+  .flow-card{width:17.5vw;border-radius:12px}
+  .flow-arrow{width:44px;height:44px;font-size:22px}
+  /* remove the lone "Apply" next to the logo on the mobile home hero */
+  .nav-cta{display:none}
+  /* mobile has no top nav, so don't keep a fixed bar or dark patch:
+     let the logo sit in the hero and scroll away with the page */
+  .nav-shell{position:absolute}
+  .nav-shell.scrolled{background:transparent;backdrop-filter:none;border-bottom:none}
+  /* tighten the tall vertical gaps between sections on mobile */
+  section{padding:50px 0}
+  .statement{padding:58px 0}
+  /* footer stacked margin-top + big top padding on the newsletter's gap */
+  footer{margin-top:0;padding-top:40px}
+}
+@media(max-width:460px){
+  .future-title{font-size:clamp(30px,9vw,44px)}
+  .flow-hero .tagline{bottom:22%;font-size:13px}
 }
 
 /* nav on this page: transparent on the hero, dark text-only bar once scrolled */
@@ -129,7 +162,7 @@
   border-radius:0;
 }
 .nav-cta:hover{background:transparent;color:#fff;text-decoration:underline;text-underline-offset:5px}
-.logo img{height:28px;width:auto;display:block}
+.logo img{height:36px;width:auto;display:block}
 
 /* ============ shorts modal ============ */
 .short-modal{
@@ -161,6 +194,8 @@
 /* ============ watch ============ */
 .watch-wrap{display:grid;grid-template-columns:1.55fr .8fr;gap:20px;align-items:stretch}
 @media(max-width:900px){.watch-wrap{grid-template-columns:1fr}}
+/* single centered full-frame episode player */
+.watch-single{max-width:940px;margin:0 auto}
 .frame{
   border-radius:18px;overflow:hidden;background:var(--ink);position:relative;
 }
