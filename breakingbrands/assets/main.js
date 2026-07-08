@@ -34,7 +34,7 @@ function renderIndex(limit){
         <td><span class="brand-cell">${logo}<span class="brand-name">${b.name}</span></span></td>
         <td class="cat cat-col">${b.cat}</td>
         <td class="score">${b.score}</td>
-        <td class="mv ${flat?"":(up?"up":"down")}">${flat?"—":(up?"▲ "+b.mv.slice(1):"▼ "+b.mv.slice(1))}</td>
+        <td class="mv ${flat?"":(up?"up":"down")}">${flat?"–":(up?"▲ "+b.mv.slice(1):"▼ "+b.mv.slice(1))}</td>
         <td class="why cat-col">${b.why}</td>
       </tr>`);
   });

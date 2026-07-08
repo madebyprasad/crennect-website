@@ -101,6 +101,41 @@ nav{
   box-shadow:0 30px 60px rgba(19,18,17,0.18);aspect-ratio:16/10;position:relative;
 }
 .video-frame iframe{width:100%;height:100%;border:0}
+
+/* ---------- watch: two videos below the featured one ---------- */
+.watch-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}
+@media(max-width:760px){.watch-grid-2{grid-template-columns:1fr}}
+
+/* ---------- shorts: horizontal scrolling strip of vertical cards ---------- */
+.shorts-strip{
+  display:flex;gap:14px;overflow-x:auto;margin-top:34px;padding-bottom:14px;
+  scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+}
+.shorts-strip::-webkit-scrollbar{height:8px}
+.shorts-strip::-webkit-scrollbar-thumb{background:rgba(19,18,17,.16);border-radius:999px}
+.short-card{
+  flex:0 0 auto;width:200px;aspect-ratio:9/16;border-radius:16px;overflow:hidden;
+  position:relative;cursor:pointer;padding:0;background:var(--ink);
+  border:1px solid rgba(19,18,17,.08);scroll-snap-align:start;
+}
+.short-card img{width:100%;height:100%;object-fit:cover;display:block}
+.short-card .sc-play{
+  position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:flex-start;padding:12px;
+  background:linear-gradient(180deg,rgba(0,0,0,0) 55%,rgba(0,0,0,.5) 100%);transition:background .2s;
+}
+.short-card:hover .sc-play{background:rgba(0,0,0,.32)}
+.short-card .sc-play span{
+  width:42px;height:42px;border-radius:50%;background:rgba(244,241,234,.95);
+  display:flex;align-items:center;justify-content:center;color:var(--ink);font-size:15px;padding-left:3px;
+}
+@media(max-width:600px){.short-card{width:150px}}
+
+/* ---------- shorts player modal ---------- */
+.short-modal{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;background:rgba(10,9,8,.88);backdrop-filter:blur(8px)}
+.short-modal.open{display:flex}
+.short-modal .sm-frame{width:min(420px,92vw);aspect-ratio:9/16;border-radius:20px;overflow:hidden;background:#000;box-shadow:0 40px 100px rgba(0,0,0,.6)}
+.short-modal iframe{width:100%;height:100%;border:0}
+.short-modal .sm-close{position:absolute;top:26px;right:30px;font-family:'Space Grotesk',sans-serif;font-size:14px;font-weight:600;color:var(--cream);background:none;border:1.5px solid rgba(244,241,234,.4);border-radius:999px;padding:9px 20px;cursor:pointer}
 .hero-meta{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
 .pill{
   font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:600;

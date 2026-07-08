@@ -69,7 +69,15 @@
 <section style="padding-top:30px;">
   <div class="wrap reveal">
     <div class="video-frame" style="aspect-ratio:16/9;">
-      <iframe src="https://www.youtube.com/embed/videoseries?list=UUQZbsX5B4lOdqetVJG7RCvw" title="Breaking Brands latest episodes" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe>
+      <iframe src="https://www.youtube.com/embed/E1otxMe1zA0?rel=0" title="Breaking Brands featured episode" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe>
+    </div>
+    <div class="watch-grid-2">
+      <div class="video-frame" style="aspect-ratio:16/9;">
+        <iframe src="https://www.youtube.com/embed/rl_6LhTYY3Q?rel=0" title="Breaking Brands episode" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe>
+      </div>
+      <div class="video-frame" style="aspect-ratio:16/9;">
+        <iframe src="https://www.youtube.com/embed/Ivx0GFSLReQ?rel=0" title="Breaking Brands episode" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe>
+      </div>
     </div>
     <div class="hero-meta" style="margin-top:18px;">
       <span class="pill">🎬 Hosted by Prasad Danie</span>
@@ -82,6 +90,21 @@
     </div>
   </div>
 </section>
+
+<!-- ============ SHORTS ============ -->
+<section class="shorts-section" id="shorts-section" style="padding-top:10px;display:none;">
+  <div class="wrap reveal">
+    <span class="kicker">Shorts</span>
+    <h2 class="h-lg">Quick hits, <span class="serif-i">straight from the feed.</span></h2>
+    <div class="shorts-strip" id="shorts-strip"></div>
+  </div>
+</section>
+
+<!-- shorts player modal -->
+<div class="short-modal" id="short-modal" onclick="closeShort(event)">
+  <button class="sm-close" onclick="closeShort(event, true)">✕ Close</button>
+  <div class="sm-frame"><iframe id="short-frame" src="about:blank" title="Breaking Brands short" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+</div>
 
 <section style="padding-top:20px;">
   <div class="wrap reveal">
@@ -138,6 +161,38 @@
   </div>
 </footer>
 
+<script>
+/* ===== Shorts strip =====
+   Paste the channel's YouTube Shorts IDs below (the code after /shorts/ or watch?v=).
+   The section stays hidden until at least one ID is added. */
+const SHORTS = [
+  "8GX87KENvgc","Jhy1mIxgJdw","IDgZVgWvpMo","yydV98tx3_s","GaxoRh6MmmU",
+  "30ZCZI-7K6k","zHdeLZwTAxs","fuq88UE1w4w","M3eKo0PsZ6U","Xtht1cfmANs",
+  "RhMkWZrsr7E","pFaiWWUPi5Q","Q8e34RARHAo","3WFVKsnXSXI"
+];
+(function(){
+  const strip = document.getElementById("shorts-strip");
+  const section = document.getElementById("shorts-section");
+  if(!strip || !SHORTS.length) return;
+  section.style.display = "";
+  strip.innerHTML = SHORTS.map(function(id){
+    return '<button class="short-card" onclick="openShort(\'' + id + '\')" aria-label="Play short">' +
+      '<img src="https://i.ytimg.com/vi/' + id + '/oardefault.jpg" onerror="this.onerror=null;this.src=\'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg\'" alt="Breaking Brands short" loading="lazy">' +
+      '<span class="sc-play"><span>&#9654;</span></span></button>';
+  }).join("");
+})();
+function openShort(id){
+  const m = document.getElementById("short-modal");
+  document.getElementById("short-frame").src = "https://www.youtube.com/embed/" + id + "?autoplay=1&rel=0&playsinline=1";
+  m.classList.add("open");
+}
+function closeShort(e, force){
+  if(!force && e.target.closest(".sm-frame")) return;
+  const m = document.getElementById("short-modal");
+  m.classList.remove("open");
+  document.getElementById("short-frame").src = "about:blank";
+}
+</script>
 <script src="assets/main.js"></script>
 </body>
 </html>
