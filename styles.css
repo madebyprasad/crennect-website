@@ -3851,7 +3851,7 @@ overflow-y: auto;
   .legal-page .legal-wrap h2 { margin-top: 44px; }
 }
 
-/* GenAI page: enforce standard header/nav sizing to match all other pages */
+/* App-Hub page: enforce standard header/nav sizing to match all other pages */
 body.genai-page .header { padding: 25px 0 !important; }
 body.genai-page .header .header-container {
   max-width: 1600px !important;

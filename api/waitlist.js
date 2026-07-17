@@ -44,7 +44,7 @@ export default async function handler(req, res) {
     await resend.emails.send({
       from: 'Crennect Website <noreply@crennect.com>',
       to: 'reach@crennect.com',
-      subject: 'New GenAI Waitlist Signup',
+      subject: 'New App-Hub Waitlist Signup',
       html: `
         <h2>New Waitlist Signup</h2>
         <p><strong>Email:</strong> ${email}</p>
@@ -58,11 +58,11 @@ export default async function handler(req, res) {
     await resend.emails.send({
       from: 'Crennect <noreply@crennect.com>',
       to: email,
-      subject: 'You’re on the Crennect GenAI Waitlist 🚀',
+      subject: 'You’re on the Crennect App-Hub Waitlist 🚀',
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6;">
           <h2>You're In 🚀</h2>
-          <p>Thanks for joining the GenAI early access list.</p>
+          <p>Thanks for joining the App-Hub early access list.</p>
           <p>We’ll notify you as soon as private access opens.</p>
           <br>
           <p>— Team Crennect</p>

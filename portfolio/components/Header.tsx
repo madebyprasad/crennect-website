@@ -66,7 +66,7 @@ export default function Header() {
           <nav className="nav">
             <a href="/about.html" style={navLinkStyle}>About Us</a>
             <a href="https://portfolio.crennect.com/" style={navLinkStyle}>Case Studies</a>
-            <a href="https://www.crennect.com/app-hub" style={navLinkStyle}>GenAI</a>
+            <a href="https://www.crennect.com/app-hub" style={navLinkStyle}>App-Hub</a>
             <a href="/services.html" style={navLinkStyle}>Services</a>
             <a href="#resources" style={navLinkStyle}>Resources</a>
             <a href="contact.html" style={navLinkStyle}>Contact Us</a>
@@ -101,7 +101,7 @@ export default function Header() {
           <div className="mobile-menu-links">
             <a href="/about.html" onClick={closeMobileMenu}>About Us</a>
             <a href="https://portfolio.crennect.com/" onClick={closeMobileMenu}>Case Studies</a>
-            <a href="genai.html" onClick={closeMobileMenu}>GenAI</a>
+            <a href="app-hub.html" onClick={closeMobileMenu}>App-Hub</a>
             <a href="/services.html" onClick={closeMobileMenu}>Services</a>
             <a href="#resources" onClick={closeMobileMenu}>Resources</a>
           </div>
