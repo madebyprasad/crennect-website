@@ -27,7 +27,7 @@ We work across six service lines:
 - [Home](https://www.crennect.com/index.html): Overview of Crennect and what we do
 - [About Us](https://www.crennect.com/about.html): Our vision, expertise, and approach
 - [Services](https://www.crennect.com/services.html): Detailed service offerings
-- [GenAI](https://www.crennect.com/genai.html): How we use generative AI to build intelligent brand systems
+- [GenAI](https://www.crennect.com/app-hub.html): How we use generative AI to build intelligent brand systems
 - [Contact](https://www.crennect.com/contact.html): Start a conversation with us
 - [Case Studies](https://portfolio.crennect.com/): Our portfolio and client work
 - [Breaking Brands](https://www.crennect.com/breakingbrands/): Our IP studying how brands break through
