@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Crennect App Hub | AI Tools for Brand, Marketing &amp; Sales</title>
 <meta name="description" content="Crennect App Hub: AI tools for brand strategy, content, pricing and sales, built from real client work. Explore open tools or contact Crennect for enterprise access.">
-<link rel="canonical" href="https://www.crennect.com/app-hub.html">
+<link rel="canonical" href="https://www.crennect.com/app-hub">
 <meta name="robots" content="index, follow">
 <meta name="theme-color" content="#3D9BE9">
 <!-- Open Graph -->
@@ -13,7 +13,7 @@
 <meta property="og:site_name" content="Crennect">
 <meta property="og:title" content="Crennect App Hub | AI Tools for Brand, Marketing &amp; Sales">
 <meta property="og:description" content="AI tools for brand strategy, content, pricing and sales, built from real client work. Explore open tools or contact Crennect for enterprise access.">
-<meta property="og:url" content="https://www.crennect.com/app-hub.html">
+<meta property="og:url" content="https://www.crennect.com/app-hub">
 <meta property="og:image" content="https://www.crennect.com/assets/images/og-image.jpg">
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
@@ -32,7 +32,7 @@
   "@context": "https://schema.org",
   "@type": "WebPage",
   "name": "Crennect App Hub",
-  "url": "https://www.crennect.com/app-hub.html",
+  "url": "https://www.crennect.com/app-hub",
   "description": "AI tools for brand strategy, content, pricing and sales, built from real client work by Crennect.",
   "publisher": {
     "@type": "Organization",
@@ -570,7 +570,7 @@
   </div>
 </div>
 
-<script>
+<script data-cfasync="false">
 (function(){
   var LOCAL = location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
   var page = document.getElementById('chPage');
@@ -601,6 +601,16 @@
     var ov = document.getElementById(id);
     ov.addEventListener('click', function(e){ if(e.target === ov) closeModal(id); });
   });
+
+  // Local mode: point every app card at its absolute location on this machine,
+  // so this file opens apps correctly from any folder it is copied to.
+  if(LOCAL){
+    var HUB_BASE = 'file:///E:/Crennect/App Hub/';
+    document.querySelectorAll('a.ch-tile').forEach(function(t){
+      var h = t.getAttribute('href');
+      if(h && !/^https?:/i.test(h)){ t.href = encodeURI(HUB_BASE + h); }
+    });
+  }
 
   // Access control: on the website, tiles show popups instead of opening
   if(!LOCAL){
@@ -652,7 +662,7 @@
     btn.style.opacity = '.6'; btn.style.pointerEvents = 'none';
 
     function fail(){
-      status.textContent = 'Submission failed. Please try again, or mail reach@crennect.com';
+      status.textContent = 'Submission failed. Please try again, or use the email button below.';
       status.className = 'ch-ent-status ch-err';
       btn.style.opacity = ''; btn.style.pointerEvents = '';
     }
