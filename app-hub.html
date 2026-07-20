@@ -612,10 +612,29 @@
     });
   }
 
+  // Owner detection: if the Crennect data service is running on this machine,
+  // the live website opens the real apps through it instead of showing popups.
+  var OWNER = false;
+  if(!LOCAL){
+    try{
+      var ctrl = new AbortController();
+      setTimeout(function(){ ctrl.abort(); }, 1500);
+      fetch('http://127.0.0.1:8790/ping', { signal: ctrl.signal }).then(function(r){
+        if(!r.ok) throw new Error();
+        OWNER = true;
+        document.querySelectorAll('a.ch-tile').forEach(function(t){
+          var h = t.getAttribute('href');
+          if(h && !/^https?:/i.test(h)){ t.href = 'http://127.0.0.1:8790/apps/' + encodeURI(h); }
+        });
+      }).catch(function(){});
+    }catch(e){}
+  }
+
   // Access control: on the website, tiles show popups instead of opening
   if(!LOCAL){
     document.querySelectorAll('a.ch-tile').forEach(function(t){
       t.addEventListener('click', function(e){
+        if(OWNER) return; // this machine runs the Crennect stack, open the app normally
         e.preventDefault();
         var name = t.querySelector('.ch-tile-body h3').textContent;
         if(t.dataset.tier === 'prop'){
