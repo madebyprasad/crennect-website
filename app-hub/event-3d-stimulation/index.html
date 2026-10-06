@@ -1,0 +1,1683 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>
+// When opened without a trailing slash (e.g. /app-hub/event-3d-stimulation), load files from this folder, not the parent.
+(function(){ var p = location.pathname; if (p.slice(-1) !== '/' && !/\.html?$/i.test(p)) { var b = document.createElement('base'); b.href = p + '/'; document.head.appendChild(b); } })();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="First-person 3D walkthrough of the curved projection stall. Load 8240 x 1200 wall media, or three 2746 x 1200 parts, and see it at eye level.">
+<title>Projection Stall Walkthrough</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: full-height 3D stage on the left, control rail on the right; stacks (stage over controls) on phones. */
+:root{
+  --bg:#110c0e; --stage:#070506; --panel:#191215; --raise:#221a1e; --line:#38282e;
+  --fg:#f3e8eb; --muted:#a8949a; --accent:#e3284f; --accent-soft:#e3284f22; --brass:#cfa557; --ok:#5fc48f; --warn:#f0b549;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:dark;
+}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:14px;margin:0;overflow:hidden}
+#app{display:grid;grid-template-columns:minmax(0,1fr) 340px;height:100%}
+#stage{position:relative;background:var(--stage);min-width:0;overflow:hidden}
+#c{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+#c.dragging{cursor:grabbing}
+.hud{position:absolute;left:16px;top:14px;display:flex;flex-direction:column;gap:4px;pointer-events:none;max-width:calc(100% - 32px)}
+.hud .eyebrow{font-family:var(--display);font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.hud .view{font-family:var(--display);font-weight:700;font-size:24px;line-height:1.05;text-shadow:0 1px 8px #000}
+.hud .meta{font-family:var(--mono);font-size:11.5px;color:#d9c9ce;text-shadow:0 1px 6px #000}
+.hint{position:absolute;left:16px;bottom:14px;right:16px;font-size:12px;color:#cdbcc1;pointer-events:none;text-shadow:0 1px 6px #000}
+.hint .narrow{display:none}
+.hint kbd{font-family:var(--mono);font-size:11px;border:1px solid #ffffff40;border-radius:3px;padding:0 4px;background:#00000066}
+.drop{position:absolute;inset:12px;border:2px dashed var(--accent);border-radius:10px;background:#0c0709cc;display:grid;place-items:center;font-family:var(--display);font-size:26px;font-weight:600;letter-spacing:.04em}
+.loading{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-family:var(--display);font-size:18px;letter-spacing:.08em;text-transform:uppercase;text-align:center;padding:0 24px}
+.toast{position:absolute;right:16px;top:14px;font:600 12px var(--body);letter-spacing:.06em;text-transform:uppercase;background:#0c0709d9;border:1px solid var(--line);border-radius:99px;padding:7px 12px;color:var(--fg)}
+
+aside{background:var(--panel);border-left:1px solid var(--line);overflow-y:auto;min-width:0}
+.brand{padding:18px 18px 14px;border-bottom:1px solid var(--line)}
+.brand h1{font-family:var(--display);font-weight:700;font-size:26px;line-height:1;margin:0;letter-spacing:.01em;text-wrap:balance}
+.brand p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.45}
+section{padding:14px 18px 16px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+section h2{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button,.filebtn{font:600 13px/1 var(--body);color:var(--fg);background:var(--raise);border:1px solid var(--line);border-radius:6px;padding:9px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+button:hover,.filebtn:hover{border-color:#5a3f48}
+button:focus-visible,.filebtn:focus-within,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.primary:hover{border-color:#ff6f8d}
+.filebtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.chip{justify-content:flex-start;padding:8px 10px;font-weight:500;font-size:13px;line-height:1.15;text-align:left}
+.chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:#fff}
+.media-card{background:var(--raise);border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.media-name{font-weight:600;overflow-wrap:anywhere}
+.pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:99px;border:1px solid currentColor;width:fit-content}
+.pill.ok{color:var(--ok)} .pill.warn{color:var(--warn)}
+label.ctl{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;font-size:13px}
+label.ctl input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--accent)}
+label.ctl output{font-family:var(--mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.toggle{display:flex;align-items:center;gap:10px;font-size:13.5px;cursor:pointer}
+.toggle input{width:16px;height:16px;accent-color:var(--accent);margin:0}
+.toggle small{color:var(--muted);font-size:12px}
+select{font:500 13px var(--body);color:var(--fg);background:var(--raise);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%}
+dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:12.5px}
+dt{color:var(--muted)} dd{margin:0;white-space:nowrap;font-family:var(--mono);font-size:12px;text-align:right;font-variant-numeric:tabular-nums}
+.note{font-size:12.5px;line-height:1.5;color:#e8d6a8;background:#f0b5490f;border:1px solid #f0b54940;border-radius:6px;padding:8px 10px;margin:0}
+.muted{color:var(--muted);font-size:12px;line-height:1.45;margin:0}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.seg button{justify-content:center;font-weight:500;padding:8px 6px}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:#fff}
+.parts{display:flex;flex-direction:column;gap:6px}
+.part{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;background:var(--raise);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.part b{font-family:var(--display);font-size:15px;letter-spacing:.02em}
+.part small{display:block;font-family:var(--mono);font-size:11px;color:var(--muted);overflow-wrap:anywhere}
+.part small.ok{color:var(--ok)} .part small.warn{color:var(--warn)}
+.part .filebtn,.part button{padding:7px 10px;font-size:12px}
+.dims{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center;font-size:12.5px}
+.dims label{color:var(--muted)}
+.dims .dval{font-family:var(--mono);font-size:12px;text-align:right;font-variant-numeric:tabular-nums}
+.dims input{width:92px;font:500 12px var(--mono);color:var(--fg);background:var(--raise);border:1px solid var(--line);border-radius:6px;padding:6px 8px;text-align:right}
+.dims input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+
+/* Realism switch: the one control that changes the whole render */
+.realism{background:linear-gradient(180deg,#2a1219,#191215)}
+.switch{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer}
+.switch .lbl{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:.02em}
+.switch input{appearance:none;-webkit-appearance:none;width:46px;height:26px;border-radius:99px;background:#3a2a30;border:1px solid #5a3f48;position:relative;cursor:pointer;margin:0;flex:none;transition:background .2s}
+.switch input::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#f3e8eb;transition:transform .2s}
+.switch input:checked{background:var(--accent);border-color:var(--accent)}
+.switch input:checked::after{transform:translateX(20px)}
+.realism p{margin:0;color:#d7c3c9;font-size:12.5px;line-height:1.5}
+
+@media (max-width:820px){
+  body{overflow:auto}
+  #app{display:block;height:auto}
+  #stage{height:62svh;min-height:340px}
+  aside{border-left:0;border-top:1px solid var(--line)}
+  .hud .view{font-size:20px}
+  .hint .wide{display:none} .hint .narrow{display:inline}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="stage">
+    <canvas id="c" aria-label="3D view of the projection stall"></canvas>
+    <div class="loading" id="loading">Loading 3D view…</div>
+    <div class="hud">
+      <span class="eyebrow">Visitor's eye view</span>
+      <span class="view" id="viewName">Inside the rope</span>
+      <span class="meta" id="viewMeta"></span>
+    </div>
+    <div class="toast" id="toast" hidden>Building realistic scene…</div>
+    <div class="hint" id="hint"><span class="wide">Drag to look around · <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or arrows to walk · double-click the floor to walk there · scroll to change lens</span><span class="narrow">Drag to look · double-tap the floor to walk there</span></div>
+    <div class="drop" id="drop" hidden>Drop image or video to project</div>
+  </div>
+
+  <aside>
+    <div class="brand">
+      <h1>Projection Stall Walkthrough</h1>
+      <p>Your curved projection room built from the floor plan, seen at eye level. Load your wall content and walk around it.</p>
+    </div>
+
+    <section class="realism" aria-labelledby="h-real">
+      <label class="switch" for="realism"><span class="lbl" id="h-real">Realism</span><input type="checkbox" id="realism" role="switch"></label>
+      <p>Guests in modern event looks, lit only by the screens the way they would be on the night, with soft light on the floor and brass. Turn off for a fast layout preview.</p>
+    </section>
+
+    <section aria-labelledby="h-media">
+      <h2 id="h-media">Wall media</h2>
+      <div class="seg" role="group" aria-label="How your media is split">
+        <button type="button" id="modeFull" aria-pressed="true">One full-wall file</button>
+        <button type="button" id="modeParts" aria-pressed="false">3 part files</button>
+      </div>
+      <div class="row" id="fullCtl">
+        <label class="filebtn primary">Load image or video
+          <input type="file" id="file" accept="image/*,video/*">
+        </label>
+        <button id="whiteBtn" type="button">Plain white</button>
+        <button id="sampleBtn" type="button">Test pattern</button>
+      </div>
+      <div class="parts" id="partsCtl" hidden>
+        <p class="muted">One file per zone, left to right as you face the wall. Each part is 2746 × 1200 px.</p>
+      </div>
+      <div class="media-card">
+        <span class="media-name" id="mediaName">Plain white wall</span>
+        <span class="pill ok" id="mediaPill">Load your media to preview it</span>
+        <div class="row" id="videoCtl" hidden>
+          <button id="playBtn" type="button">Pause</button>
+          <button id="muteBtn" type="button">Unmute</button>
+          <button id="restartBtn" type="button">Restart</button>
+        </div>
+      </div>
+      <label class="ctl" for="fit">Mapping on the wall
+        <select id="fit" style="grid-column:1/-1">
+          <option value="keep" selected>Keep media proportions</option>
+          <option value="stretch">Full canvas edge to edge (as projectors map it)</option>
+          <option value="design">Designed size, 61.8 ft wide (edges cropped)</option>
+        </select>
+      </label>
+      <p class="muted">Files stay in your browser. Nothing is uploaded. Media plays at its full resolution. If one 8240 px video stutters on an older laptop, the 3-part option is usually smoother.</p>
+    </section>
+
+    <section aria-labelledby="h-view">
+      <h2 id="h-view">Stand here</h2>
+      <div class="chips" id="views"></div>
+      <label class="ctl" for="height">Your height <output id="heightOut">5.5 ft · eyes at 5.1 ft</output>
+        <input type="range" id="height" min="4.8" max="6.4" step="0.1" value="5.5">
+      </label>
+      <label class="ctl" for="persp">Perspective
+        <select id="persp" style="grid-column:1/-1">
+          <option value="natural">Natural, like your eyes (no edge stretching)</option>
+          <option value="lens">Camera lens (straight lines, stretched edges)</option>
+        </select>
+      </label>
+      <label class="ctl" for="lens">Field of view <output id="lensOut">108° · very wide</output>
+        <input type="range" id="lens" min="11" max="50" step="1" value="13">
+      </label>
+      <label class="toggle"><input type="checkbox" id="pan"> Slowly look around</label>
+    </section>
+
+    <section aria-labelledby="h-people">
+      <h2 id="h-people">Visitors</h2>
+      <label class="toggle"><input type="checkbox" id="people"> Show people in the stall</label>
+      <label class="ctl" for="count">Number of visitors <output id="countOut">8</output>
+        <input type="range" id="count" min="1" max="16" step="1" value="8">
+      </label>
+      <button id="shuffle" type="button">Rearrange visitors</button>
+      <p class="muted">Guests stand inside the rope, mostly facing the wall, and some are filming it on their phones. Anyone standing where you stand steps out of view.</p>
+    </section>
+
+    <section aria-labelledby="h-show">
+      <h2 id="h-show">Show in model</h2>
+      <label class="toggle"><input type="checkbox" id="guides"> Zone guides <small>3 parts · 1264 px blocks</small></label>
+      <label class="toggle"><input type="checkbox" id="openings"> Side openings <small>2.02 ft, per plan</small></label>
+      <label class="toggle"><input type="checkbox" id="rope"> Rope &amp; stanchions</label>
+      <label class="toggle"><input type="checkbox" id="pedestals"> Display pedestals</label>
+      <label class="toggle"><input type="checkbox" id="ceiling" checked> Ceiling, truss &amp; projectors</label>
+      <label class="ctl" for="bright">Projection brightness <output id="brightOut">100%</output>
+        <input type="range" id="bright" min="20" max="140" step="5" value="100">
+      </label>
+      <label class="toggle"><input type="checkbox" id="camfx"> Camera glow &amp; vignette <small>changes media colours</small></label>
+      <label class="ctl" for="reflect">Floor reflection <output id="reflectOut">5%</output>
+        <input type="range" id="reflect" min="0" max="100" step="1" value="5">
+      </label>
+      <label class="ctl" for="house">House lights <output id="houseOut">5%</output>
+        <input type="range" id="house" min="0" max="100" step="5" value="5">
+      </label>
+    </section>
+
+    <section aria-labelledby="h-size">
+      <h2 id="h-size">Stall size</h2>
+      <p class="muted" id="dimSrc">From the floor plan. All sizes in feet.</p>
+      <div class="dims" id="dims"></div>
+      <p class="note" id="dimErr" hidden></p>
+      <div class="row">
+        <button id="editDims" type="button">Edit dimensions</button>
+        <button id="applyDims" class="primary" type="button" hidden>Apply</button>
+        <button id="cancelDims" type="button" hidden>Cancel</button>
+        <button id="resetDims" type="button" hidden>Reset to plan</button>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-dims">
+      <h2 id="h-dims">Measurements</h2>
+      <dl>
+        <dt>Wall run in this model</dt><dd id="mLen">–</dd>
+        <dt>Screen surface (minus openings)</dt><dd id="mSurf">–</dd>
+        <dt>Wall height</dt><dd id="mH">9.0 ft</dd>
+        <dt>Media spec</dt><dd>8240 × 1200 px</dd>
+        <dt>Spec wall</dt><dd>61.8 × 9 ft</dd>
+        <dt>Pixels per ft, across</dt><dd id="mPxW">–</dd>
+        <dt>Pixels per ft, up</dt><dd id="mPxH">133 px/ft</dd>
+        <dt>Each part (2746 px)</dt><dd id="mPart">–</dd>
+        <dt>Each 1264 px block</dt><dd id="mBlock">–</dd>
+      </dl>
+      <p class="note" id="lenNote"></p>
+      <div class="row"><button id="matchSpec" type="button" hidden>Make the wall 61.8 ft (media spec)</button><button id="backPlan" type="button" hidden>Back to floor plan size</button></div>
+    </section>
+  </aside>
+</div>
+
+<script>
+// If the 3D modules can't load (offline, blocked), say so instead of showing a blank stage.
+setTimeout(function(){ if(!window.__stallReady){ var l=document.getElementById('loading'); if(l){ l.hidden=false; l.textContent='The 3D view could not load. Open this page from a web server (GitHub Pages or a local server), not by double-clicking the file.'; } } }, 15000);
+</script>
+<script type="importmap">
+{ "imports": {
+  "three": "./vendor/three/build/three.module.min.js",
+  "three/addons/": "./vendor/three/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { Pass, FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
+import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+
+// ---------- stall dimensions (feet). Defaults are the floor plan; editable from the panel ----------
+const FASCIA_H = 0.5, SPEC_LEN = 61.8, MEDIA_W = 8240, MEDIA_H = 1200;
+const PLAN_DIMS = { boothW: 24, boothD: 15, domeW: 19.9, domeD: 12.48, wallH: 9, entrance: 6, opening: 2.02, ropeW: 13 };
+const DIM_FIELDS = [
+  { k: 'boothW', label: 'Booth width', min: 10, max: 80 },
+  { k: 'boothD', label: 'Booth depth', min: 8, max: 60 },
+  { k: 'domeW', label: 'Curved room width', min: 8, max: 70 },
+  { k: 'domeD', label: 'Curved room depth', min: 6, max: 55 },
+  { k: 'wallH', label: 'Screen wall height', min: 6, max: 20 },
+  { k: 'entrance', label: 'Entrance width', min: 3, max: 30 },
+  { k: 'opening', label: 'Side openings (0 = none)', min: 0, max: 8 },
+  { k: 'ropeW', label: 'Rope area width', min: 4, max: 60 }
+];
+const dims = { ...PLAN_DIMS };
+try { const saved = JSON.parse(localStorage.getItem('stall-dims') || 'null'); if (saved) DIM_FIELDS.forEach(f => { if (typeof saved[f.k] === 'number') dims[f.k] = saved[f.k]; }); } catch (e) { /* ignore */ }
+const $ = id => document.getElementById(id);
+const W = (u, v, y = 0) => new THREE.Vector3(u, y, -v);   // dome coords (u across, v depth from the front edge) -> world
+const deg = d => d * Math.PI / 180;
+const lerp = (a, b, t) => a + (b - a) * t;
+const SRGB = THREE.SRGBColorSpace;
+function bez(t, P) {
+  const a = (1 - t) ** 3, b = 3 * (1 - t) ** 2 * t, c = 3 * (1 - t) * t * t, d = t ** 3;
+  return [a * P[0][0] + b * P[1][0] + c * P[2][0] + d * P[3][0], a * P[0][1] + b * P[1][1] + c * P[2][1] + d * P[3][1]];
+}
+
+// layout derived from dims (recomputed on every rebuild)
+let WALL_H, EA, EB, EV0, RA, RB, PED, BOOTH, SX, SV, L, gapLen, path, domeOutline;
+function computeLayout() {
+  WALL_H = dims.wallH;
+  EA = dims.domeW / 2; SX = EA / 9.95; SV = dims.domeD / 12.48;
+  EV0 = 3.7 * SV; EB = dims.domeD - EV0;
+  RA = dims.ropeW / 2; RB = RA * (6.85 / 6.6);
+  PED = { u: 0, v: EV0 + 2.64 * SV };
+  // booth around the curved room, keeping the plan's offset (room sits 1.41 ft left of booth centre)
+  let u0 = 1.41 * SX - dims.boothW / 2; u0 = Math.min(u0, -EA - 0.3); let u1 = u0 + dims.boothW; if (u1 < EA + 0.3) { u1 = EA + 0.3; u0 = u1 - dims.boothW; }
+  BOOTH = { u0, u1, v0: 0, v1: Math.max(dims.boothD, dims.domeD + 0.3) };
+  const half = dims.entrance / 2;
+  const corner = [[-half, 0.15 * SV], [-7.5 * SX, 0.9 * SV], [-EA, 1.8 * SV], [-EA, EV0]];
+  path = [];
+  for (let i = 0; i <= 120; i++) { const p = bez(i / 120, corner); path.push({ u: p[0], v: p[1], th: null }); }
+  for (let i = 1; i <= 360; i++) { const th = Math.PI - Math.PI * i / 360; path.push({ u: EA * Math.cos(th), v: EV0 + EB * Math.sin(th), th }); }
+  for (let i = 119; i >= 0; i--) { const p = bez(i / 120, corner); path.push({ u: -p[0], v: p[1], th: null }); }
+  L = 0; path[0].s = 0;
+  for (let i = 1; i < path.length; i++) { L += Math.hypot(path[i].u - path[i - 1].u, path[i].v - path[i - 1].v); path[i].s = L; }
+  // side openings, centred where the plan has them, sized by arc length
+  const centres = [deg(136.9), deg(43.1)].map(th => { let best = path[0]; path.forEach(p => { if (p.th !== null && Math.abs(p.th - th) < Math.abs((best.th ?? 99) - th)) best = p; }); return best.s; });
+  gapLen = 0;
+  for (let i = 1; i < path.length; i++) {
+    const ms = (path[i].s + path[i - 1].s) / 2;
+    path[i].gapSeg = dims.opening > 0.05 && centres.some(c => Math.abs(ms - c) < dims.opening / 2);
+    if (path[i].gapSeg) gapLen += path[i].s - path[i - 1].s;
+  }
+  domeOutline = path.map(p => new THREE.Vector2(p.u, p.v));
+  domeOutline.push(new THREE.Vector2(half, 0), new THREE.Vector2(-half, 0));
+}
+function pathAt(s) { // point + inward normal at arc length s
+  let i = 1; while (i < path.length - 1 && path[i].s < s) i++;
+  const a = path[i - 1], b = path[i], t = (s - a.s) / Math.max(1e-6, b.s - a.s);
+  const u = lerp(a.u, b.u, t), v = lerp(a.v, b.v, t);
+  let tu = b.u - a.u, tv = b.v - a.v; const n = Math.hypot(tu, tv) || 1; tu /= n; tv /= n;
+  return { u, v, nu: tv, nv: -tu };
+}
+
+// ---------- renderer / scene ----------
+const canvas = $('c');
+let renderer;
+try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' }); }
+catch (e) { $('loading').textContent = 'This browser could not start 3D (WebGL).'; throw e; }
+window.__stallReady = true;
+$('loading').hidden = true;
+renderer.shadowMap.enabled = false;
+RectAreaLightUniformsLib.init();
+const MAXTEX = renderer.capabilities.maxTextureSize;
+const ANISO = renderer.capabilities.getMaxAnisotropy();
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x060405);
+const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 400);
+camera.rotation.order = 'YXZ';
+const coarse = matchMedia('(pointer: coarse)').matches;
+$('realism').checked = !coarse;
+
+const hemi = new THREE.HemisphereLight(0x884455, 0x220a10, 1.6); scene.add(hemi);
+const ambient = new THREE.AmbientLight(0xffffff, 0.3); scene.add(ambient);
+const pedLight = new THREE.PointLight(0xffe2e8, 2, 12, 2); scene.add(pedLight);
+
+const reflectGroup = new THREE.Group(); reflectGroup.scale.y = -1; scene.add(reflectGroup);
+function pair() {
+  const a = new THREE.Group(), b = new THREE.Group(); scene.add(a); reflectGroup.add(b);
+  return {
+    a, b,
+    add(m) { a.add(m); b.add(m.clone()); },
+    set visible(v) { a.visible = v; b.visible = v; },
+    clear() { [a, b].forEach(g => { g.traverse(o => { if (o.geometry && o !== g) o.geometry.dispose(); }); while (g.children.length) g.remove(g.children[0]); }); }
+  };
+}
+function clearGroup(g) { g.traverse(o => { if (o.geometry && o !== g) o.geometry.dispose(); }); while (g.children.length) g.remove(g.children[0]); }
+
+// ---------- materials ----------
+const placeholder = new THREE.DataTexture(new Uint8Array([0, 0, 0, 255]), 1, 1, THREE.RGBAFormat); placeholder.needsUpdate = true;
+const wallMat = new THREE.ShaderMaterial({
+  side: THREE.DoubleSide,
+  uniforms: { map: { value: placeholder }, p0: { value: placeholder }, p1: { value: placeholder }, p2: { value: placeholder }, parts: { value: 0 }, raw: { value: new THREE.Vector4(0, 0, 0, 0) }, rect: { value: new THREE.Vector4(0, 0, 1, 1) }, bright: { value: 1 }, guides: { value: placeholder }, showGuides: { value: 0 } },
+  vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
+  fragmentShader: `uniform sampler2D map; uniform sampler2D p0; uniform sampler2D p1; uniform sampler2D p2; uniform float parts; uniform vec4 raw; uniform sampler2D guides; uniform vec4 rect; uniform float bright; uniform float showGuides; varying vec2 vUv;
+    vec3 dec(vec3 c, float r){ return mix(c, mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(vec3(0.04045), c)), r); }
+    vec3 media(vec2 m){
+      const float A = 2746.0 / 8240.0; const float Bq = 5492.0 / 8240.0;
+      vec3 full = dec(texture2D(map, m).rgb, raw.x);
+      vec3 c0 = dec(texture2D(p0, vec2(m.x / A, m.y)).rgb, raw.y);
+      vec3 c1 = dec(texture2D(p1, vec2((m.x - A) / (Bq - A), m.y)).rgb, raw.z);
+      vec3 c2 = dec(texture2D(p2, vec2((m.x - Bq) / (1.0 - Bq), m.y)).rgb, raw.w);
+      return mix(full, m.x < A ? c0 : (m.x < Bq ? c1 : c2), parts);
+    }
+    void main(){ vec2 m = (vUv - rect.xy) / rect.zw; vec3 c = vec3(0.0);
+      if (m.x >= 0.0 && m.x <= 1.0 && m.y >= 0.0 && m.y <= 1.0) {
+        c = media(m) * bright;
+        vec4 g = texture2D(guides, m); c = mix(c, g.rgb, g.a * showGuides);
+      }
+      gl_FragColor = vec4(c, 1.0);
+      #include <tonemapping_fragment>
+      #include <colorspace_fragment>
+    }`
+});
+const shellMat = new THREE.MeshStandardMaterial({ color: 0xe9e4e6, side: THREE.DoubleSide, roughness: 0.8 });
+const fasciaMat = new THREE.MeshStandardMaterial({ color: 0xc4153b, side: THREE.DoubleSide, emissive: 0x3a0510, roughness: 0.6 });
+const capMat = new THREE.MeshStandardMaterial({ color: 0xc4153b, roughness: 0.5 });
+const floorMat = new THREE.MeshPhysicalMaterial({ color: 0x0b0b0c, roughness: 0.55, metalness: 0.0, clearcoat: 0.6, clearcoatRoughness: 0.2, transparent: false, opacity: 1 });
+const boothFloorMat = new THREE.MeshStandardMaterial({ color: 0x0b0b0c, roughness: 0.8 });
+const greyMat = new THREE.MeshStandardMaterial({ color: 0x77706f, roughness: 0.9 });
+const shelfMat = new THREE.MeshStandardMaterial({ color: 0x9a8f8c, roughness: 0.85 });
+const consoleMat = new THREE.MeshStandardMaterial({ color: 0x4d4749, roughness: 0.6 });
+const yellowMat = new THREE.MeshStandardMaterial({ color: 0xe8c21a, roughness: 0.5 });
+const ceilMat = new THREE.MeshBasicMaterial({ color: 0x070506, side: THREE.DoubleSide });
+const trussMat = new THREE.MeshStandardMaterial({ color: 0x24262c, roughness: 0.5, metalness: 0.6 });
+const projBody = new THREE.MeshStandardMaterial({ color: 0x8e8b90, roughness: 0.5, metalness: 0.3 });
+const lensMat = new THREE.MeshBasicMaterial({ color: 0xb8d0ff });
+const pedMat = new THREE.MeshStandardMaterial({ color: 0xfff4f6, emissive: 0xffe3e8, emissiveIntensity: 0.9, roughness: 0.6 });
+const brass = new THREE.MeshStandardMaterial({ color: 0xd2a24c, metalness: 1, roughness: 0.22 });
+const ropeMat = new THREE.MeshPhysicalMaterial({ color: 0xa50f2b, roughness: 0.55, sheen: 1, sheenColor: new THREE.Color(0xff5a7a), sheenRoughness: 0.4 });
+
+// persistent containers, refilled on every rebuild
+const stallStatic = new THREE.Group(); scene.add(stallStatic);
+const gapCaps = new THREE.Group(); scene.add(gapCaps);
+const ceilingGroup = new THREE.Group(); scene.add(ceilingGroup);
+const wallSolid = pair(), wallGap = pair(), peds = pair(), rope = pair();
+const realRig = new THREE.Group(); scene.add(realRig);
+const AREA_N = 8; let areaLights = [];
+let domeFloor = null, boothFloor = null;
+function spot(color, intensity, from, to, angle) {
+  const s = new THREE.SpotLight(color, intensity, 40, angle, 0.65, 2);
+  s.position.copy(from); s.target.position.copy(to); realRig.add(s); realRig.add(s.target);
+  return s;
+}
+const pedSpot = spot(0xfff0e6, 5, new THREE.Vector3(), new THREE.Vector3(), 0.34);
+
+function strip(i0, i1, y0, y1, off) {
+  const pos = [], uv = [], idx = [];
+  for (let i = i0; i <= i1; i++) {
+    const p = path[i], q = path[Math.min(i + 1, path.length - 1)], r = path[Math.max(i - 1, 0)];
+    let tu = q.u - r.u, tv = q.v - r.v; const n = Math.hypot(tu, tv) || 1; tu /= n; tv /= n;
+    const ou = -tv * off, ov = tu * off;
+    pos.push(p.u + ou, y0, -(p.v + ov), p.u + ou, y1, -(p.v + ov));
+    uv.push(p.s / L, y0 / WALL_H, p.s / L, y1 / WALL_H);
+  }
+  for (let k = 0; k < i1 - i0; k++) { const a = k * 2; idx.push(a, a + 2, a + 1, a + 1, a + 2, a + 3); }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex(idx); g.computeVertexNormals(); return g;
+}
+
+function buildStall() {
+  computeLayout();
+  [stallStatic, gapCaps, ceilingGroup].forEach(clearGroup);
+  [wallSolid, wallGap, peds, rope].forEach(p => p.clear());
+  const TOP = WALL_H + FASCIA_H;
+
+  // curved projection wall, split into solid runs and side openings
+  const runs = []; { let start = 0, cur = path[1].gapSeg;
+    for (let i = 2; i < path.length; i++) if (path[i].gapSeg !== cur) { runs.push({ i0: start, i1: i - 1, gap: cur }); start = i - 1; cur = path[i].gapSeg; }
+    runs.push({ i0: start, i1: path.length - 1, gap: cur }); }
+  runs.forEach(r => {
+    const target = r.gap ? wallGap : wallSolid;
+    target.add(new THREE.Mesh(strip(r.i0, r.i1, 0, WALL_H, 0), wallMat));
+    target.add(new THREE.Mesh(strip(r.i0, r.i1, 0, TOP, 0.14), shellMat));
+  });
+  stallStatic.add(new THREE.Mesh(strip(0, path.length - 1, WALL_H, TOP, -0.02), fasciaMat));
+  const cap = (i, group) => { const p = path[i]; const m = new THREE.Mesh(new THREE.BoxGeometry(0.22, TOP, 0.22), capMat); m.position.copy(W(p.u, p.v, TOP / 2)); group.add(m); };
+  cap(0, stallStatic); cap(path.length - 1, stallStatic);
+  runs.filter(r => r.gap).forEach(r => { cap(r.i0, gapCaps); cap(r.i1, gapCaps); });
+
+  // floors
+  const domeShape = new THREE.Shape(domeOutline);
+  domeFloor = new THREE.Mesh(new THREE.ShapeGeometry(domeShape), floorMat); domeFloor.rotation.x = -Math.PI / 2; stallStatic.add(domeFloor);
+  const boothShape = new THREE.Shape([new THREE.Vector2(BOOTH.u0, BOOTH.v0), new THREE.Vector2(BOOTH.u1, BOOTH.v0), new THREE.Vector2(BOOTH.u1, BOOTH.v1), new THREE.Vector2(BOOTH.u0, BOOTH.v1)]);
+  boothShape.holes.push(new THREE.Path(domeOutline.slice().reverse()));
+  boothFloor = new THREE.Mesh(new THREE.ShapeGeometry(boothShape), boothFloorMat); boothFloor.rotation.x = -Math.PI / 2; boothFloor.position.y = -0.005; stallStatic.add(boothFloor);
+
+  // booth shell and back-of-house, anchored to the booth corners as on the plan
+  const { u0, u1, v1 } = BOOTH;
+  const box = (a0, a1, b0, b1, h, mat, y0 = 0) => { const m = new THREE.Mesh(new THREE.BoxGeometry(Math.abs(a1 - a0), h, Math.abs(b1 - b0)), mat); m.position.copy(W((a0 + a1) / 2, (b0 + b1) / 2, y0 + h / 2)); stallStatic.add(m); };
+  const wallTall = Math.max(10, TOP + 0.5);
+  box(u0 - 0.4, u0, 0, v1 + 0.4, wallTall, greyMat);
+  box(u1, u1 + 0.4, 0, v1 + 0.4, wallTall, greyMat);
+  box(u0, u1, v1, v1 + 0.4, wallTall, greyMat);
+  box(u0 + 0.44, u0 + 1.74, v1 - 5.64, v1 - 0.65, 3.4, consoleMat);
+  box(u0 + 2.64, u0 + 7.63, v1 - 1.68, v1 - 0.5, 6, shelfMat);
+  box(u1 - 8.67, u1 - 1.71, v1 - 1.68, v1 - 0.48, 6, shelfMat);
+  box(u1 - 1.66, u1 - 0.48, v1 - 8.43, v1 - 0.48, 6, shelfMat);
+  box(u1 - 3.31, u1 - 0.41, 2.75, 3.05, WALL_H, capMat);
+  box(u1 - 2.91, u1 - 0.91, 2.4, 2.75, 2.6, yellowMat);
+
+  // ceiling, truss, projectors
+  const ceil = new THREE.Mesh(new THREE.ShapeGeometry(domeShape), ceilMat); ceil.rotation.x = -Math.PI / 2; ceil.position.y = TOP; ceilingGroup.add(ceil);
+  [-8, -5.4, -2.7, 0, 2.7, 5.4, 8].forEach(k => {
+    const u = k * SX, vmax = EV0 + EB * Math.sqrt(Math.max(0, 1 - (u / EA) ** 2)) - 0.2;
+    const m = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, Math.max(0.5, vmax - 0.3)), trussMat);
+    m.position.copy(W(u, (vmax + 0.3) / 2, TOP - 0.15)); ceilingGroup.add(m);
+  });
+  [[-2.7, 10.5], [-1.4, 9.6], [1.4, 9.6], [2.7, 10.5], [-6.2, 5.6], [6.2, 5.6]].forEach(([a, b]) => {
+    const u = a * SX, v = b * SV, g = new THREE.Group();
+    g.add(new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.38, 0.9), projBody));
+    const lens = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.06, 16), lensMat); lens.rotation.x = Math.PI / 2; lens.position.set(0.28, 0, 0.47); g.add(lens);
+    const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.2, 8), trussMat); rod.position.y = 0.28; g.add(rod);
+    g.position.copy(W(u, v, TOP - 0.5)); g.lookAt(W(-u * 1.4, v - 4, TOP - 0.5)); ceilingGroup.add(g);
+  });
+
+  // display pedestals
+  [[-0.62, 0.35, 3.3], [0.62, 0.35, 3.3], [0, -0.7, 3.7]].forEach(([du, dv, h]) => {
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.62, h, 48), pedMat); m.position.copy(W(PED.u + du, PED.v + dv, h / 2)); peds.add(m);
+  });
+  pedLight.position.copy(W(PED.u, PED.v, 3.9));
+  pedSpot.position.copy(W(PED.u, PED.v, WALL_H + 0.3)); pedSpot.target.position.copy(W(PED.u, PED.v, 0));
+
+  // rope & stanchions
+  const half = dims.entrance / 2;
+  const ropePts = [[-(half - 0.1), 0.5], [-half * 0.85, 2.2 * SV]];
+  for (let i = 0; i <= 120; i++) { const th = Math.PI - Math.PI * i / 120; ropePts.push([RA * Math.cos(th), EV0 + RB * Math.sin(th)]); }
+  ropePts.push([half * 0.85, 2.2 * SV], [half - 0.1, 0.5]);
+  const posts = [];
+  { const corners = new Set([0, 1, 2, ropePts.length - 3, ropePts.length - 2, ropePts.length - 1]);
+    let acc = 0; posts.push(ropePts[0]);
+    for (let i = 1; i < ropePts.length; i++) {
+      acc += Math.hypot(ropePts[i][0] - ropePts[i - 1][0], ropePts[i][1] - ropePts[i - 1][1]);
+      if (corners.has(i) || acc >= 3.2) { posts.push(ropePts[i]); acc = 0; }
+    }
+    for (let i = posts.length - 1; i > 0; i--) if (Math.hypot(posts[i][0] - posts[i - 1][0], posts[i][1] - posts[i - 1][1]) < 1.2) posts.splice(i === posts.length - 1 ? i - 1 : i, 1);
+  }
+  posts.forEach(([u, v]) => {
+    const g = new THREE.Group();
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.56, 0.07, 32), brass); base.position.y = 0.035; g.add(base);
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.07, 3.0, 14), brass); pole.position.y = 1.55; g.add(pole);
+    const top = new THREE.Mesh(new THREE.SphereGeometry(0.12, 16, 12), brass); top.position.y = 3.1; g.add(top);
+    g.position.copy(W(u, v)); rope.add(g);
+  });
+  for (let i = 1; i < posts.length; i++) {
+    const a = W(posts[i - 1][0], posts[i - 1][1], 2.85), b = W(posts[i][0], posts[i][1], 2.85);
+    const mid = a.clone().lerp(b, 0.5); mid.y -= 0.35;
+    rope.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.QuadraticBezierCurve3(a, mid, b), 16, 0.055, 8, false), ropeMat));
+  }
+
+  // screen light: area lights along the wall
+  areaLights.forEach(l => realRig.remove(l)); areaLights = [];
+  for (let i = 0; i < AREA_N; i++) {
+    const s = (i + 0.5) / AREA_N * L, p = pathAt(s);
+    const l = new THREE.RectAreaLight(0xffffff, 0.1, L / AREA_N * 1.02, WALL_H * 0.96);
+    l.position.copy(W(p.u + p.nu * 0.05, p.v + p.nv * 0.05, WALL_H / 2));
+    l.lookAt(W(p.u + p.nu * 5, p.v + p.nv * 5, WALL_H / 2));
+    realRig.add(l); areaLights.push(l);
+  }
+  // keep current toggles
+  wallGap.visible = !$('openings').checked; gapCaps.visible = $('openings').checked;
+  rope.visible = $('rope').checked; peds.visible = $('pedestals').checked;
+}
+computeLayout();
+
+// ---------- shared helpers for people ----------
+let seed = 7;
+const rnd = () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+const pick = arr => arr[Math.floor(rnd() * arr.length)];
+const blobTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d');
+  const g = x.createRadialGradient(64, 64, 0, 64, 64, 64); g.addColorStop(0, 'rgba(0,0,0,.85)'); g.addColorStop(0.45, 'rgba(0,0,0,.45)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+  x.fillStyle = g; x.fillRect(0, 0, 128, 128); const t = new THREE.CanvasTexture(c); return t; })();
+const blobMat = new THREE.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false, opacity: 0.7, color: 0x000000 });
+function contactShadow(w, d) { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), blobMat); m.rotation.x = -Math.PI / 2; m.position.y = 0.012; m.renderOrder = 1; return m; }
+
+// simple layout dummies (fast mode)
+function dummy(h, top, bottom, head) {
+  const g = new THREE.Group();
+  const mt = new THREE.MeshLambertMaterial({ color: top }), mb = new THREE.MeshLambertMaterial({ color: bottom }), mh = new THREE.MeshLambertMaterial({ color: head });
+  const legL = 0.47 * h;
+  [-0.22, 0.22].forEach(x => { const l = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.14, legL, 10), mb); l.position.set(x, legL / 2, 0); g.add(l); });
+  const torsoH = 0.35 * h;
+  const t = new THREE.Mesh(new THREE.CylinderGeometry(0.56, 0.48, torsoH, 16), mt); t.scale.z = 0.55; t.position.y = legL + torsoH / 2; g.add(t);
+  const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.15, 0.3, 8), mh); neck.position.y = legL + torsoH + 0.15; g.add(neck);
+  const hd = new THREE.Mesh(new THREE.SphereGeometry(0.31, 16, 12), mh); hd.scale.y = 1.12; hd.position.y = h - 0.35; g.add(hd);
+  const armL = 0.37 * h;
+  [-1, 1].forEach(s => { const a = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.09, armL, 8), mt); a.position.set(s * 0.64, legL + torsoH - armL / 2 + 0.05, 0); a.rotation.z = s * 0.06; g.add(a); });
+  return g;
+}
+
+// ---------- realistic women: sculpted bodies, faces, hair, fashion ----------
+// Body profile for a 5.4 ft woman: [height fraction, half-width, front depth, back depth]
+const TORSO = [
+  [0.455, 0.40, 0.26, 0.30], [0.48, 0.52, 0.30, 0.37], [0.52, 0.585, 0.33, 0.42], [0.565, 0.54, 0.31, 0.38],
+  [0.62, 0.43, 0.29, 0.30], [0.665, 0.45, 0.32, 0.30], [0.70, 0.47, 0.37, 0.31], [0.728, 0.50, 0.43, 0.32],
+  [0.755, 0.52, 0.36, 0.33], [0.78, 0.55, 0.30, 0.32], [0.797, 0.55, 0.26, 0.29], [0.81, 0.5, 0.22, 0.25], [0.82, 0.4, 0.2, 0.22], [0.83, 0.27, 0.17, 0.19], [0.845, 0.17, 0.15, 0.16]
+];
+function cr(p0, p1, p2, p3, t) { const t2 = t * t, t3 = t2 * t; return 0.5 * ((2 * p1) + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3); }
+function prof(yf) {
+  const T = TORSO; if (yf <= T[0][0]) return { rx: T[0][1], zf: T[0][2], zb: T[0][3] };
+  if (yf >= T[T.length - 1][0]) { const e = T[T.length - 1]; return { rx: e[1], zf: e[2], zb: e[3] }; }
+  let i = 0; while (T[i + 1][0] < yf) i++;
+  const a = T[Math.max(0, i - 1)], b = T[i], c = T[i + 1], d = T[Math.min(T.length - 1, i + 2)];
+  const t = (yf - b[0]) / (c[0] - b[0]);
+  return { rx: cr(a[1], b[1], c[1], d[1], t), zf: cr(a[2], b[2], c[2], d[2], t), zb: cr(a[3], b[3], c[3], d[3], t) };
+}
+// loft rings into a smooth closed surface: ring = {y, rx, zf, zb, x0, z0, rip, freq, ph}
+function loft(rings, R = 40, capBottom = false, capTop = false, arc = null) {
+  const pos = [], uv = [], idx = [], ex = 2 / 2.4;
+  rings.forEach(r => {
+    for (let j = 0; j <= R; j++) {
+      const th = arc ? lerp(arc[0], arc[1], j / R) : j / R * Math.PI * 2, s = Math.sin(th), c = Math.cos(th);
+      let rr = 1 + (r.rip || 0) * Math.sin(th * (r.freq || 0) + (r.ph || 0));
+      const x = (r.x0 || 0) + r.rx * rr * Math.sign(s) * Math.abs(s) ** ex;
+      const z = (r.z0 || 0) + (c >= 0 ? r.zf : r.zb) * rr * Math.sign(c) * Math.abs(c) ** ex;
+      const yy = r.y + (r.dy ? r.dy(th) : 0);
+      pos.push(x, yy, z); uv.push(j / R, yy * 0.6);
+    }
+  });
+  const C = R + 1;
+  for (let i = 0; i < rings.length - 1; i++) for (let j = 0; j < R; j++) { const a = i * C + j, b = a + C; idx.push(a, a + 1, b, a + 1, b + 1, b); }
+  const addCap = (ri, down) => { const r = rings[ri]; const ci = pos.length / 3; pos.push(r.x0 || 0, r.y, r.z0 || 0); uv.push(0.5, r.y * 0.6);
+    for (let j = 0; j < R; j++) { const a = ri * C + j; down ? idx.push(ci, a, a + 1) : idx.push(ci, a + 1, a); } };
+  if (capBottom) addCap(0, true); if (capTop) addCap(rings.length - 1, false);
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex(idx); g.computeVertexNormals();
+  // weld the seam normals
+  const n = g.attributes.normal;
+  if (!arc) for (let i = 0; i < rings.length; i++) { const a = i * C, b = i * C + R; const v = new THREE.Vector3(n.getX(a) + n.getX(b), n.getY(a) + n.getY(b), n.getZ(a) + n.getZ(b)).normalize(); n.setXYZ(a, v.x, v.y, v.z); n.setXYZ(b, v.x, v.y, v.z); }
+  return g;
+}
+// sweep a tapered tube along points; radius from keyframes [[t, r], ...]
+function sweep(points, keys, radial = 12, segs = 32, flat = 1) {
+  const curve = new THREE.CatmullRomCurve3(points, false, 'centripetal');
+  const g = new THREE.TubeGeometry(curve, segs, 1, radial, false);
+  const pos = g.attributes.position, P = new THREE.Vector3();
+  const rAt = t => { if (typeof keys === 'function') return keys(t); let i = 0; while (i < keys.length - 2 && keys[i + 1][0] < t) i++; const a = keys[i], b = keys[i + 1]; const k = Math.min(1, Math.max(0, (t - a[0]) / Math.max(1e-6, b[0] - a[0]))); return lerp(a[1], b[1], k * k * (3 - 2 * k)); };
+  for (let i = 0; i <= segs; i++) {
+    curve.getPointAt(i / segs, P); const r = rAt(i / segs);
+    for (let j = 0; j <= radial; j++) { const k = i * (radial + 1) + j; pos.setXYZ(k, P.x + (pos.getX(k) - P.x) * r, P.y + (pos.getY(k) - P.y) * r * (flat), P.z + (pos.getZ(k) - P.z) * r); }
+  }
+  g.computeVertexNormals();
+  return g;
+}
+const ell = (rx, ry, rz, seg = 20) => { const g = new THREE.SphereGeometry(1, seg, Math.max(8, seg * 0.7 | 0)); g.scale(rx, ry, rz); return g; };
+const place = (g, x, y, z, q) => { if (q) g.applyQuaternion(q); g.translate(x, y, z); return g; };
+const alignQ = (dir) => new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), dir.clone().normalize());
+
+// ----- fabric textures -----
+function canvasTex(w, h, draw, repeat) { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = ANISO; if (repeat) t.repeat.set(repeat[0], repeat[1]); return t; }
+let texSeed = 11; const trnd = () => { texSeed = (texSeed * 16807) % 2147483647; return texSeed / 2147483647; };
+const sequinNormal = canvasTex(256, 256, (x, w, h) => { const s = 6; for (let i = 0; i < w; i += s) for (let j = 0; j < h; j += s) { const r = 128 + (trnd() - 0.5) * 170, g = 128 + (trnd() - 0.5) * 170; x.fillStyle = `rgb(${r | 0},${g | 0},235)`; x.beginPath(); x.arc(i + s / 2, j + s / 2, s / 2, 0, Math.PI * 2); x.fill(); } }, [14, 9]);
+const sequinNormal2 = sequinNormal.clone(); sequinNormal2.repeat.set(6, 5);
+const knitNormal = canvasTex(128, 128, (x, w, h) => { x.fillStyle = 'rgb(128,128,255)'; x.fillRect(0, 0, w, h); for (let j = 0; j < h; j += 4) { x.fillStyle = 'rgb(128,150,240)'; x.fillRect(0, j, w, 1); x.fillStyle = 'rgb(128,106,240)'; x.fillRect(0, j + 2, w, 1); } }, [20, 30]);
+const monogramMap = canvasTex(256, 256, (x, w, h) => {
+  x.fillStyle = '#121010'; x.fillRect(0, 0, w, h); x.strokeStyle = '#b38a46'; x.lineWidth = 6;
+  for (let i = -w; i < w * 2; i += 64) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i + h, h); x.stroke(); x.beginPath(); x.moveTo(i + h, 0); x.lineTo(i, h); x.stroke(); }
+  x.fillStyle = '#d9b46a'; for (let i = 0; i < w; i += 64) for (let j = 0; j < h; j += 64) { x.beginPath(); x.arc(i + 32, j + 32, 8, 0, Math.PI * 2); x.fill(); x.fillStyle = '#121010'; x.beginPath(); x.arc(i + 32, j + 32, 3.5, 0, Math.PI * 2); x.fill(); x.fillStyle = '#d9b46a'; }
+}, [7, 9]); monogramMap.colorSpace = SRGB;
+const embroideryMap = canvasTex(256, 256, (x, w, h) => {
+  x.fillStyle = '#5b0f1f'; x.fillRect(0, 0, w, h);
+  const cols = ['#e9b44c', '#2f8f6a', '#f06a8b', '#f2e2c4', '#3c6fd1'];
+  for (let k = 0; k < 70; k++) { const cx = trnd() * w, cy = trnd() * h, r = 6 + trnd() * 16; x.fillStyle = cols[k % cols.length];
+    for (let p = 0; p < 6; p++) { const a = p / 6 * Math.PI * 2; x.beginPath(); x.ellipse(cx + Math.cos(a) * r * .6, cy + Math.sin(a) * r * .6, r * .45, r * .22, a, 0, Math.PI * 2); x.fill(); }
+    x.fillStyle = '#e9b44c'; x.beginPath(); x.arc(cx, cy, r * .22, 0, Math.PI * 2); x.fill(); }
+}, [4, 6]); embroideryMap.colorSpace = SRGB;
+const lehengaMap = canvasTex(256, 256, (x, w, h) => {
+  x.fillStyle = '#efe4d4'; x.fillRect(0, 0, w, h); x.strokeStyle = '#c9b9a2'; x.lineWidth = 2;
+  for (let i = 0; i < w; i += 32) for (let j = 0; j < h; j += 40) { x.beginPath(); x.arc(i + 16, j + 20, 13, Math.PI * 0.1, Math.PI * 0.9); x.stroke(); x.beginPath(); x.arc(i + 16, j + 6, 3, 0, Math.PI * 2); x.stroke(); }
+}, [10, 3]); lehengaMap.colorSpace = SRGB;
+const denimMap = canvasTex(256, 256, (x, w, h) => { x.fillStyle = '#3d5b86'; x.fillRect(0, 0, w, h);
+  for (let i = -h; i < w; i += 3) { x.strokeStyle = `rgba(${trnd() < 0.5 ? '20,35,70' : '150,175,210'},${0.18 + trnd() * 0.2})`; x.lineWidth = 1; x.beginPath(); x.moveTo(i, 0); x.lineTo(i + h, h); x.stroke(); }
+  const g = x.createLinearGradient(0, 0, w, 0); g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.5, 'rgba(190,210,235,.22)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, w, h); }, [3, 2]); denimMap.colorSpace = SRGB;
+const beltMap = canvasTex(128, 32, (x, w, h) => { x.fillStyle = '#7a1420'; x.fillRect(0, 0, w, h); x.fillStyle = '#d6a24a'; for (let i = 0; i < w; i += 16) { x.beginPath(); x.arc(i + 8, 16, 5, 0, Math.PI * 2); x.fill(); } x.fillStyle = '#2f8f6a'; for (let i = 0; i < w; i += 16) x.fillRect(i, 4, 3, 3); }, [12, 1]); beltMap.colorSpace = SRGB;
+
+const M = {}; // material cache
+function mat(key, make) { return M[key] || (M[key] = make()); }
+const fab = {
+  ivorySequin: () => mat('ivorySequin', () => new THREE.MeshPhysicalMaterial({ color: 0xf1e6d6, map: lehengaMap, roughness: 0.32, metalness: 0.35, normalMap: sequinNormal, normalScale: new THREE.Vector2(0.55, 0.55), sheen: 0.6, sheenColor: new THREE.Color(0xffffff), clearcoat: 0.3 })),
+  champagneSequin: () => mat('champSequin', () => new THREE.MeshPhysicalMaterial({ color: 0xd9bf94, roughness: 0.25, metalness: 0.75, normalMap: sequinNormal2, normalScale: new THREE.Vector2(0.7, 0.7) })),
+  silverMetal: () => mat('silver', () => new THREE.MeshPhysicalMaterial({ color: 0xcfd3da, roughness: 0.22, metalness: 0.9, normalMap: sequinNormal2, normalScale: new THREE.Vector2(0.3, 0.3) })),
+  monogram: () => mat('monogram', () => new THREE.MeshPhysicalMaterial({ color: 0xffffff, map: monogramMap, roughness: 0.55, sheen: 0.5, sheenColor: new THREE.Color(0x887766) })),
+  embroidery: () => mat('embroidery', () => new THREE.MeshPhysicalMaterial({ color: 0xffffff, map: embroideryMap, roughness: 0.6, metalness: 0.15, normalMap: knitNormal, normalScale: new THREE.Vector2(0.4, 0.4) })),
+  blackSatin: () => mat('blackSatin', () => new THREE.MeshPhysicalMaterial({ color: 0x141317, roughness: 0.32, sheen: 1, sheenColor: new THREE.Color(0x6b6b78), sheenRoughness: 0.3, clearcoat: 0.25 })),
+  redSatin: () => mat('redSatin', () => new THREE.MeshPhysicalMaterial({ color: 0x9e0b24, roughness: 0.3, sheen: 1, sheenColor: new THREE.Color(0xff6c80), sheenRoughness: 0.3, clearcoat: 0.3 })),
+  blush: () => mat('blush', () => new THREE.MeshPhysicalMaterial({ color: 0xf0b7c4, roughness: 0.55, sheen: 1, sheenColor: new THREE.Color(0xffe6ee), sheenRoughness: 0.5, normalMap: knitNormal, normalScale: new THREE.Vector2(0.2, 0.2) })),
+  ivoryCrepe: () => mat('ivoryCrepe', () => new THREE.MeshPhysicalMaterial({ color: 0xece3d6, roughness: 0.7, sheen: 0.6, sheenColor: new THREE.Color(0xffffff) })),
+  blackCrepe: () => mat('blackCrepe', () => new THREE.MeshPhysicalMaterial({ color: 0x0f0e11, roughness: 0.75, sheen: 0.5, sheenColor: new THREE.Color(0x444450) })),
+  leather: () => mat('leather', () => new THREE.MeshPhysicalMaterial({ color: 0x0b0a0c, roughness: 0.28, clearcoat: 1, clearcoatRoughness: 0.15 })),
+  nudeShoe: () => mat('nudeShoe', () => new THREE.MeshPhysicalMaterial({ color: 0xc89c80, roughness: 0.35, clearcoat: 0.8 })),
+  goldShoe: () => mat('goldShoe', () => new THREE.MeshStandardMaterial({ color: 0xd6ad5c, roughness: 0.25, metalness: 1 })),
+  gold: () => mat('gold', () => new THREE.MeshStandardMaterial({ color: 0xd8ad55, roughness: 0.2, metalness: 1 })),
+  belt: () => mat('belt', () => new THREE.MeshPhysicalMaterial({ color: 0xffffff, map: beltMap, roughness: 0.45, metalness: 0.2 })),
+  navyBag: () => mat('navyBag', () => new THREE.MeshPhysicalMaterial({ color: 0x1b2333, roughness: 0.35, clearcoat: 0.8 })),
+  phone: () => mat('phone', () => new THREE.MeshStandardMaterial({ color: 0x1a1a1e, roughness: 0.3, metalness: 0.6 })),
+  hotPink: () => mat('hotPink', () => new THREE.MeshPhysicalMaterial({ color: 0xe0306c, roughness: 0.22, clearcoat: 1, clearcoatRoughness: 0.08 })),
+  babyPink: () => mat('babyPink', () => new THREE.MeshPhysicalMaterial({ color: 0xf2a9bd, roughness: 0.4, sheen: 1, sheenColor: new THREE.Color(0xffe0ea), sheenRoughness: 0.35, clearcoat: 0.5 })),
+  redVinyl: () => mat('redVinyl', () => new THREE.MeshPhysicalMaterial({ color: 0xb0101c, roughness: 0.16, clearcoat: 1, clearcoatRoughness: 0.06, side: THREE.DoubleSide })),
+  redTights: () => mat('redTights', () => new THREE.MeshPhysicalMaterial({ color: 0xd0242c, roughness: 0.5, sheen: 1, sheenColor: new THREE.Color(0xff8a80), sheenRoughness: 0.3 })),
+  redGlitter: () => mat('redGlitter', () => new THREE.MeshPhysicalMaterial({ color: 0xc0101e, roughness: 0.25, metalness: 0.7, normalMap: sequinNormal2, normalScale: new THREE.Vector2(0.8, 0.8) })),
+  crystal: () => mat('crystal', () => new THREE.MeshPhysicalMaterial({ color: 0xf4f1ee, roughness: 0.35, metalness: 0.2, normalMap: sequinNormal2, normalScale: new THREE.Vector2(0.35, 0.35), sheen: 0.6, sheenColor: new THREE.Color(0xffffff) })),
+  sheer: () => mat('sheer', () => new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.6, transparent: true, opacity: 0.55, depthWrite: false, side: THREE.DoubleSide, sheen: 1, sheenColor: new THREE.Color(0xffffff), sheenRoughness: 0.5 })),
+  denim: () => mat('denim', () => new THREE.MeshStandardMaterial({ color: 0xffffff, map: denimMap, roughness: 0.85 })),
+  whiteShoe: () => mat('whiteShoe', () => new THREE.MeshPhysicalMaterial({ color: 0xf3f0ec, roughness: 0.2, clearcoat: 1 })),
+  silverShoe: () => mat('silverShoe', () => new THREE.MeshStandardMaterial({ color: 0xd6d9df, roughness: 0.2, metalness: 1 }))
+};
+function skinMat(tone) { return mat('skin' + tone, () => new THREE.MeshPhysicalMaterial({ color: tone, roughness: 0.5, sheen: 0.5, sheenColor: new THREE.Color(0xff8a70), sheenRoughness: 0.55, clearcoat: 0.08, clearcoatRoughness: 0.5 })); }
+const streaks = (vertical) => canvasTex(256, 256, (x, w, h) => { x.fillStyle = '#d0d0d0'; x.fillRect(0, 0, w, h);
+  for (let i = 0; i < 420; i++) { const p = trnd() * (vertical ? w : h), l = 0.55 + trnd() * 0.45; x.fillStyle = `rgba(${l > 0.8 ? 255 : 60},${l > 0.8 ? 255 : 60},${l > 0.8 ? 255 : 60},${0.12 + trnd() * 0.25})`; vertical ? x.fillRect(p, 0, 1 + trnd() * 2, h) : x.fillRect(0, p, w, 1 + trnd() * 2); } }, [1, 1]);
+const hairTexTube = streaks(false), hairTexSheet = streaks(true); hairTexTube.repeat.set(1, 3); hairTexSheet.repeat.set(6, 1);
+function hairMat(c, sheet) { return mat('hair' + c + (sheet ? 's' : ''), () => new THREE.MeshPhysicalMaterial({ color: c, map: sheet ? hairTexSheet : hairTexTube, roughness: 0.4, sheen: 1, sheenColor: new THREE.Color(c).lerp(new THREE.Color(0xc89060), 0.5), sheenRoughness: 0.3, clearcoat: 0.2, clearcoatRoughness: 0.35, side: sheet ? THREE.DoubleSide : THREE.FrontSide })); }
+function faceMat(tone, lip) {
+  return mat('face' + tone + lip, () => {
+    const c = document.createElement('canvas'); c.width = 512; c.height = 256; const x = c.getContext('2d');
+    const base = '#' + new THREE.Color(tone).getHexString(); x.fillStyle = base; x.fillRect(0, 0, 512, 256);
+    const fx = 128; // front of the sphere sits at u = 0.25
+    // blush
+    [-1, 1].forEach(s => { const g = x.createRadialGradient(fx + s * 40, 150, 2, fx + s * 40, 150, 22); g.addColorStop(0, 'rgba(200,90,90,.28)'); g.addColorStop(1, 'rgba(200,90,90,0)'); x.fillStyle = g; x.fillRect(fx + s * 40 - 24, 126, 48, 48); });
+    // brows
+    x.strokeStyle = 'rgba(30,18,14,.9)'; x.lineCap = 'round';
+    [-1, 1].forEach(s => { x.lineWidth = 3.4; x.beginPath(); x.moveTo(fx + s * 14, 110); x.quadraticCurveTo(fx + s * 30, 103, fx + s * 46, 110); x.stroke(); });
+    // eyes with liner and lashes
+    [-1, 1].forEach(s => {
+      const ex = fx + s * 30, ey = 126;
+      const sh = x.createRadialGradient(ex, ey - 3, 1, ex, ey - 3, 13); sh.addColorStop(0, 'rgba(90,50,45,.45)'); sh.addColorStop(1, 'rgba(90,50,45,0)'); x.fillStyle = sh; x.fillRect(ex - 15, ey - 16, 30, 24);
+      x.fillStyle = '#efe6e0'; x.beginPath(); x.ellipse(ex, ey, 10, 4.2, 0, 0, Math.PI * 2); x.fill();
+      x.fillStyle = '#2a170f'; x.beginPath(); x.arc(ex, ey, 3.8, 0, Math.PI * 2); x.fill();
+      x.strokeStyle = '#0d0807'; x.lineWidth = 2.6; x.beginPath(); x.moveTo(ex - 11, ey + 0.5); x.quadraticCurveTo(ex, ey - 7, ex + 12 * s * s, ey - 2); x.stroke();
+      x.lineWidth = 2; x.beginPath(); x.moveTo(ex + s * 10, ey - 2); x.lineTo(ex + s * 15, ey - 5); x.stroke();
+    });
+    // nose shadow + lips
+    x.fillStyle = 'rgba(80,40,30,.18)'; x.beginPath(); x.ellipse(fx, 152, 7, 3, 0, 0, Math.PI * 2); x.fill();
+    x.fillStyle = lip; x.beginPath(); x.moveTo(fx - 15, 168); x.quadraticCurveTo(fx - 6, 161, fx, 164); x.quadraticCurveTo(fx + 6, 161, fx + 15, 168); x.quadraticCurveTo(fx, 177, fx - 15, 168); x.fill();
+    x.strokeStyle = 'rgba(60,20,20,.5)'; x.lineWidth = 1; x.beginPath(); x.moveTo(fx - 14, 168); x.quadraticCurveTo(fx, 170, fx + 14, 168); x.stroke();
+    const t = new THREE.CanvasTexture(c); t.colorSpace = SRGB; t.anisotropy = ANISO;
+    return new THREE.MeshPhysicalMaterial({ color: 0xffffff, map: t, roughness: 0.48, sheen: 0.5, sheenColor: new THREE.Color(0xff8a70), sheenRoughness: 0.55 });
+  });
+}
+// phone screens show a live crop of the wall media
+const phoneCanvasP = document.createElement('canvas'); phoneCanvasP.width = 180; phoneCanvasP.height = 320;
+const phoneCanvasL = document.createElement('canvas'); phoneCanvasL.width = 320; phoneCanvasL.height = 180;
+const phoneTexP = new THREE.CanvasTexture(phoneCanvasP), phoneTexL = new THREE.CanvasTexture(phoneCanvasL);
+phoneTexP.colorSpace = phoneTexL.colorSpace = SRGB;
+const screenMatP = new THREE.MeshBasicMaterial({ map: phoneTexP, toneMapped: false }), screenMatL = new THREE.MeshBasicMaterial({ map: phoneTexL, toneMapped: false });
+const wallThumb = document.createElement('canvas'); wallThumb.width = 1236; wallThumb.height = 180;
+function refreshThumb() { const t = wallThumb.getContext('2d'); t.fillStyle = '#000'; t.fillRect(0, 0, 1236, 180); drawWall(t, 0, 0, 1236, 180); }
+function updatePhones() {
+  try {
+    phoneCanvasP.getContext('2d').drawImage(wallThumb, 1236 * 0.46, 0, 180 * 9 / 16, 180, 0, 0, 180, 320); phoneTexP.needsUpdate = true;
+    phoneCanvasL.getContext('2d').drawImage(wallThumb, 618 - 160, 0, 320, 180, 0, 0, 320, 180); phoneTexL.needsUpdate = true;
+  } catch (e) { /* ignore */ }
+}
+
+// Modern event looks, taken from the reference photos
+const OUTFITS = [
+  { id: 'lehenga', hair: 'long', lip: '#b5676a', heel: 0.24, shoe: 'nudeShoe' },              // ivory sequin blouse + flowing lehenga
+  { id: 'monogram', hair: 'bob', lip: '#9e4a4f', heel: 0.28, shoe: 'leather', sleeves: 'jacket', jacket: 'monogram' }, // monogram shirt co-ord, wide trousers
+  { id: 'bustier', hair: 'long', lip: '#8f3a40', heel: 0.22, shoe: 'leather', bag: true },     // embroidered corset top + wide-leg satin trousers
+  { id: 'sheer', hair: 'long', lip: '#c77b7b', heel: 0.3, shoe: 'nudeShoe', sleeves: 'bell' }, // white midi dress with chiffon bell sleeves
+  { id: 'vinyl', hair: 'straight', hairCol: 0x6b2814, lip: '#d1475e', heel: 0.33, shoe: 'redGlitter', sleeves: 'jacket', jacket: 'redVinyl' }, // pink satin top, red vinyl coat, black trousers
+  { id: 'denim', hair: 'straight', lip: '#c46a78', heel: 0.16, shoe: 'whiteShoe' },             // baby-pink corset top with bow + baggy jeans
+  { id: 'silver', hair: 'pony', lip: '#a24a58', heel: 0.3, shoe: 'silverShoe' },                // silver sequin top + black satin midi skirt
+  { id: 'blazer', hair: 'bun', lip: '#8e2f3c', heel: 0.3, shoe: 'leather', sleeves: 'jacket', jacket: 'blackSatin' } // white top, black blazer, black trousers
+];
+const SKIN = [0xc68e6a, 0xb67b58, 0xd9a183, 0x9c6747, 0xe2b394, 0xa9704f];
+const HAIR = [0x150d09, 0x24150e, 0x3a2215, 0x0f0a08, 0x4a2c1a];
+
+function woman(opts) {
+  const { H, build, tone, outfit, pose } = opts;
+  const hairCol = outfit.hairCol || opts.hairCol;
+  const parts = []; // {g, m}
+  const add = (g, m) => parts.push({ g, m });
+  const B = build, D = build;
+  const skin = skinMat(tone);
+  const fy = f => f * H;
+  const section = (y0f, y1f, infl, step = 0.05, fn) => {
+    const n = Math.max(3, Math.ceil((y1f - y0f) * H / step)); const rings = [];
+    for (let i = 0; i <= n; i++) { const yf = lerp(y0f, y1f, i / n), p = fn ? fn(yf) : prof(yf); rings.push({ y: yf * H, rx: p.rx * B + infl, zf: p.zf * D + infl, zb: p.zb * D + infl }); }
+    return rings;
+  };
+  // torso
+  add(loft(section(0.452, 0.845, 0), 32, true, false), skin);
+  // neck + head
+  const hc = new THREE.Vector3(0, H - 0.355, 0.04);
+  add(sweep([new THREE.Vector3(0, fy(0.82), -0.01), new THREE.Vector3(0, fy(0.86), 0.0), new THREE.Vector3(0, hc.y - 0.12, 0.02)], [[0, 0.165], [1, 0.14]], 12, 6), skin);
+  const head = new THREE.SphereGeometry(0.33, 32, 24); head.scale(0.86, 1.07, 0.96); head.translate(hc.x, hc.y, hc.z); add(head, faceMat(tone, outfit.lip));
+  add(place(ell(0.035, 0.07, 0.05, 10), 0, hc.y - 0.06, hc.z + 0.3), skin);
+  [-1, 1].forEach(s => add(place(ell(0.04, 0.075, 0.03, 8), s * 0.285, hc.y - 0.02, hc.z - 0.02), skin));
+
+  // legs (contrapposto: one weight-bearing, one relaxed)
+  const wl = opts.weight;
+  const legs = [];
+  [-1, 1].forEach(s => {
+    const free = s !== wl;
+    const hip = new THREE.Vector3(s * 0.25 * B, fy(0.5), 0);
+    const knee = free ? new THREE.Vector3(s * 0.25 * B, fy(0.29), 0.12) : new THREE.Vector3(s * 0.19 * B, fy(0.285), 0.02);
+    const ankle = free ? new THREE.Vector3(s * 0.3 * B, fy(0.048), 0.05) : new THREE.Vector3(s * 0.15 * B, fy(0.045), -0.03);
+    const l0 = 0.12, l1 = hip.distanceTo(knee), l2 = knee.distanceTo(ankle), tot = l0 + l1 + l2;
+    const tH = l0 / tot, tK = (l0 + l1) / tot;
+    const keys = [[0, 0.3 * B], [tH, 0.3 * B], [tH + (tK - tH) * 0.35, 0.265 * B], [tH + (tK - tH) * 0.8, 0.18], [tK, 0.155], [tK + (1 - tK) * 0.3, 0.172], [tK + (1 - tK) * 0.78, 0.105], [1, 0.082]];
+    const pts = [hip.clone().add(new THREE.Vector3(0, 0.12, 0)), hip, knee, ankle];
+    add(sweep(pts, keys, 12, 30), skin);
+    const curve = new THREE.CatmullRomCurve3(pts, false, 'centripetal');
+    const rAt = t => { let i = 0; while (i < keys.length - 2 && keys[i + 1][0] < t) i++; const a = keys[i], b = keys[i + 1]; const k = Math.min(1, Math.max(0, (t - a[0]) / (b[0] - a[0]))); return lerp(a[1], b[1], k * k * (3 - 2 * k)); };
+    legs.push({ s, hip, knee, ankle, keys, pts, tH, tK, curve, rAt });
+    const hh = outfit.heel;
+    const heelPt = new THREE.Vector3(ankle.x, ankle.y - 0.14, ankle.z - 0.12);
+    const toe = new THREE.Vector3(ankle.x + s * 0.04, -hh + 0.035, ankle.z + 0.55 - hh * 0.4);
+    const dir = toe.clone().sub(heelPt); const len = dir.length();
+    const foot = ell(0.085, 0.06, len / 2 + 0.04, 14); foot.applyQuaternion(alignQ(dir)); const mid = heelPt.clone().lerp(toe, 0.5); foot.translate(mid.x, mid.y, mid.z);
+    add(foot, fab[outfit.shoe]());
+    if (hh > 0.1) add(sweep([new THREE.Vector3(heelPt.x, heelPt.y, heelPt.z - 0.02), new THREE.Vector3(heelPt.x, lerp(heelPt.y, -hh, 0.5), heelPt.z - 0.03), new THREE.Vector3(heelPt.x, -hh, heelPt.z - 0.04)], [[0, 0.035], [1, outfit.boots ? 0.04 : 0.018]], 8, 4), fab[outfit.shoe]());
+    // a sub-section of the leg, inflated: boots, stockings
+    const legShell = (t0, t1, extra, m, radial = 12) => {
+      const p = []; for (let k = 0; k <= 10; k++) p.push(curve.getPointAt(lerp(t0, t1, k / 10)));
+      add(sweep(p, t => rAt(lerp(t0, t1, t)) + extra, radial, 20), m);
+    };
+    if (outfit.boots) {
+      legShell(Math.max(0, tK - 0.07), 1, 0.03, fab.leather());
+      add(sweep([curve.getPointAt(0.97), new THREE.Vector3(ankle.x, ankle.y - 0.1, ankle.z - 0.02)], [[0, 0.11], [1, 0.1]], 12, 4), fab.leather());
+    }
+    if (outfit.stockings) {
+      const tTop = tH + (tK - tH) * 0.3;
+      legShell(tTop, 1, 0.008, fab.redTights());
+      legShell(tTop, tTop + 0.025, 0.02, fab.redTights()); // lace band
+    }
+  });
+
+  // arms by pose
+  const armPose = (s, kind) => {
+    const S = new THREE.Vector3(s * 0.5 * B, fy(0.79), -0.03);
+    let E, Wr;
+    if (kind === 'phone') { E = new THREE.Vector3(s * 0.42, fy(0.77), 0.36); Wr = new THREE.Vector3(s * 0.16, fy(0.835), 0.74); }
+    else if (kind === 'phone2') { E = new THREE.Vector3(s * 0.46, fy(0.69), 0.3); Wr = new THREE.Vector3(s * 0.2, fy(0.775), 0.66); }
+    else if (kind === 'hip') { E = new THREE.Vector3(s * 0.86 * B, fy(0.66), -0.16); Wr = new THREE.Vector3(s * 0.55 * B, fy(0.59), 0.0); }
+    else if (kind === 'bag') { E = new THREE.Vector3(s * 0.66 * B, fy(0.64), -0.06); Wr = new THREE.Vector3(s * 0.63 * B, fy(0.55), 0.16); }
+    else { E = new THREE.Vector3(s * 0.63 * B, fy(0.615), -0.05); Wr = new THREE.Vector3(s * 0.6 * B, fy(0.47), 0.04); }
+    const Sx = S.clone().add(new THREE.Vector3(-s * 0.08, 0.06, 0));
+    const l0 = 0.1, l1 = S.distanceTo(E), l2 = E.distanceTo(Wr), tot = l0 + l1 + l2, tS = l0 / tot, tE = (l0 + l1) / tot;
+    add(sweep([Sx, S, E, Wr], [[0, 0.15], [tS, 0.14], [tS + (tE - tS) * 0.55, 0.112], [tE, 0.083], [tE + (1 - tE) * 0.3, 0.09], [1, 0.058]], 10, 24), skin);
+    const d = Wr.clone().sub(E).normalize();
+    const hand = ell(0.095, 0.045, 0.19, 12); hand.applyQuaternion(alignQ(d)); const hcn = Wr.clone().addScaledVector(d, 0.16); hand.translate(hcn.x, hcn.y, hcn.z); add(hand, skin);
+    if (opts.bangles && !outfit.sleeves) { const b = new THREE.TorusGeometry(0.085, 0.014, 6, 20); b.applyQuaternion(alignQ(d)); const bp = Wr.clone().addScaledVector(d, -0.04); b.translate(bp.x, bp.y, bp.z); add(b, fab.gold()); }
+    // sleeves
+    if (outfit.sleeves === 'jacket') add(sweep([Sx, S, E, Wr.clone().addScaledVector(d, -0.02)], [[0, 0.21], [tS, 0.2], [tE, 0.145], [1, 0.125]], 12, 20), fab[outfit.jacket]());
+    if (outfit.sleeves === 'bell') add(sweep([Sx, S, E, Wr.clone().addScaledVector(d, 0.12), Wr.clone().addScaledVector(d, 0.2).add(new THREE.Vector3(0, -0.32, 0))], [[0, 0.17], [tS * 0.9, 0.16], [tE * 0.9, 0.13], [0.82, 0.3], [1, 0.38]], 14, 24), fab.sheer());
+    return { S, E, Wr, hand: hcn, d };
+  };
+  const arms = {};
+  let leftKind = 'down', rightKind = 'down';
+  if (pose === 'phone') rightKind = 'phone';
+  else if (pose === 'phone2') { leftKind = 'phone2'; rightKind = 'phone2'; }
+  else if (pose === 'hip') rightKind = 'hip';
+  if (outfit.bag && leftKind === 'down') leftKind = 'bag';
+  arms.l = armPose(-1, leftKind); arms.r = armPose(1, rightKind);
+
+  const extras = [];
+  if (pose === 'phone' || pose === 'phone2') {
+    const land = pose === 'phone2';
+    const at = land ? new THREE.Vector3(0, fy(0.79), 0.72) : arms.r.hand.clone().add(new THREE.Vector3(-0.03, 0.06, 0.04));
+    const body = new THREE.Mesh(new THREE.BoxGeometry(land ? 0.5 : 0.25, land ? 0.25 : 0.5, 0.03), fab.phone());
+    const scr = new THREE.Mesh(new THREE.PlaneGeometry(land ? 0.46 : 0.22, land ? 0.22 : 0.46), land ? screenMatL : screenMatP);
+    scr.rotation.y = Math.PI; scr.position.z = -0.017;
+    const ph = new THREE.Group(); ph.add(body); ph.add(scr); ph.position.copy(at); ph.rotation.x = -0.12;
+    extras.push(ph);
+  }
+
+  // ---- garments ----
+  const o = outfit.id;
+  const floor = -outfit.heel + 0.03;
+  // skirt from a low waist down to a hem; hemFn(theta) lets the hem go high-low
+  const skirt = (yTopF, hemY, hemR, rip, freq, m, fitted, hemFn) => {
+    const rings = []; const n = 18;
+    for (let i = 0; i <= n; i++) {
+      const t = i / n, y = lerp(fy(yTopF), hemY, t);
+      const p = prof(Math.min(Math.max(0.46, y / H), 0.62));
+      let rx, zf, zb;
+      if (y >= fy(0.5)) { rx = p.rx * B + 0.035; zf = p.zf * D + 0.035; zb = p.zb * D + 0.035; }
+      else {
+        const k = (fy(0.5) - y) / (fy(0.5) - hemY); const hp = prof(0.52); const e = fitted ? Math.pow(k, 2.2) : Math.pow(k, 1.1);
+        rx = lerp(hp.rx * B + 0.04, hemR, e); zf = lerp(hp.zf * D + 0.05, hemR * 0.92, e); zb = lerp(hp.zb * D + 0.05, hemR * 0.92, e);
+      }
+      const k2 = Math.max(0, (fy(0.5) - y) / (fy(0.5) - hemY));
+      const ring = { y, rx, zf, zb, rip: rip * k2, freq, ph: 0.6 };
+      if (hemFn) ring.dy = th => t * t * (hemFn(th) - hemY);
+      rings.push(ring);
+    }
+    rings.reverse(); add(loft(rings, 44, false, false), m);
+  };
+  const pelvis = (yTop, m, infl = 0.03) => add(loft(section(0.452, yTop, infl), 32, true, false), m);
+  const thighs = (m, frac = 0.3, extra = 0.035) => legs.forEach(L_ => { const t1 = L_.tH + (L_.tK - L_.tH) * frac; const p = []; for (let k = 0; k <= 6; k++) p.push(L_.curve.getPointAt(lerp(0, t1, k / 6))); add(sweep(p, t => L_.rAt(lerp(0, t1, t)) + extra, 12, 8), m); });
+  const trousers = (m, top, rTop, rHem) => {
+    pelvis(top, m, 0.04);
+    legs.forEach(a => {
+      const t = new THREE.Vector3(a.hip.x, fy(0.53), 0.0), bot = new THREE.Vector3(a.ankle.x * 1.05, floor, a.ankle.z + 0.06);
+      add(sweep([t.clone().add(new THREE.Vector3(0, 0.1, 0)), t, t.clone().lerp(bot, 0.5), bot], [[0, rTop], [0.45, rTop + 0.01], [1, rHem]], 16, 16), m);
+    });
+  };
+  const band = (y0, y1, m, infl = 0.025) => add(loft(section(y0, y1, infl), 32, true, true), m);
+  const straps = (m) => [-1, 1].forEach(s => {
+    const p = prof(0.745), q = prof(0.8);
+    add(sweep([new THREE.Vector3(s * 0.2 * B, fy(0.745), p.zf * D + 0.03), new THREE.Vector3(s * 0.3 * B, fy(0.81), q.zf * D * 0.7), new THREE.Vector3(s * 0.3 * B, fy(0.812), -q.zb * D * 0.7), new THREE.Vector3(s * 0.22 * B, fy(0.72), -prof(0.72).zb * D - 0.02)], [[0, 0.016], [1, 0.016]], 5, 14), m);
+  });
+  // bra / bralette: two moulded cups, an under-band and straps
+  const cups = (m, bow) => {
+    const yC = 0.727, p = prof(yC);
+    [-1, 1].forEach(s => { const g = new THREE.SphereGeometry(1, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2); g.rotateX(Math.PI / 2); g.scale(0.185 * B, 0.15, 0.105); g.rotateY(s * 0.32); g.translate(s * 0.185 * B, fy(yC) - 0.01, p.zf * D - 0.055); add(g, m); });
+    band(0.692, 0.712, m, 0.022); straps(m);
+    if (bow) { const z = p.zf * D + 0.05, y = fy(0.712);
+      [-1, 1].forEach(s => { const l = ell(0.07, 0.04, 0.025, 10); l.rotateZ(s * 0.35); l.translate(s * 0.065, y, z); add(l, bow); });
+      add(place(ell(0.028, 0.03, 0.03, 8), 0, y, z + 0.01), bow);
+      [-1, 1].forEach(s => { const t = ell(0.022, 0.08, 0.012, 8); t.rotateZ(s * 0.3); t.translate(s * 0.04, y - 0.07, z - 0.005); add(t, bow); }); }
+  };
+  // open-front jacket or coat, hanging straight below the hips
+  const jacket = (y0f, m) => {
+    const fn = yf => { const p = prof(Math.max(yf, 0.53)); const w = prof(0.53); return { rx: Math.max(p.rx, w.rx * 0.98), zf: Math.max(p.zf, 0.36), zb: Math.max(p.zb, 0.38) }; };
+    const rings = section(y0f, 0.832, 0.075, 0.05, fn);
+    add(loft(rings, 36, false, false, [0.32, Math.PI * 2 - 0.32]), m);
+  };
+  const choker = (m, r = 0.165) => { const g = new THREE.TorusGeometry(r, 0.025, 8, 28); g.rotateX(Math.PI / 2); g.translate(0, fy(0.852), 0.0); add(g, m); };
+
+  // tops cover the torso to the waistband; nothing cropped or bra-style
+  const bow = () => { const p = prof(0.74), z = p.zf * D + 0.05, y = fy(0.74);
+    [-1, 1].forEach(s => { const l = ell(0.07, 0.04, 0.025, 10); l.rotateZ(s * 0.35); l.translate(s * 0.065, y, z); add(l, fab.babyPink()); });
+    add(place(ell(0.028, 0.03, 0.03, 8), 0, y, z + 0.01), fab.babyPink()); };
+  if (o === 'lehenga') { band(0.6, 0.79, fab.ivorySequin(), 0.025); straps(fab.ivorySequin()); skirt(0.6, floor, 1.15, 0.05, 13, fab.ivorySequin()); choker(fab.gold()); }
+  if (o === 'monogram') { band(0.5, 0.835, fab.monogram(), 0.03); trousers(fab.monogram(), 0.6, 0.34, 0.4); }
+  if (o === 'bustier') { band(0.6, 0.79, fab.embroidery()); straps(fab.embroidery()); trousers(fab.blackSatin(), 0.625, 0.34, 0.42); add(loft(section(0.598, 0.628, 0.065), 32, false, false), fab.belt()); choker(fab.belt(), 0.17);
+    const bag = new THREE.CylinderGeometry(0.42, 0.42, 0.14, 24, 1, false, 0, Math.PI); bag.rotateZ(Math.PI / 2); bag.rotateY(Math.PI / 2); bag.rotateX(Math.PI); bag.translate(-0.68 * B, fy(0.53), 0.12); add(bag, fab.navyBag());
+    add(sweep([new THREE.Vector3(-0.68 * B, fy(0.53), 0.12), new THREE.Vector3(-0.3, fy(0.74), prof(0.74).zf * D + 0.05), new THREE.Vector3(0.32, fy(0.81), 0.05), new THREE.Vector3(0.2, fy(0.79), -prof(0.79).zb * D - 0.03), new THREE.Vector3(-0.55 * B, fy(0.58), -0.3)], [[0, 0.02], [1, 0.02]], 5, 24), fab.navyBag());
+  }
+  if (o === 'sheer') { band(0.5, 0.8, fab.ivoryCrepe(), 0.025); straps(fab.ivoryCrepe());
+    skirt(0.52, fy(0.2), 0.9, 0.06, 9, fab.ivoryCrepe(), false, th => lerp(fy(0.24), fy(0.1), (1 - Math.cos(th)) / 2 * 0.9 + 0.05 * Math.sin(th * 3))); }
+  if (o === 'vinyl') { band(0.55, 0.8, fab.hotPink(), 0.025); straps(fab.hotPink()); trousers(fab.blackCrepe(), 0.58, 0.32, 0.34); jacket(0.36, fab.redVinyl()); }
+  if (o === 'denim') { band(0.56, 0.79, fab.babyPink(), 0.025); straps(fab.babyPink()); bow(); trousers(fab.denim(), 0.58, 0.33, 0.37); }
+  if (o === 'silver') { band(0.6, 0.795, fab.silverMetal(), 0.025); straps(fab.silverMetal()); skirt(0.61, fy(0.16), 0.75, 0.03, 8, fab.blackSatin(), true); }
+  if (o === 'blazer') { band(0.55, 0.83, fab.ivoryCrepe(), 0.025); trousers(fab.blackCrepe(), 0.6, 0.34, 0.4); jacket(0.4, fab.blackSatin()); }
+  [-1, 1].forEach(s => add(place(ell(0.028, 0.06, 0.028, 8), s * 0.29, hc.y - 0.12, hc.z - 0.01), fab.gold()));
+  if (o === 'denim' || o === 'silver') { const g = new THREE.TorusGeometry(0.2, 0.008, 4, 28); g.rotateX(Math.PI / 2 - 0.35); g.translate(0, fy(0.81), 0.08); add(g, fab.gold()); } // fine chain
+
+  // ---- hair ----
+  const hm = hairMat(hairCol);
+  const capG = new THREE.SphereGeometry(0.352, 32, 16, 0, Math.PI * 2, 0, Math.PI * 0.46);
+  capG.rotateX(-0.75); capG.scale(0.9, 1.08, 1.0); capG.translate(hc.x, hc.y + 0.01, hc.z - 0.015); add(capG, hm);
+  const style = outfit.hair;
+  const zBack = yf => -(prof(Math.min(0.84, Math.max(0.46, yf))).zb * D) - 0.06 - (outfit.jacket ? 0.08 : 0);
+  const lockGeos = [], lockCurves = [];
+  if (style === 'long' || style === 'straight' || style === 'bob') {
+    const bob = style === 'bob'; const N = bob ? 24 : 28; const endF = bob ? 0.8 : (style === 'straight' ? 0.6 : 0.64);
+    const span = bob ? 2.5 : 1.95;
+    for (let i = 0; i < N; i++) {
+      const a = lerp(-span, span, i / (N - 1)) + (rnd() - 0.5) * 0.08;
+      const sa = Math.sin(a), ca = Math.cos(a);
+      const start = new THREE.Vector3(hc.x + sa * 0.17, hc.y + 0.28 + rnd() * 0.02, hc.z - ca * 0.17 - 0.02);
+      const p1 = new THREE.Vector3(hc.x + sa * 0.33, hc.y - 0.04, hc.z - ca * 0.335);
+      const pts = [start, p1];
+      const endY = fy(endF) - rnd() * 0.18;
+      const wave = style === 'long' ? 0.025 : (bob ? 0.025 : 0.008);
+      for (let k = 1; k <= 5; k++) {
+        const t = k / 5, y = lerp(p1.y - 0.1, endY, t);
+        let x, z;
+        if (bob) { const r = 0.36 + t * 0.06; x = sa * r; z = hc.z - ca * r; }
+        else if (Math.abs(a) > 1.35) { x = Math.sign(a) * lerp(0.33, 0.42 * B, Math.min(1, t * 1.4)); z = lerp(hc.z - ca * 0.33, -0.12 + Math.abs(ca) * -0.1, t); if (y < fy(0.8)) z = Math.min(z, zBack(y / H) + 0.1); }
+        else { x = sa * lerp(0.36, 0.42 * B, t); z = Math.min(hc.z - ca * 0.34, zBack(y / H)) - (1 - Math.abs(sa)) * 0.03; }
+        x += Math.sin(t * 9 + i) * wave; z += Math.cos(t * 7 + i * 1.3) * wave * 0.5;
+        pts.push(new THREE.Vector3(x, y, z));
+      }
+      const r0 = bob ? 0.085 : 0.095;
+      lockGeos.push(sweep(pts, [[0, r0 * 0.45], [0.12, r0], [0.4, r0 * 0.85], [0.85, r0 * 0.55], [1, 0.012]], 6, 24));
+      lockCurves.push(new THREE.CatmullRomCurve3(pts.map((q, qi) => qi === 0 ? q : q.clone().lerp(new THREE.Vector3(hc.x, q.y, hc.z - 0.05), 0.04)), false, 'centripetal'));
+    }
+    const M_ = 20, rows = [];
+    lockCurves.forEach(c => { const r = []; for (let k = 0; k <= M_; k++) r.push(c.getPointAt(k / M_)); rows.push(r); });
+    const sp = [], su = [], si = [];
+    rows.forEach((r, i) => r.forEach((q, k) => { sp.push(q.x, q.y, q.z); su.push(i / (rows.length - 1), k / M_); }));
+    for (let i = 0; i < rows.length - 1; i++) for (let k = 0; k < M_ - 1; k++) { const a = i * (M_ + 1) + k, b = a + M_ + 1; si.push(a, b, a + 1, a + 1, b, b + 1); }
+    const sheet = new THREE.BufferGeometry(); sheet.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3)); sheet.setAttribute('uv', new THREE.Float32BufferAttribute(su, 2)); sheet.setIndex(si); sheet.computeVertexNormals();
+    add(sheet, hairMat(hairCol, true));
+  } else if (style === 'bun') {
+    lockGeos.push(place(ell(0.17, 0.15, 0.15, 14), hc.x, hc.y - 0.02, hc.z - 0.36));
+  } else if (style === 'pony') {
+    const tie = new THREE.Vector3(hc.x, hc.y + 0.13, hc.z - 0.33);
+    lockGeos.push(place(ell(0.07, 0.07, 0.06, 8), tie.x, tie.y, tie.z));
+    for (let i = 0; i < 8; i++) {
+      const jx = (rnd() - 0.5) * 0.08, jz = (rnd() - 0.5) * 0.06;
+      const pts = [tie, new THREE.Vector3(jx, tie.y + 0.04, tie.z - 0.14), new THREE.Vector3(jx * 1.5, hc.y - 0.3, zBack(0.86) - 0.02 + jz), new THREE.Vector3(jx * 2, fy(0.74), zBack(0.74) + jz), new THREE.Vector3(jx * 2.4, fy(0.66), zBack(0.66) + jz)];
+      lockGeos.push(sweep(pts, [[0, 0.05], [0.2, 0.075], [0.8, 0.05], [1, 0.01]], 6, 18));
+    }
+  }
+  lockGeos.forEach(g => add(g, hm));
+
+  // merge by material
+  const byMat = new Map(); parts.forEach(({ g, m }) => { if (!byMat.has(m)) byMat.set(m, []); byMat.get(m).push(g); });
+  const grp = new THREE.Group();
+  byMat.forEach((geos, m) => {
+    geos.forEach(c => { if (!c.attributes.uv) c.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(c.attributes.position.count * 2), 2)); Object.keys(c.attributes).forEach(k => { if (!['position', 'normal', 'uv'].includes(k)) c.deleteAttribute(k); }); });
+    const merged = mergeGeometries(geos, false);
+    geos.forEach(g => g.dispose());
+    if (!merged) return;
+    const mesh = new THREE.Mesh(merged, m); if (m.transparent) mesh.renderOrder = 2; grp.add(mesh);
+  });
+  extras.forEach(e => grp.add(e));
+  grp.position.y = outfit.heel;
+  return grp;
+}
+
+// ---------- crowd placement ----------
+const crowd = pair();
+const shadowsGroup = new THREE.Group(); scene.add(shadowsGroup);
+function insideVisitorArea(u, v) {
+  if (v >= EV0) return (u / (RA - 0.6)) ** 2 + ((v - EV0) / (RB - 0.6)) ** 2 < 1;
+  if (v >= 2.9 * SV) return Math.abs(u) < RA - 0.9;
+  return false;
+}
+let buildToken = 0, compiledOnce = false, crowdBuilt = false;
+async function buildCrowd() {
+  const token = ++buildToken;
+  if (!$('people').checked) { crowdBuilt = false; crowd.clear(); while (shadowsGroup.children.length) shadowsGroup.remove(shadowsGroup.children[0]); return; }
+  crowdBuilt = true;
+  crowd.clear(); while (shadowsGroup.children.length) shadowsGroup.remove(shadowsGroup.children[0]);
+  const real = $('realism').checked;
+  const n = +$('count').value; const placed = [];
+  // spread guests through the rope area; anyone standing where you stand is hidden while you're there
+  let tries = 0, gap = 2.0;
+  while (placed.length < n && tries < 9000) {
+    tries++; if (tries % 3000 === 0) gap -= 0.2;
+    const u = (rnd() * 2 - 1) * RA, v = 2.9 * SV + rnd() * (EV0 + RB - 2.9 * SV);
+    if (!insideVisitorArea(u, v)) continue;
+    if (Math.hypot(u - PED.u, v - PED.v) < 2.0) continue;
+    if (placed.some(p => Math.hypot(p[0] - u, p[1] - v) < gap)) continue;
+    placed.push([u, v]);
+  }
+  const order = OUTFITS.map((o, i) => i).sort(() => rnd() - 0.5);
+  const toast = $('toast');
+  for (let idx = 0; idx < placed.length; idx++) {
+    if (token !== buildToken) return;
+    const [u, v] = placed[idx];
+    const toward = Math.atan2(u, -(v - EV0)) + (rnd() - 0.5) * 0.8;
+    const yaw = rnd() < 0.18 ? toward + Math.PI * (0.6 + rnd() * 0.5) : toward;
+    let p;
+    if (real) {
+      const outfit = OUTFITS[order[idx % order.length]];
+      const r = rnd(); const pose = r < 0.3 ? 'phone' : r < 0.42 ? 'phone2' : r < 0.62 ? 'hip' : 'down';
+      p = woman({ H: 5.15 + rnd() * 0.55, build: 0.93 + rnd() * 0.12, tone: pick(SKIN), outfit, pose, hairCol: pick(HAIR), weight: rnd() < 0.5 ? -1 : 1, bangles: rnd() < 0.5 });
+    } else {
+      const tones = [0x2c303b, 0x3b2a30, 0x22302b, 0x463c3e, 0x26262c, 0x56473a];
+      p = dummy(5.1 + rnd() * 0.7, pick(tones), pick(tones), pick([0x8a6450, 0x6e4b3a, 0xb08468]));
+    }
+    const holder = new THREE.Group(); holder.add(p); holder.position.copy(W(u, v)); holder.rotation.y = yaw;
+    crowd.add(holder);
+    const sh = contactShadow(1.7, 1.25); sh.position.x = holder.position.x; sh.position.z = holder.position.z; sh.rotation.z = yaw; shadowsGroup.add(sh);
+    if (real) { toast.textContent = `Adding guests ${idx + 1} of ${placed.length}`; toast.hidden = false; await new Promise(r => requestAnimationFrame(r)); }
+  }
+  if (real && !compiledOnce && renderer.compileAsync) { compiledOnce = true; try { await renderer.compileAsync(scene, camera); } catch (e) { /* ignore */ } }
+  if (token === buildToken) toast.hidden = true;
+  if (real && envRT) applyEnv(envRT.texture);
+}
+
+// ---------- media ----------
+let media = { el: null, w: MEDIA_W, h: MEDIA_H, video: false, name: 'Sample test pattern', drawCanvas: null, tex: null };
+const sampleCanvas = document.createElement('canvas');
+function drawSample() {
+  const c = sampleCanvas, s = 0.5; c.width = MEDIA_W * s; c.height = MEDIA_H * s;
+  const x = c.getContext('2d'); const w = c.width, h = c.height;
+  const bg = x.createLinearGradient(0, 0, 0, h); bg.addColorStop(0, '#2a0610'); bg.addColorStop(1, '#5a0c1e');
+  x.fillStyle = bg; x.fillRect(0, 0, w, h);
+  let sd = 3; const r = () => { sd = (sd * 16807) % 2147483647; return sd / 2147483647; };
+  for (let i = 0; i < 260; i++) {
+    const cx = r() * w, cy = r() * h, rad = 6 + r() ** 3 * 120;
+    const gr = x.createRadialGradient(cx - rad * .35, cy - rad * .35, rad * .05, cx, cy, rad);
+    const hue = 340 + r() * 18;
+    gr.addColorStop(0, `hsla(${hue},90%,${82 + r() * 10}%,.95)`); gr.addColorStop(.35, `hsla(${hue},85%,${42 + r() * 10}%,.9)`); gr.addColorStop(1, `hsla(${hue},90%,10%,.0)`);
+    x.fillStyle = gr; x.beginPath(); x.arc(cx, cy, rad, 0, Math.PI * 2); x.fill();
+  }
+  const part = 2746 * s;
+  x.textAlign = 'center'; x.textBaseline = 'middle';
+  for (let k = 0; k < 3; k++) {
+    const cx = part * k + part / 2;
+    x.fillStyle = 'rgba(255,255,255,.92)'; x.font = `700 64px "Barlow Condensed", "Arial Narrow", sans-serif`;
+    x.fillText(`PART ${k + 1}`, cx, 120);
+    x.font = `500 26px "JetBrains Mono", monospace`; x.fillStyle = 'rgba(255,230,236,.85)';
+    x.fillText(`${2746 * k} – ${2746 * (k + 1)} px`, cx, 168);
+    const rad = 1.5 * (MEDIA_H / WALL_H) * s;
+    x.strokeStyle = 'rgba(255,255,255,.9)'; x.lineWidth = 4; x.beginPath(); x.arc(cx, 360, rad, 0, Math.PI * 2); x.stroke();
+    x.beginPath(); x.moveTo(cx - rad, 360); x.lineTo(cx + rad, 360); x.moveTo(cx, 360 - rad); x.lineTo(cx, 360 + rad); x.stroke();
+    x.font = `500 20px "JetBrains Mono", monospace`; x.fillStyle = 'rgba(255,255,255,.85)'; x.fillText('3 ft circle', cx, 360 + rad + 24);
+  }
+  x.fillStyle = 'rgba(255,255,255,.75)'; x.font = '500 16px "JetBrains Mono", monospace';
+  for (let px = 0; px <= MEDIA_W; px += 250) {
+    const xx = px * s, big = px % 1000 === 0;
+    x.fillRect(xx - 1, h - (big ? 26 : 12), 2, big ? 26 : 12);
+    if (big && px > 0 && px < MEDIA_W) x.fillText(px, xx, h - 38);
+  }
+  x.textAlign = 'left'; x.font = '600 18px "Barlow", sans-serif'; x.fillStyle = 'rgba(255,255,255,.8)';
+  x.fillText('SAMPLE · 8240 × 1200 · load your own media from the panel', 18, 24);
+}
+const whiteCanvas = document.createElement('canvas'); whiteCanvas.width = 412; whiteCanvas.height = 60; { const x = whiteCanvas.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, 412, 60); }
+const guideCanvas = document.createElement('canvas');
+function drawGuides() {
+  const c = guideCanvas; c.width = 4096; c.height = 600; const x = c.getContext('2d');
+  const s = c.width / MEDIA_W; x.clearRect(0, 0, c.width, c.height);
+  x.strokeStyle = 'rgba(207,165,87,.95)'; x.lineWidth = 3; x.setLineDash([14, 10]);
+  for (let px = 1264; px < MEDIA_W; px += 1264) { x.beginPath(); x.moveTo(px * s, 0); x.lineTo(px * s, c.height); x.stroke(); }
+  x.setLineDash([]);
+  x.fillStyle = 'rgba(207,165,87,1)'; x.font = '600 20px "JetBrains Mono", monospace'; x.textAlign = 'center';
+  for (let px = 0, k = 1; px < MEDIA_W; px += 1264, k++) x.fillText(`#${k} · 1264`, (px + Math.min(1264, MEDIA_W - px) / 2) * s, c.height - 22);
+  x.fillStyle = 'rgba(255,60,100,1)';
+  [0, 2746, 5492, MEDIA_W].forEach(px => x.fillRect(Math.min(px * s, c.width - 8) - (px ? 4 : 0), 0, 8, c.height));
+  x.font = '700 40px "Barlow Condensed", sans-serif';
+  for (let k = 0; k < 3; k++) { const cx = (2746 * k + 1373) * s; x.fillStyle = 'rgba(227,40,79,.95)'; x.fillRect(cx - 120, 14, 240, 52); x.fillStyle = '#fff'; x.fillText(`PART ${k + 1} · 2746`, cx, 54); }
+}
+function texFromCanvas(cv, mips) { const t = new THREE.CanvasTexture(cv); t.colorSpace = SRGB; t.anisotropy = ANISO; t.generateMipmaps = !!mips; t.minFilter = mips ? THREE.LinearMipmapLinearFilter : THREE.LinearFilter; return t; }
+let guideTex;
+const videoHost = document.createElement('div'); videoHost.style.cssText = 'position:fixed;left:0;top:0;width:2px;height:2px;overflow:hidden;opacity:0;pointer-events:none'; document.body.appendChild(videoHost);
+// GPU texture straight from the image/video at its own resolution (no canvas copy), mipmapped so it stays sharp at an angle
+function mediaTexture(el, w, h, isVideo) {
+  let tex, drawCanvas = null;
+  if (w > MAXTEX) { // only for files wider than this GPU can hold
+    drawCanvas = document.createElement('canvas'); drawCanvas.width = MAXTEX; drawCanvas.height = Math.round(MAXTEX * h / w);
+    if (!isVideo) drawCanvas.getContext('2d').drawImage(el, 0, 0, drawCanvas.width, drawCanvas.height);
+    tex = new THREE.CanvasTexture(drawCanvas);
+  } else if (isVideo) tex = new THREE.VideoTexture(el);
+  else if (el instanceof HTMLCanvasElement) tex = new THREE.CanvasTexture(el);
+  else { tex = new THREE.Texture(el); tex.needsUpdate = true; }
+  // a video copied through a canvas every frame skips mipmaps to stay smooth
+  const mips = !(drawCanvas && isVideo);
+  const raw = isVideo && !drawCanvas; // fast GPU video upload: plain RGBA, sRGB decoded in the wall shader
+  tex.colorSpace = raw ? THREE.NoColorSpace : SRGB; tex.userData.raw = raw; tex.anisotropy = ANISO; tex.generateMipmaps = mips;
+  tex.minFilter = mips ? THREE.LinearMipmapLinearFilter : THREE.LinearFilter; tex.magFilter = THREE.LinearFilter;
+  return { tex, drawCanvas };
+}
+function setMedia(el, w, h, name, isVideo, opt = {}) {
+  if (media.tex && media.tex !== placeholder) { media.tex.dispose(); wallMat.uniforms.map.value = placeholder; }
+  if (media.video && media.el && media.el !== el) media.el.pause();
+  media = { el, w, h, video: isVideo, name, drawCanvas: null, tex: null, parts: !!opt.parts };
+  let tex = placeholder;
+  if (!opt.parts) { const r = mediaTexture(el, w, h, isVideo); tex = r.tex; media.drawCanvas = r.drawCanvas; wallMat.uniforms.raw.value.x = tex.userData.raw ? 1 : 0; }
+  wallMat.uniforms.parts.value = opt.parts ? 1 : 0;
+  media.tex = opt.parts ? null : tex; if (!opt.parts) wallMat.uniforms.map.value = tex;
+  $('mediaName').textContent = name;
+  const ratio = w / h, spec = MEDIA_W / MEDIA_H, pill = $('mediaPill');
+  if (opt.parts) { pill.className = 'pill ' + (opt.warn ? 'warn' : 'ok'); pill.textContent = opt.pill; }
+  else if (el === whiteCanvas) { pill.className = 'pill ok'; pill.textContent = 'Load your media to preview it'; }
+  else if (w === MEDIA_W && h === MEDIA_H) { pill.className = 'pill ok'; pill.textContent = `${w} × ${h} · matches wall spec`; }
+  else if (Math.abs(ratio - spec) / spec < 0.01) { pill.className = 'pill ok'; pill.textContent = `${w} × ${h} · same shape as spec`; }
+  else { pill.className = 'pill warn'; pill.textContent = `${w} × ${h} · shape differs from 8240 × 1200`; }
+  syncVideoCtl();
+  applyFit(); updateHud();
+  envDirty = 2; setTimeout(() => { refreshThumb(); sampleGlow(); updatePhones(); }, 60);
+}
+function applyFit() {
+  const mode = $('fit').value, r = wallMat.uniforms.rect.value;
+  const wallRatio = L / WALL_H, mRatio = media.w / media.h;
+  if (mode === 'stretch') r.set(0, 0, 1, 1);
+  else if (mode === 'design') { const f = SPEC_LEN / L; r.set((1 - f) / 2, 0, f, 1); }
+  else { const f = mRatio / wallRatio; if (f <= 1) r.set((1 - f) / 2, 0, f, 1); else { const g = 1 / f; r.set(0, (1 - g) / 2, 1, g); } }
+  envDirty = 2;
+}
+function loadFile(file) {
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  if (file.type.startsWith('video/')) {
+    const v = document.createElement('video');
+    v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto'; videoHost.appendChild(v); v.addEventListener('play', syncVideoCtl); v.addEventListener('pause', syncVideoCtl);
+    v.onloadeddata = () => { setFull({ el: v, w: v.videoWidth, h: v.videoHeight, name: file.name, video: true, url }); v.play().catch(() => syncVideoCtl()); };
+    v.onerror = () => { $('mediaName').textContent = `${file.name} could not be played in this browser. Try an MP4 (H.264) export at 4120 × 600.`; };
+    v.src = url;
+  } else if (file.type.startsWith('image/')) {
+    const img = new Image();
+    img.onload = () => setFull({ el: img, w: img.naturalWidth, h: img.naturalHeight, name: file.name, video: false, url });
+    img.onerror = () => { $('mediaName').textContent = `${file.name} could not be opened as an image.`; };
+    img.src = url;
+  } else { $('mediaName').textContent = 'Please choose an image or video file.'; }
+}
+
+// ---------- full-wall file or three part files ----------
+let mediaMode = 'full';
+let fullSource = null; // set at start
+const parts = [null, null, null];
+const PART_PX = [[0, 2746], [2746, 5492], [5492, MEDIA_W]];
+const emptyParts = [0, 1, 2].map(k => {
+  const c = document.createElement('canvas'); c.width = 686; c.height = 300; const x = c.getContext('2d');
+  x.fillStyle = '#ffffff'; x.fillRect(0, 0, c.width, c.height);
+  x.fillStyle = 'rgba(0,0,0,.25)'; x.font = '600 22px "Barlow", sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.fillText(`PART ${k + 1} · no media yet`, c.width / 2, c.height / 2);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = SRGB; return { canvas: c, tex: t };
+});
+const partsHaveVideo = () => parts.some(p => p && p.video);
+const activeVideos = () => mediaMode === 'full' ? (media.video ? [media.el] : []) : parts.filter(p => p && p.video).map(p => p.el);
+const hasMotion = () => activeVideos().length > 0;
+function syncVideoCtl() {
+  const vids = activeVideos(); $('videoCtl').hidden = !vids.length;
+  if (vids.length) { $('playBtn').textContent = vids.some(v => !v.paused) ? 'Pause' : 'Play'; $('muteBtn').textContent = vids.every(v => v.muted) ? 'Unmute' : 'Mute'; }
+}
+function setFull(src) {
+  if (fullSource && fullSource !== src && fullSource.url) { if (fullSource.video) fullSource.el.pause(); URL.revokeObjectURL(fullSource.url); }
+  fullSource = src; if (mediaMode !== 'full') setMode('full', true);
+  setMedia(src.el, src.w, src.h, src.name, src.video);
+}
+function showParts() {
+  ['p0', 'p1', 'p2'].forEach((u, k) => { wallMat.uniforms[u].value = parts[k] ? parts[k].tex : emptyParts[k].tex; });
+  const R = wallMat.uniforms.raw.value; R.y = parts[0] && parts[0].tex.userData.raw ? 1 : 0; R.z = parts[1] && parts[1].tex.userData.raw ? 1 : 0; R.w = parts[2] && parts[2].tex.userData.raw ? 1 : 0;
+  const loaded = parts.filter(Boolean);
+  const off = parts.map((p, k) => p && Math.abs(p.w / p.h - 2746 / 1200) / (2746 / 1200) > 0.01 ? k + 1 : 0).filter(Boolean);
+  setMedia(null, MEDIA_W, MEDIA_H, loaded.length ? `3 parts · ${loaded.length} of 3 loaded` : '3 parts · nothing loaded yet', false,
+    { parts: true, warn: off.length > 0, pill: off.length ? `Part ${off.join(' & ')} stretched to fit 2746 × 1200` : 'Each part maps to its 2746 × 1200 zone' });
+}
+// draw whatever is on the wall into a small 2D canvas (for screen-light colour and phone screens)
+function drawWall(ctx, x, y, w, h) {
+  if (media.parts) {
+    const zones = [[0, 2746], [2746, 5492], [5492, MEDIA_W]];
+    zones.forEach(([a, b], k) => { const p = parts[k]; const src = p ? p.el : emptyParts[k].canvas;
+      if (p && p.video && p.el.readyState < 2) return;
+      ctx.drawImage(src, x + w * a / MEDIA_W, y, w * (b - a) / MEDIA_W, h); });
+  } else {
+    const src = media.drawCanvas || media.el; if (!src) return;
+    if (media.video && media.el.readyState < 2) return;
+    ctx.drawImage(src, x, y, w, h);
+  }
+}
+function updatePartRow(k) {
+  const p = parts[k], el = $('pn-' + k), clr = $('pc-' + k);
+  clr.hidden = !p;
+  if (!p) { el.className = ''; el.textContent = 'Empty · 2746 × 1200'; return; }
+  const ok = Math.abs(p.w / p.h - 2746 / 1200) / (2746 / 1200) <= 0.01;
+  el.className = ok ? 'ok' : 'warn'; el.textContent = `${p.name} · ${p.w} × ${p.h}${ok ? '' : ' · will stretch'}`;
+}
+function loadPart(k, file) {
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  const done = (el, w, h, video) => {
+    const old = parts[k]; if (old) { if (old.video) old.el.pause(); URL.revokeObjectURL(old.url); }
+    if (old && old.tex) old.tex.dispose();
+    parts[k] = { el, w, h, name: file.name, video, url, tex: mediaTexture(el, w, h, video).tex }; updatePartRow(k);
+    if (video) parts.forEach(p => { if (p && p.video) { p.el.currentTime = 0; p.el.play().catch(() => {}); } }); // keep part videos in step
+    if (mediaMode !== 'parts') setMode('parts', true); else showParts();
+  };
+  const fail = msg => { $('pn-' + k).className = 'warn'; $('pn-' + k).textContent = msg; URL.revokeObjectURL(url); };
+  if (file.type.startsWith('video/')) {
+    const v = document.createElement('video'); v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto'; videoHost.appendChild(v); v.addEventListener('play', syncVideoCtl); v.addEventListener('pause', syncVideoCtl);
+    v.onloadeddata = () => done(v, v.videoWidth, v.videoHeight, true);
+    v.onerror = () => fail(`${file.name} could not be played. Try an MP4 (H.264).`);
+    v.src = url;
+  } else if (file.type.startsWith('image/')) {
+    const img = new Image(); img.onload = () => done(img, img.naturalWidth, img.naturalHeight, false);
+    img.onerror = () => fail(`${file.name} could not be opened as an image.`); img.src = url;
+  } else fail('Please choose an image or video file.');
+}
+function clearPart(k) { const p = parts[k]; if (!p) return; if (p.video) p.el.pause(); URL.revokeObjectURL(p.url); if (p.tex) p.tex.dispose(); parts[k] = null; updatePartRow(k); if (mediaMode === 'parts') showParts(); }
+function setMode(m, silent) {
+  mediaMode = m;
+  $('modeFull').setAttribute('aria-pressed', m === 'full'); $('modeParts').setAttribute('aria-pressed', m === 'parts');
+  $('fullCtl').hidden = m !== 'full'; $('partsCtl').hidden = m !== 'parts';
+  if (m === 'parts') { if (fullSource && fullSource.video) fullSource.el.pause(); parts.forEach(p => { if (p && p.video) p.el.play().catch(() => {}); }); if (!silent || !media.parts) showParts(); }
+  else { parts.forEach(p => { if (p && p.video) p.el.pause(); }); if (!silent) { setMedia(fullSource.el, fullSource.w, fullSource.h, fullSource.name, fullSource.video); if (fullSource.video) fullSource.el.play().catch(() => {}); } }
+  syncVideoCtl();
+}
+[0, 1, 2].forEach(k => {
+  const row = document.createElement('div'); row.className = 'part';
+  row.innerHTML = `<div><b>Part ${k + 1}</b><small id="pn-${k}">Empty · 2746 × 1200</small></div>
+    <label class="filebtn">Choose<input type="file" id="pf-${k}" accept="image/*,video/*"></label>
+    <button type="button" id="pc-${k}" hidden>Clear</button>`;
+  $('partsCtl').appendChild(row);
+  $('pf-' + k).addEventListener('change', e => { loadPart(k, e.target.files[0]); e.target.value = ''; });
+  $('pc-' + k).addEventListener('click', () => clearPart(k));
+});
+$('modeFull').addEventListener('click', () => { if (mediaMode !== 'full') setMode('full'); });
+$('modeParts').addEventListener('click', () => { if (mediaMode !== 'parts') setMode('parts'); });
+
+// screen light: average colour overall, and per slice of the wall for the area lights
+const probe = document.createElement('canvas'); probe.width = AREA_N; probe.height = 2;
+const probeCtx = probe.getContext('2d', { willReadFrequently: true });
+const glow = new THREE.Color(0x884455); const sliceCols = Array.from({ length: AREA_N }, () => new THREE.Color(0xff4466));
+function sampleGlow() {
+  try {
+    // respect the mapping: draw the media where it lands on the wall
+    const r = wallMat.uniforms.rect.value;
+    probeCtx.fillStyle = '#000'; probeCtx.fillRect(0, 0, AREA_N, 2);
+    probeCtx.drawImage(wallThumb, r.x * AREA_N, 0, r.z * AREA_N, 2);
+    const d = probeCtx.getImageData(0, 0, AREA_N, 2).data; let R = 0, G = 0, Bc = 0;
+    for (let i = 0; i < AREA_N; i++) {
+      const a = (i) * 4, b = (AREA_N + i) * 4;
+      const cr_ = (d[a] + d[b]) / 510, cg = (d[a + 1] + d[b + 1]) / 510, cb = (d[a + 2] + d[b + 2]) / 510;
+      sliceCols[i].setRGB(cr_, cg, cb, SRGB); R += cr_; G += cg; Bc += cb;
+    }
+    glow.setRGB(R / AREA_N, G / AREA_N, Bc / AREA_N, SRGB);
+  } catch (e) { /* ignore */ }
+}
+
+// ---------- environment reflections from the room itself ----------
+const cubeRT = new THREE.WebGLCubeRenderTarget(128, { type: THREE.HalfFloatType });
+const cubeCam = new THREE.CubeCamera(0.3, 120, cubeRT); cubeCam.position.copy(W(PED.u, PED.v, Math.min(4.5, WALL_H / 2))); scene.add(cubeCam);
+const pmrem = new THREE.PMREMGenerator(renderer);
+let envRT = null, envDirty = 2, envT = 0;
+// room reflections go on the hard, shiny things only; guests stay lit by the screens alone
+function applyEnv(tex) {
+  const list = [brass, floorMat, ropeMat, trussMat, projBody];
+  Object.values(M).forEach(m => { if (m.metalness >= 0.3) list.push(m); });
+  list.forEach(m => { const want = tex || null; if (m.envMap !== want) { m.envMap = want; m.envMapIntensity = m === brass ? 1 : m === floorMat ? 0.5 : 0.15; m.needsUpdate = true; } });
+}
+function captureEnv() {
+  const vis = [crowd.a.visible, crowd.b.visible, peds.a.visible, reflectGroup.visible, shadowsGroup.visible];
+  crowd.visible = false; peds.visible = false; reflectGroup.visible = false; shadowsGroup.visible = false;
+  const tm = renderer.toneMapping; renderer.toneMapping = THREE.NoToneMapping;
+  cubeCam.update(renderer, scene);
+  renderer.toneMapping = tm;
+  envRT = pmrem.fromCubemap(cubeRT.texture, envRT);
+  applyEnv(envRT.texture);
+  crowd.a.visible = vis[0]; crowd.b.visible = vis[1]; peds.a.visible = vis[2]; peds.b.visible = vis[2]; reflectGroup.visible = vis[3]; shadowsGroup.visible = vis[4];
+}
+
+// ---------- post-processing (realism) ----------
+const composerRT = new THREE.WebGLRenderTarget(16, 16, { type: THREE.HalfFloatType });
+const composer = new EffectComposer(renderer, composerRT);
+// Natural perspective: the scene is rendered with a wide straight lens, then re-mapped with a Panini projection
+// (what the eye perceives in a room: vertical lines stay straight, edges stop stretching).
+const proj = { d: 1, outMax: new THREE.Vector2(1, 1), srcTan: new THREE.Vector2(1, 1) };
+// renders the scene at a higher resolution with a wide straight lens, then re-maps it, so the result stays sharp
+class NaturalViewPass extends Pass {
+  constructor() {
+    super();
+    this.rt = new THREE.WebGLRenderTarget(16, 16, { type: THREE.HalfFloatType, samples: 2 });
+    this.material = new THREE.ShaderMaterial({
+      uniforms: { tDiffuse: { value: null }, d: { value: 1 }, outMax: { value: new THREE.Vector2(1, 1) }, srcTan: { value: new THREE.Vector2(1, 1) } },
+      vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
+      fragmentShader: `uniform sampler2D tDiffuse; uniform float d; uniform vec2 outMax; uniform vec2 srcTan; varying vec2 vUv;
+    void main(){
+      vec2 p = (vUv * 2.0 - 1.0) * outMax;
+      float k = p.x * p.x / ((d + 1.0) * (d + 1.0));
+      float ds = k * k * d * d - (k + 1.0) * (k * d * d - 1.0);
+      float cphi = (-k * d + sqrt(max(ds, 0.0))) / (k + 1.0);
+      float sphi = sign(p.x) * sqrt(max(1.0 - cphi * cphi, 0.0));
+      float S = (d + 1.0) / (d + cphi);
+      vec2 t = vec2(sphi, p.y / S) / cphi;
+      vec2 uv = t / srcTan * 0.5 + 0.5;
+      gl_FragColor = (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) ? vec4(0.0, 0.0, 0.0, 1.0) : texture2D(tDiffuse, uv);
+    }`
+});
+    this.fsQuad = new FullScreenQuad(this.material); this.scale = 1; this.w = 16; this.h = 16;
+  }
+  setSize(w, h) { this.w = w; this.h = h; this.resizeRT(); }
+  resizeRT() { let s = renderer.getPixelRatio() >= 1.75 ? Math.min(this.scale, 1.15) : this.scale; const maxPx = 5e6; if (this.w * this.h * s * s > maxPx) s = Math.sqrt(maxPx / (this.w * this.h)); this.rt.setSize(Math.max(1, Math.round(this.w * s)), Math.max(1, Math.round(this.h * s))); }
+  render(renderer, writeBuffer) {
+    renderer.setRenderTarget(this.rt); renderer.clear(); renderer.render(scene, camera);
+    this.material.uniforms.tDiffuse.value = this.rt.texture;
+    renderer.setRenderTarget(this.renderToScreen ? null : writeBuffer); this.fsQuad.render(renderer);
+  }
+}
+const naturalPass = new NaturalViewPass();
+const paniniPass = naturalPass; // uniforms live on naturalPass.material
+composer.addPass(naturalPass);
+const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.07, 0.3, 0.97);
+composer.addPass(bloom);
+composer.addPass(new OutputPass());
+const finish = new ShaderPass({
+  uniforms: { tDiffuse: { value: null }, uTime: { value: 0 }, uAspect: { value: 1 } },
+  vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
+  fragmentShader: `uniform sampler2D tDiffuse; uniform float uTime; uniform float uAspect; varying vec2 vUv;
+    float h(vec2 p){ return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453); }
+    void main(){ vec4 c = texture2D(tDiffuse, vUv);
+      vec2 q = (vUv - 0.5) * vec2(uAspect, 1.0); float v = smoothstep(1.05, 0.35, length(q)); c.rgb *= mix(0.72, 1.0, v);
+      c.rgb += (h(vUv * 931.0 + uTime) - 0.5) * 0.01;
+      gl_FragColor = c; }`
+});
+composer.addPass(finish);
+
+// ---------- camera & viewpoints ----------
+const VIEWS = [
+  { id: 'entrance', name: 'Walking in', u: 0, v: 0.5, lu: 0, lv: 12 },
+  { id: 'inside', name: 'Inside the rope', u: 0, v: 2.8, lu: 0, lv: 12 },
+  { id: 'ropeL', name: 'Rope edge, left', u: -4.6, v: 5.2, lu: 8, lv: 9 },
+  { id: 'ropeR', name: 'Rope edge, right', u: 4.6, v: 5.2, lu: -8, lv: 9 },
+  { id: 'display', name: 'Beside the display', u: 1.9, v: 8.3, lu: -9, lv: 4.5 },
+  { id: 'back', name: 'Back, facing out', u: 0, v: 9.8, lu: 0, lv: 0 },
+  { id: 'aisle', name: 'Behind rope (staff)', u: -8.0, v: 4.2, lu: 6, lv: 10 },
+  { id: 'plan', name: 'Plan view', plan: true }
+];
+const cam = { x: 0, z: -0.5, yaw: 0, pitch: 0.0, plan: false };
+let anim = null, currentView = 'entrance';
+let panBase = 0, panT0 = 0;
+function viewTarget(vw) {
+  if (vw.plan) return { x: (BOOTH.u0 + BOOTH.u1) / 2, z: -BOOTH.v1 / 2, yaw: 0, pitch: -Math.PI / 2 + 0.0001, plan: true };
+  const u = vw.u * SX, v = vw.v * SV, lu = vw.lu * SX, lv = vw.lv * SV;
+  const dx = lu - u, dv = lv - v;
+  return { x: u, z: -v, yaw: Math.atan2(-dx, dv), pitch: 0.02, plan: false };
+}
+function goView(id, instant) {
+  const vw = VIEWS.find(v => v.id === id); currentView = id;
+  const t = viewTarget(vw);
+  document.querySelectorAll('#views button').forEach(b => b.setAttribute('aria-pressed', b.dataset.id === id));
+  $('viewName').textContent = vw.name;
+  let dy = t.yaw - cam.yaw; dy = Math.atan2(Math.sin(dy), Math.cos(dy));
+  const from = { ...cam }, to = { ...t, yaw: cam.yaw + dy };
+  cam.plan = t.plan; applyFov();
+  if (instant || matchMedia('(prefers-reduced-motion: reduce)').matches) { Object.assign(cam, to); anim = null; }
+  else anim = { from, to, t0: performance.now(), dur: 1100 };
+  panBase = to.yaw; panT0 = performance.now();
+  updateCeilingVis();
+}
+const viewsEl = $('views');
+VIEWS.forEach(v => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.dataset.id = v.id; b.textContent = v.name; b.onclick = () => goView(v.id); viewsEl.appendChild(b); });
+
+let drag = null;
+canvas.addEventListener('pointerdown', e => { if (cam.plan) return; drag = { x: e.clientX, y: e.clientY }; canvas.setPointerCapture(e.pointerId); canvas.classList.add('dragging'); anim = null; $('pan').checked = false; });
+canvas.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const k = 2 * Math.atan(proj.outMax.y) / canvas.clientHeight * (proj.d ? 1.15 : 1);
+  cam.yaw += (e.clientX - drag.x) * k; cam.pitch += (e.clientY - drag.y) * k;
+  cam.pitch = Math.max(-1.3, Math.min(1.3, cam.pitch));
+  drag = { x: e.clientX, y: e.clientY };
+});
+const endDrag = () => { drag = null; canvas.classList.remove('dragging'); };
+canvas.addEventListener('pointerup', endDrag); canvas.addEventListener('pointercancel', endDrag);
+canvas.addEventListener('wheel', e => { e.preventDefault(); const f = Math.max(11, Math.min(50, +$('lens').value - Math.sign(e.deltaY) * 2)); $('lens').value = f; onLens(); }, { passive: false });
+const ray = new THREE.Raycaster();
+function screenDir(nx, ny) {
+  const d = proj.d, px = nx * proj.outMax.x, py = ny * proj.outMax.y;
+  const k = px * px / ((d + 1) ** 2), ds = k * k * d * d - (k + 1) * (k * d * d - 1);
+  const cphi = (-k * d + Math.sqrt(Math.max(ds, 0))) / (k + 1), sphi = Math.sign(px) * Math.sqrt(Math.max(1 - cphi * cphi, 0));
+  const S = (d + 1) / (d + cphi);
+  return new THREE.Vector3(sphi / cphi, (py / S) / cphi, -1).normalize().applyQuaternion(camera.quaternion);
+}
+canvas.addEventListener('dblclick', e => {
+  if (cam.plan) return;
+  const r = canvas.getBoundingClientRect();
+  ray.set(camera.position.clone(), screenDir((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1));
+  const hit = ray.intersectObjects([domeFloor, boothFloor])[0];
+  if (!hit) return;
+  const to = { ...cam, x: hit.point.x, z: hit.point.z };
+  clampPos(to);
+  anim = { from: { ...cam }, to, t0: performance.now(), dur: 900 };
+  markCustom();
+});
+const keys = new Set();
+addEventListener('keydown', e => { if (e.target.closest('input,select,textarea')) return; const k = e.key.toLowerCase(); if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'q', 'e'].includes(k)) { keys.add(k); e.preventDefault(); } });
+addEventListener('keyup', e => keys.delete(e.key.toLowerCase()));
+addEventListener('blur', () => keys.clear());
+function clampPos(p) { p.x = Math.max(BOOTH.u0 + 0.8, Math.min(BOOTH.u1 - 0.8, p.x)); p.z = Math.max(-(BOOTH.v1 - 0.8), Math.min(2.5, p.z)); }
+function markCustom() { if (currentView !== 'custom') { currentView = 'custom'; $('viewName').textContent = 'Walking'; document.querySelectorAll('#views button').forEach(b => b.setAttribute('aria-pressed', 'false')); } }
+$('pan').addEventListener('change', () => { panBase = cam.yaw; panT0 = performance.now(); });
+
+// field of view: full-frame equivalent focal length across the long side of the screen
+let hFov = 108, viewAspect = 1;
+function onLens() {
+  const mm = +$('lens').value; hFov = 2 * Math.atan(18 / mm) * 180 / Math.PI;
+  const tag = mm <= 15 ? 'very wide' : mm <= 22 ? 'like standing there' : mm <= 30 ? 'phone camera' : mm <= 40 ? 'focused' : 'zoomed in';
+  $('lensOut').textContent = `${Math.round(hFov)}° · ${tag}`;
+  applyFov();
+}
+function applyFov() {
+  const a = viewAspect || 1;
+  let d = $('persp').value === 'natural' ? 1 : 0, H;
+  if (cam.plan) { d = 0; H = 2 * Math.atan(Math.tan(deg(20)) * a); }
+  else if (a >= 1) H = deg(hFov);
+  else { d = 0; H = 2 * Math.atan(Math.tan(deg(hFov) / 2) * a); } // portrait: long side is vertical
+  const h2 = H / 2;
+  const xMax = (d + 1) * Math.sin(h2) / (d + Math.cos(h2)), yMax = xMax / a;
+  const Se = (d + 1) / (d + Math.cos(h2));
+  const tx = Math.tan(h2), ty = Math.max(yMax, yMax / Se / Math.cos(h2));
+  proj.d = d; proj.outMax.set(xMax, yMax); proj.srcTan.set(tx, ty);
+  const U = naturalPass.material.uniforms; U.d.value = d; U.outMax.value.copy(proj.outMax); U.srcTan.value.copy(proj.srcTan);
+  const sc = Math.min(1.7, Math.max(1, tx / xMax, ty / yMax)); if (Math.abs(sc - naturalPass.scale) > 0.01) { naturalPass.scale = sc; naturalPass.resizeRT(); }
+  camera.fov = 2 * Math.atan(ty) * 180 / Math.PI; camera.aspect = tx / ty; camera.updateProjectionMatrix();
+}
+$('persp').addEventListener('change', applyFov);
+$('lens').addEventListener('input', onLens);
+const eyeOf = h => h - 0.38;
+$('height').addEventListener('input', () => { const f = +$('height').value; $('heightOut').textContent = `${f.toFixed(1)} ft · eyes at ${eyeOf(f).toFixed(1)} ft`; });
+$('height').dispatchEvent(new Event('input'));
+
+// ---------- controls wiring ----------
+$('count').addEventListener('input', () => { $('countOut').textContent = $('count').value; });
+$('count').addEventListener('change', () => buildCrowd());
+$('shuffle').addEventListener('click', () => { seed = Math.floor(Math.random() * 1e6) + 1; buildCrowd(); });
+$('people').addEventListener('change', () => { const on = $('people').checked; crowd.visible = on; shadowsGroup.visible = on; if (on && !crowdBuilt) buildCrowd(); });
+$('rope').addEventListener('change', () => { rope.visible = $('rope').checked; });
+$('pedestals').addEventListener('change', () => { const on = $('pedestals').checked; peds.visible = on; pedLight.visible = on; pedSpot.visible = on; envDirty = 1; });
+function updateCeilingVis() { ceilingGroup.visible = $('ceiling').checked && !cam.plan; }
+$('ceiling').addEventListener('change', updateCeilingVis);
+$('openings').addEventListener('change', () => { const o = $('openings').checked; wallGap.visible = !o; gapCaps.visible = o; updateMeasures(); envDirty = 1; });
+function applyReflect() {
+  const r = +$('reflect').value / 100, on = r > 0;
+  reflectGroup.visible = on; floorMat.opacity = 1 - r * 0.75;
+  if (floorMat.transparent !== on) { floorMat.transparent = on; floorMat.needsUpdate = true; }
+  $('reflectOut').textContent = on ? `${Math.round(r * 100)}%` : 'Off';
+}
+$('reflect').addEventListener('input', applyReflect);
+$('guides').addEventListener('change', () => { wallMat.uniforms.showGuides.value = $('guides').checked ? 1 : 0; });
+$('bright').addEventListener('input', () => { wallMat.uniforms.bright.value = $('bright').value / 100; $('brightOut').textContent = `${$('bright').value}%`; envDirty = 1; });
+$('house').addEventListener('input', () => { $('houseOut').textContent = `${$('house').value}%`; });
+$('fit').addEventListener('change', applyFit);
+$('file').addEventListener('change', e => { loadFile(e.target.files[0]); e.target.value = ''; });
+$('sampleBtn').addEventListener('click', () => setFull({ el: sampleCanvas, w: MEDIA_W, h: MEDIA_H, name: 'Test pattern', video: false }));
+$('whiteBtn').addEventListener('click', () => setFull({ el: whiteCanvas, w: MEDIA_W, h: MEDIA_H, name: 'Plain white wall', video: false }));
+$('playBtn').addEventListener('click', () => { const vids = activeVideos(); if (!vids.length) return; if (vids.some(v => !v.paused)) vids.forEach(v => v.pause()); else vids.forEach(v => v.play().catch(() => {})); setTimeout(syncVideoCtl, 50); });
+$('muteBtn').addEventListener('click', () => { const vids = activeVideos(); if (!vids.length) return; const mute = !vids.every(v => v.muted); vids.forEach(v => { v.muted = mute; if (!mute) v.play().catch(() => {}); }); syncVideoCtl(); });
+$('restartBtn').addEventListener('click', () => { activeVideos().forEach(v => { v.currentTime = 0; v.play().catch(() => {}); }); setTimeout(syncVideoCtl, 50); });
+const stage = $('stage'); let dragDepth = 0;
+stage.addEventListener('dragenter', e => { e.preventDefault(); dragDepth++; $('drop').hidden = false; });
+stage.addEventListener('dragover', e => e.preventDefault());
+stage.addEventListener('dragleave', () => { if (--dragDepth <= 0) { dragDepth = 0; $('drop').hidden = true; } });
+stage.addEventListener('drop', e => { e.preventDefault(); dragDepth = 0; $('drop').hidden = true; const f = e.dataTransfer.files[0];
+  if (mediaMode === 'parts') { const k = parts.findIndex(p => !p); loadPart(k < 0 ? 0 : k, f); } else loadFile(f); });
+
+// ---------- stall size editor ----------
+function rebuildStall() {
+  buildStall(); updateMeasures(); applyFit();
+  cubeCam.position.copy(W(PED.u, PED.v, Math.min(4.5, WALL_H / 2)));
+  envDirty = 2;
+  if ($('people').checked) buildCrowd(); else crowdBuilt = false;
+  if (currentView !== 'custom') goView(currentView, true); else clampPos(cam);
+}
+const fmtFt = v => `${(+v.toFixed(2))} ft`;
+DIM_FIELDS.forEach(f => {
+  const lab = document.createElement('label'); lab.htmlFor = 'dim-' + f.k; lab.textContent = f.label;
+  const val = document.createElement('span'); val.className = 'dval'; val.id = 'dv-' + f.k;
+  const inp = document.createElement('input'); inp.type = 'number'; inp.id = 'dim-' + f.k; inp.min = f.min; inp.max = f.max; inp.step = '0.01'; inp.hidden = true; inp.inputMode = 'decimal';
+  const cell = document.createElement('span'); cell.append(val, inp);
+  $('dims').append(lab, cell);
+});
+function showDims() {
+  const isPlan = DIM_FIELDS.every(f => Math.abs(dims[f.k] - PLAN_DIMS[f.k]) < 1e-6);
+  DIM_FIELDS.forEach(f => { $('dv-' + f.k).textContent = fmtFt(dims[f.k]); $('dim-' + f.k).value = dims[f.k]; });
+  $('dimSrc').textContent = isPlan ? 'From the floor plan. All sizes in feet.' : 'Edited in this browser. All sizes in feet.';
+}
+function setEditing(on) {
+  DIM_FIELDS.forEach(f => { $('dv-' + f.k).hidden = on; $('dim-' + f.k).hidden = !on; });
+  $('editDims').hidden = on; $('applyDims').hidden = !on; $('cancelDims').hidden = !on; $('resetDims').hidden = !on;
+  $('dimErr').hidden = true;
+  if (on) $('dim-' + DIM_FIELDS[0].k).focus();
+}
+$('editDims').addEventListener('click', () => { showDims(); setEditing(true); });
+$('cancelDims').addEventListener('click', () => { showDims(); setEditing(false); });
+$('resetDims').addEventListener('click', () => { DIM_FIELDS.forEach(f => { $('dim-' + f.k).value = PLAN_DIMS[f.k]; }); $('dimErr').hidden = true; });
+$('applyDims').addEventListener('click', () => {
+  const v = {}; const errs = [];
+  DIM_FIELDS.forEach(f => { const n = parseFloat($('dim-' + f.k).value); if (!isFinite(n) || n < f.min || n > f.max) errs.push(`${f.label} must be between ${f.min} and ${f.max} ft.`); v[f.k] = n; });
+  if (!errs.length) {
+    if (v.domeW > v.boothW - 0.6) errs.push('Curved room width must be at least 0.6 ft less than the booth width.');
+    if (v.domeD > v.boothD - 0.3) errs.push('Curved room depth must be at least 0.3 ft less than the booth depth.');
+    if (v.entrance > v.domeW * 0.6) errs.push(`Entrance can be at most ${(+(v.domeW * 0.6).toFixed(1))} ft for this room width.`);
+    if (v.ropeW > v.domeW - 2) errs.push(`Rope area must be at least 2 ft narrower than the curved room (max ${(+(v.domeW - 2).toFixed(1))} ft).`);
+    if (v.ropeW < v.entrance) errs.push('Rope area must be at least as wide as the entrance.');
+  }
+  if (errs.length) { $('dimErr').textContent = errs.join(' '); $('dimErr').hidden = false; return; }
+  Object.assign(dims, v);
+  try { localStorage.setItem('stall-dims', JSON.stringify(dims)); } catch (e) { /* ignore */ }
+  rebuildStall(); showDims(); setEditing(false);
+});
+showDims();
+// scale the whole stall so the wall's run matches the media spec at its current height
+$('matchSpec').addEventListener('click', () => {
+  const target = SPEC_LEN * WALL_H / 9;
+  for (let i = 0; i < 3; i++) {
+    const f = target / L;
+    ['boothW', 'boothD', 'domeW', 'domeD', 'ropeW'].forEach(k => { dims[k] = +(dims[k] * f).toFixed(2); });
+    computeLayout();
+  }
+  try { localStorage.setItem('stall-dims', JSON.stringify(dims)); } catch (e) { /* ignore */ }
+  rebuildStall(); showDims(); setEditing(false);
+});
+$('backPlan').addEventListener('click', () => {
+  Object.assign(dims, PLAN_DIMS);
+  try { localStorage.removeItem('stall-dims'); } catch (e) { /* ignore */ }
+  rebuildStall(); showDims(); setEditing(false);
+});
+
+function applyRealism() {
+  const real = $('realism').checked;
+  realRig.visible = real;
+  renderer.toneMapping = THREE.NoToneMapping; // keeps the wall media colours exactly as in the file
+  if (!real) applyEnv(null); else envDirty = 2;
+  pedLight.intensity = real ? 0.6 : 2; pedMat.emissiveIntensity = real ? 0.22 : 0.9;
+  resize();
+  $('toast').hidden = false;
+  requestAnimationFrame(() => setTimeout(() => { buildCrowd(); $('toast').hidden = true; }, 30));
+}
+$('realism').addEventListener('change', applyRealism);
+
+function updateMeasures() {
+  const surf = $('openings').checked ? L - gapLen : L;
+  $('mLen').textContent = `${L.toFixed(1)} ft`;
+  $('mH').textContent = `${WALL_H.toFixed(1)} ft`; $('mPxH').textContent = `${Math.round(MEDIA_H / WALL_H)} px/ft`;
+  $('mSurf').textContent = `${surf.toFixed(1)} ft`;
+  $('mPxW').textContent = `${Math.round(MEDIA_W / L)} px/ft`;
+  $('mPart').textContent = `${(2746 / MEDIA_W * L).toFixed(1)} ft`;
+  $('mBlock').textContent = `${(1264 / MEDIA_W * L).toFixed(1)} ft`;
+  const squeeze = Math.round((1 - L / SPEC_LEN) * 100);
+  const wallRatio = L / WALL_H, specRatio = MEDIA_W / MEDIA_H, diff = Math.round((1 - wallRatio / specRatio) * 100);
+  $('matchSpec').hidden = Math.abs(diff) <= 2; $('backPlan').hidden = DIM_FIELDS.every(f => Math.abs(dims[f.k] - PLAN_DIMS[f.k]) < 1e-6);
+  $('lenNote').textContent = Math.abs(diff) <= 2
+    ? `The wall's shape (${L.toFixed(1)} × ${WALL_H.toFixed(1)} ft) matches 8240 × 1200 media, so content maps without stretching.`
+    : `This wall runs ${L.toFixed(1)} × ${WALL_H.toFixed(1)} ft. Mapped edge to edge, 8240 × 1200 content shows about ${Math.abs(diff)}% ${diff > 0 ? 'narrower' : 'wider'} than designed for 61.8 × 9 ft (the test pattern's 3 ft circles look ${diff > 0 ? 'tall' : 'flat'}).`;
+}
+function updateHud() {
+  const v = -camera.position.z;
+  $('viewMeta').textContent = cam.plan ? `Top view · ${media.name}` : `Eyes at ${eyeOf(+$('height').value).toFixed(1)} ft · ${v.toFixed(1)} ft in from entrance · ${media.name}`;
+}
+
+// ---------- loop ----------
+let dprScale = 1, fpsN = 0, fpsT = performance.now();
+function resize() {
+  const w = stage.clientWidth, h = stage.clientHeight;
+  const real = $('realism').checked;
+  const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2) * (real ? dprScale : 1));
+  renderer.setPixelRatio(dpr);
+  renderer.setSize(w, h, false); viewAspect = w / Math.max(1, h); applyFov();
+  composer.setPixelRatio(dpr); composer.setSize(w, h);
+  finish.uniforms.uAspect.value = viewAspect;
+}
+new ResizeObserver(resize).observe(stage);
+const ease = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+let last = performance.now(), glowT = 0, hudT = 0;
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (anim) {
+    const t = Math.min(1, (now - anim.t0) / anim.dur), k = ease(t);
+    ['x', 'z', 'yaw', 'pitch'].forEach(p => cam[p] = anim.from[p] + (anim.to[p] - anim.from[p]) * k);
+    if (t >= 1) { anim = null; panBase = cam.yaw; panT0 = now; }
+  } else if (!cam.plan) {
+    const sp = 3.6 * dt; let fx = 0, fz = 0;
+    if (keys.has('w') || keys.has('arrowup')) fz += 1;
+    if (keys.has('s') || keys.has('arrowdown')) fz -= 1;
+    if (keys.has('a')) fx -= 1; if (keys.has('d')) fx += 1;
+    if (keys.has('arrowleft') || keys.has('q')) cam.yaw += 1.4 * dt;
+    if (keys.has('arrowright') || keys.has('e')) cam.yaw -= 1.4 * dt;
+    if (fx || fz) {
+      const s = Math.sin(cam.yaw), c = Math.cos(cam.yaw);
+      cam.x += (-s * fz + c * fx) * sp; cam.z += (-c * fz - s * fx) * sp; clampPos(cam); markCustom();
+    }
+    if ($('pan').checked) cam.yaw = panBase + Math.sin((now - panT0) / 1000 * 0.3) * 1.0;
+  }
+  const real = $('realism').checked;
+  const eye = eyeOf(+$('height').value);
+  if (cam.plan) { const tf = Math.tan(deg(20)); const hgt = Math.max((BOOTH.v1 + 2) / (2 * tf), (BOOTH.u1 - BOOTH.u0 + 2) / (2 * tf * viewAspect)) + WALL_H + 1; camera.position.set(cam.x, hgt, cam.z); camera.rotation.set(-Math.PI / 2, 0, 0); }
+  else { camera.position.set(cam.x, eye, cam.z); camera.rotation.set(cam.pitch, cam.yaw, 0); }
+
+  // oversized video (wider than this GPU allows): copy only when the video shows a new frame
+  if (media.video && media.drawCanvas && media.el.readyState >= 2 && !media.el.paused && media.el.currentTime !== media.lastT) {
+    media.lastT = media.el.currentTime;
+    media.drawCanvas.getContext('2d').drawImage(media.el, 0, 0, media.drawCanvas.width, media.drawCanvas.height); media.tex.needsUpdate = true;
+  }
+  if (now - glowT > (hasMotion() ? 400 : 800)) { glowT = now; refreshThumb(); sampleGlow(); if (real) updatePhones(); }
+  const b = wallMat.uniforms.bright.value, house = +$('house').value / 100;
+  if (real) {
+    hemi.color.copy(glow).multiplyScalar(0.015 * b); hemi.groundColor.copy(glow).multiplyScalar(0.005 * b); hemi.intensity = 1;
+    ambient.intensity = 0.002 + house * 0.35;
+    areaLights.forEach((l, i) => { l.color.copy(sliceCols[i]); l.intensity = 0.12 * b; });
+    if (envDirty > 0) { if (envDirty > 0) envDirty--; envT = now; captureEnv(); }
+    finish.uniforms.uTime.value = (now % 10000) / 1000;
+    bloom.enabled = finish.enabled = $('camfx').checked;
+    composer.render(dt);
+  } else {
+    hemi.color.copy(glow).multiplyScalar(0.03 + 0.07 * b); hemi.groundColor.copy(glow).multiplyScalar(0.02 * b); hemi.intensity = 1.6;
+    ambient.intensity = 0.01 + house * 0.3;
+    bloom.enabled = false; finish.enabled = false;
+    composer.render(dt);
+  }
+  if (!cam.plan) { const A = crowd.a.children, Bc = crowd.b.children, S_ = shadowsGroup.children;
+    for (let i = 0; i < A.length; i++) { const v = Math.hypot(A[i].position.x - camera.position.x, A[i].position.z - camera.position.z) > 2.6; A[i].visible = v; if (Bc[i]) Bc[i].visible = v; if (S_[i]) S_[i].visible = v; } }
+  if (now - hudT > 200) { hudT = now; updateHud(); }
+  // keep realism smooth on slower GPUs by lowering render resolution
+  fpsN++; if (now - fpsT > 2500) { const fps = fpsN * 1000 / (now - fpsT); fpsN = 0; fpsT = now;
+    if (real && fps < 22 && dprScale > 0.8) { dprScale = Math.max(0.8, dprScale - 0.1); resize(); }
+    else if (real && fps > 55 && dprScale < 1) { dprScale = Math.min(1, dprScale + 0.1); resize(); } }
+  requestAnimationFrame(frame);
+}
+
+// ---------- start ----------
+buildStall();
+drawSample(); drawGuides();
+guideTex = texFromCanvas(guideCanvas, true); wallMat.uniforms.guides.value = guideTex;
+fullSource = { el: whiteCanvas, w: MEDIA_W, h: MEDIA_H, name: 'Plain white wall', video: false };
+setMedia(whiteCanvas, MEDIA_W, MEDIA_H, 'Plain white wall', false);
+// open with the sample video playing (published next to the page); stays on plain white if it can't load
+const DEFAULT_VIDEO = 'media/sample-video.mp4';
+{ const v = document.createElement('video'); v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto'; videoHost.appendChild(v);
+  v.addEventListener('play', syncVideoCtl); v.addEventListener('pause', syncVideoCtl);
+  $('mediaName').textContent = 'Loading sample video…';
+  v.onloadeddata = () => {
+    if (fullSource.el !== whiteCanvas || mediaMode !== 'full') return; // someone already chose other media
+    setFull({ el: v, w: v.videoWidth, h: v.videoHeight, name: 'Sample video', video: true }); v.play().catch(() => syncVideoCtl());
+  };
+  v.onerror = () => { if (fullSource.el === whiteCanvas) $('mediaName').textContent = 'Plain white wall'; };
+  v.src = DEFAULT_VIDEO; }
+wallGap.visible = !$('openings').checked; gapCaps.visible = $('openings').checked;
+updateMeasures(); onLens(); goView('inside', true);
+pedLight.visible = pedSpot.visible = $('pedestals').checked;
+applyReflect();
+camera.position.set(cam.x, 5, cam.z);
+realRig.visible = $('realism').checked; if ($('realism').checked) { pedMat.emissiveIntensity = 0.22; pedLight.intensity = 0.6; }
+renderer.toneMapping = THREE.NoToneMapping;
+resize(); buildCrowd(); sampleGlow(); updatePhones();
+requestAnimationFrame(frame);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => {
+  drawGuides(); guideTex.needsUpdate = true;
+  if (media.el === sampleCanvas) { drawSample(); media.tex.needsUpdate = true; envDirty = 2; updatePhones(); }
+});
+</script>
+</body>
+</html>
