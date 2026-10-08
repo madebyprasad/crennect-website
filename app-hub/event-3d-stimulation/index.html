@@ -24,7 +24,7 @@
 [hidden]{display:none!important}
 html,body{height:100%}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:14px;margin:0;overflow:hidden}
-#app{display:grid;grid-template-columns:minmax(0,1fr) 340px;height:100%}
+#app{display:grid;grid-template-rows:minmax(0,1fr) auto;height:100%}
 #stage{position:relative;background:var(--stage);min-width:0;overflow:hidden}
 #c{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 #c.dragging{cursor:grabbing}
@@ -40,10 +40,23 @@ body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:14px
 .stats{position:absolute;right:16px;bottom:40px;font:500 12px var(--mono);background:#000c;border:1px solid var(--line);border-radius:6px;padding:8px 10px;color:#9ef0b8;white-space:pre;pointer-events:none}
 .toast{position:absolute;right:16px;top:14px;font:600 12px var(--body);letter-spacing:.06em;text-transform:uppercase;background:#0c0709d9;border:1px solid var(--line);border-radius:99px;padding:7px 12px;color:var(--fg)}
 
-aside{background:var(--panel);border-left:1px solid var(--line);overflow-y:auto;min-width:0}
-.brand{padding:18px 18px 14px;border-bottom:1px solid var(--line)}
-.brand h1{font-family:var(--display);font-weight:700;font-size:26px;line-height:1;margin:0;letter-spacing:.01em;text-wrap:balance}
-.brand p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.45}
+/* Bottom dock: a slim tab bar; each tab opens its controls in a panel that slides up over the bottom of the view */
+.dock{position:relative;background:var(--panel);border-top:1px solid var(--line);min-width:0;z-index:5}
+.bar{display:flex;align-items:center;gap:6px;padding:8px 16px;padding-bottom:calc(8px + env(safe-area-inset-bottom, 0px));overflow-x:auto;scrollbar-width:none}
+.bar::-webkit-scrollbar{display:none}
+.bar .title{font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:.01em;white-space:nowrap;margin-right:10px}
+.tab{flex:none;font:600 13px/1 var(--body);background:transparent;border:1px solid transparent;color:#d9c9ce;padding:9px 12px;border-radius:99px}
+.tab:hover{border-color:var(--line)}
+.tab[aria-expanded="true"]{background:var(--accent-soft);border-color:var(--accent);color:#fff}
+.bar .spacer{flex:1 0 8px}
+.bar .switch{flex:none;gap:10px}
+.bar .switch .lbl{font-size:16px}
+.panel{position:absolute;left:0;right:0;bottom:100%;max-height:min(46vh,440px);overflow-y:auto;background:#191215f2;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-top:1px solid var(--line);box-shadow:0 -12px 30px #0008}
+.panel-head{position:sticky;top:0;display:flex;justify-content:flex-end;padding:8px 12px 0;pointer-events:none}
+.panel-head button{pointer-events:auto;padding:6px 10px;font-size:12px}
+.panel section{display:block;columns:300px auto;column-gap:28px;padding:0 20px 18px;border:0}
+.panel section > *{break-inside:avoid;margin:0 0 12px}
+.panel section > h2{column-span:all;margin:-18px 0 14px}
 section{padding:14px 18px 16px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
 section h2{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -97,10 +110,9 @@ dt{color:var(--muted)} dd{margin:0;white-space:nowrap;font-family:var(--mono);fo
 .realism p{margin:0;color:#d7c3c9;font-size:12.5px;line-height:1.5}
 
 @media (max-width:820px){
-  body{overflow:auto}
-  #app{display:block;height:auto}
-  #stage{height:62svh;min-height:340px}
-  aside{border-left:0;border-top:1px solid var(--line)}
+  .bar .title{display:none}
+  .panel{max-height:58vh}
+  .panel section{columns:auto;padding:0 16px 16px}
   .hud .view{font-size:20px}
   .hint .wide{display:none} .hint .narrow{display:inline}
 }
@@ -114,7 +126,7 @@ dt{color:var(--muted)} dd{margin:0;white-space:nowrap;font-family:var(--mono);fo
     <div class="loading" id="loading">Loading 3D view…</div>
     <div class="hud">
       <span class="eyebrow">Visitor's eye view</span>
-      <span class="view" id="viewName">Inside the rope</span>
+      <span class="view" id="viewName">Walking in</span>
       <span class="meta" id="viewMeta"></span>
     </div>
     <div class="toast" id="toast" hidden>Building realistic scene…</div>
@@ -123,17 +135,9 @@ dt{color:var(--muted)} dd{margin:0;white-space:nowrap;font-family:var(--mono);fo
     <div class="drop" id="drop" hidden>Drop image or video to project</div>
   </div>
 
-  <aside>
-    <div class="brand">
-      <h1>Projection Stall Walkthrough</h1>
-      <p>Your curved projection room built from the floor plan, seen at eye level. Load your wall content and walk around it.</p>
-    </div>
-
-    <section class="realism" aria-labelledby="h-real">
-      <label class="switch" for="realism"><span class="lbl" id="h-real">Realism</span><input type="checkbox" id="realism" role="switch"></label>
-      <p>Guests in modern event looks, lit only by the screens the way they would be on the night, with soft light on the floor and brass. Turn off for a fast layout preview.</p>
-    </section>
-
+  <div class="dock">
+    <div class="panel" id="panel" hidden>
+      <div class="panel-head"><button type="button" id="panelClose" aria-label="Close controls">Close ✕</button></div>
     <section aria-labelledby="h-media">
       <h2 id="h-media">Wall media</h2>
       <div class="seg" role="group" aria-label="How your media is split">
@@ -173,8 +177,8 @@ dt{color:var(--muted)} dd{margin:0;white-space:nowrap;font-family:var(--mono);fo
     <section aria-labelledby="h-view">
       <h2 id="h-view">Stand here</h2>
       <div class="chips" id="views"></div>
-      <label class="ctl" for="height">Your height <output id="heightOut">5.5 ft · eyes at 5.1 ft</output>
-        <input type="range" id="height" min="4.8" max="6.4" step="0.1" value="5.5">
+      <label class="ctl" for="height">Your height <output id="heightOut">4.8 ft · eyes at 4.4 ft</output>
+        <input type="range" id="height" min="4.5" max="6.4" step="0.1" value="4.8">
       </label>
       <label class="ctl" for="persp">Perspective
         <select id="persp" style="grid-column:1/-1">
@@ -206,7 +210,7 @@ dt{color:var(--muted)} dd{margin:0;white-space:nowrap;font-family:var(--mono);fo
 
     <section aria-labelledby="h-show">
       <h2 id="h-show">Show in model</h2>
-      <label class="toggle"><input type="checkbox" id="guides"> Zone guides <small>3 parts · 1264 px blocks</small></label>
+      <label class="toggle"><input type="checkbox" id="guides" checked> Zone guides <small>shown faintly on the first play</small></label>
       <label class="toggle"><input type="checkbox" id="openings"> Side openings <small>2.02 ft, per plan</small></label>
       <label class="toggle"><input type="checkbox" id="rope"> Rope &amp; stanchions</label>
       <label class="toggle"><input type="checkbox" id="pedestals"> Display pedestals</label>
@@ -252,9 +256,38 @@ dt{color:var(--muted)} dd{margin:0;white-space:nowrap;font-family:var(--mono);fo
       <p class="note" id="lenNote"></p>
       <div class="row"><button id="matchSpec" type="button" hidden>Make the wall 61.8 ft (media spec)</button><button id="backPlan" type="button" hidden>Back to floor plan size</button></div>
     </section>
-  </aside>
+    </div>
+    <div class="bar" role="tablist" aria-label="Controls" id="bar">
+      <span class="title">Projection Stall Walkthrough</span>
+      <span class="spacer"></span>
+      <label class="switch" for="realism" title="Guests lit only by the screens, soft light on the floor and brass. Turn off for a fast layout preview."><span class="lbl">Realism</span><input type="checkbox" id="realism" role="switch"></label>
+    </div>
+  </div>
 </div>
 
+<script>
+// Bottom dock: one tab per controls section; the active section shows in the panel above the bar.
+(function(){
+  var panel = document.getElementById('panel'), bar = document.getElementById('bar'), spacer = bar.querySelector('.spacer');
+  var sections = [].slice.call(panel.querySelectorAll('section'));
+  var tabs = sections.map(function(sec){
+    var h = sec.querySelector('h2'), b = document.createElement('button');
+    b.type = 'button'; b.className = 'tab'; b.textContent = h.textContent; b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-controls', sec.id = sec.id || ('sec-' + h.id));
+    sec.hidden = true; bar.insertBefore(b, spacer);
+    b.addEventListener('click', function(){ open(sec, b); });
+    return b;
+  });
+  function open(sec, b){
+    var already = b.getAttribute('aria-expanded') === 'true';
+    sections.forEach(function(s){ s.hidden = true; }); tabs.forEach(function(t){ t.setAttribute('aria-expanded', 'false'); });
+    if (already) { panel.hidden = true; return; }
+    sec.hidden = false; b.setAttribute('aria-expanded', 'true'); panel.hidden = false; panel.scrollTop = 0;
+  }
+  function close(){ panel.hidden = true; tabs.forEach(function(t){ t.setAttribute('aria-expanded', 'false'); }); }
+  document.getElementById('panelClose').addEventListener('click', close);
+  addEventListener('keydown', function(e){ if (e.key === 'Escape' && !panel.hidden) close(); });
+})();
+</script>
 <script>
 // If the 3D modules can't load (offline, blocked), say so instead of showing a blank stage.
 setTimeout(function(){ if(!window.__stallReady){ var l=document.getElementById('loading'); if(l){ l.hidden=false; l.textContent='The 3D view could not load. Open this page from a web server (GitHub Pages or a local server), not by double-clicking the file.'; } } }, 15000);
@@ -1492,7 +1525,17 @@ function applyReflect() {
   $('reflectOut').textContent = on ? `${Math.round(r * 100)}%` : 'Off';
 }
 $('reflect').addEventListener('input', applyReflect);
-$('guides').addEventListener('change', () => { wallMat.uniforms.showGuides.value = $('guides').checked ? 1 : 0; });
+// Zone guides: shown faintly while the video plays the first time, then switched off; ticking them shows them clearly.
+let guidesAuto = true, loopWatch = { el: null, t: 0 };
+wallMat.uniforms.showGuides.value = 0.28;
+$('guides').addEventListener('change', () => { guidesAuto = false; wallMat.uniforms.showGuides.value = $('guides').checked ? 0.8 : 0; });
+function watchGuideLoop() {
+  if (!guidesAuto) return;
+  const v = activeVideos()[0]; if (!v) return;
+  if (loopWatch.el !== v) { loopWatch = { el: v, t: v.currentTime }; return; }
+  if (v.currentTime + 0.5 < loopWatch.t) { guidesAuto = false; $('guides').checked = false; wallMat.uniforms.showGuides.value = 0; } // video started its second play
+  loopWatch.t = v.currentTime;
+}
 $('bright').addEventListener('input', () => { wallMat.uniforms.bright.value = $('bright').value / 100; $('brightOut').textContent = `${$('bright').value}%`; envDirty = 1; });
 $('house').addEventListener('input', () => { $('houseOut').textContent = `${$('house').value}%`; });
 $('fit').addEventListener('change', applyFit);
@@ -1665,6 +1708,7 @@ function frame(now) {
     bloom.enabled = false; finish.enabled = false;
     composer.render(dt);
   }
+  watchGuideLoop();
   if (mediaMode === 'parts' && now - syncT > 250) { syncT = now;
     const vids = parts.filter(p => p && p.video && !p.el.paused).map(p => p.el);
     if (vids.length > 1) { const m0 = vids[0];
@@ -1693,13 +1737,13 @@ guideTex = texFromCanvas(guideCanvas, true); wallMat.uniforms.guides.value = gui
 fullSource = { el: whiteCanvas, w: MEDIA_W, h: MEDIA_H, name: 'Plain white wall', video: false };
 setMedia(whiteCanvas, MEDIA_W, MEDIA_H, 'Plain white wall', false);
 // open with the sample video playing (published next to the page); stays on plain white if it can't load
-const DEFAULT_VIDEO = 'media/sample-video-smooth.mp4'; // 7904 × 1152 wall, stored as 3952 × 2304 so graphics hardware can decode it
+const DEFAULT_VIDEO = 'media/plum-video-smooth.mp4'; // Plum final video: 7904 × 1152 wall, stored as 3952 × 2304 so graphics hardware can decode it
 { const v = document.createElement('video'); v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto'; videoHost.appendChild(v);
   v.addEventListener('play', syncVideoCtl); v.addEventListener('pause', syncVideoCtl);
-  $('mediaName').textContent = 'Loading sample video…';
+  $('mediaName').textContent = 'Loading Plum video…';
   v.onloadeddata = () => {
     if (fullSource.el !== whiteCanvas || mediaMode !== 'full') return; // someone already chose other media
-    setFull({ el: v, w: v.videoWidth * 2, h: v.videoHeight / 2, name: 'Sample video', video: true, stacked: true }); v.play().catch(() => syncVideoCtl());
+    setFull({ el: v, w: v.videoWidth * 2, h: v.videoHeight / 2, name: 'Plum video (final)', video: true, stacked: true }); v.play().catch(() => syncVideoCtl());
   };
   v.onerror = () => { if (fullSource.el === whiteCanvas) $('mediaName').textContent = 'Plain white wall'; };
   (async () => {
@@ -1707,12 +1751,12 @@ const DEFAULT_VIDEO = 'media/sample-video-smooth.mp4'; // 7904 × 1152 wall, sto
       const res = await fetch(DEFAULT_VIDEO); if (!res.ok) throw new Error(res.status);
       const total = +res.headers.get('content-length') || 0, reader = res.body.getReader(), chunks = []; let got = 0;
       for (;;) { const { done, value } = await reader.read(); if (done) break; chunks.push(value); got += value.length;
-        if (total && fullSource.el === whiteCanvas) $('mediaName').textContent = `Loading sample video… ${Math.round(got / total * 100)}%`; }
+        if (total && fullSource.el === whiteCanvas) $('mediaName').textContent = `Loading Plum video… ${Math.round(got / total * 100)}%`; }
       v.src = URL.createObjectURL(new Blob(chunks, { type: 'video/mp4' }));
     } catch (e) { v.src = DEFAULT_VIDEO; } // fall back to streaming
   })(); }
 wallGap.visible = !$('openings').checked; gapCaps.visible = $('openings').checked;
-updateMeasures(); onLens(); goView('inside', true);
+updateMeasures(); onLens(); goView('entrance', true);
 pedLight.visible = pedSpot.visible = $('pedestals').checked;
 applyReflect();
 camera.position.set(cam.x, 5, cam.z);

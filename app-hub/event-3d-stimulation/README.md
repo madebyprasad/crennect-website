@@ -38,6 +38,10 @@ Tips:
 - **Zone guides** (under *Show in model*) draws the 3-part split and the 1264 px blocks over the media.
 - **Mapping on the wall** defaults to keeping the media's proportions. You can switch to edge-to-edge (how projectors map it) or to designed size (61.8 ft wide, edges cropped).
 
+## Layout
+
+The 3D view fills the screen. Controls sit in a bar along the bottom: click a tab (Wall media, Stand here, Visitors, Show in model, Stall size, Measurements) to open its panel, and click it again, press Esc or use Close to hide it. Realism is switched on and off at the right end of the bar.
+
 ## Controls
 
 | Action | How |
@@ -55,12 +59,14 @@ What the page shows when it opens:
 
 | Setting | Default |
 |---|---|
-| Standing spot | Inside the rope |
+| Standing spot | Walking in |
+| Your height | 4.8 ft (eyes at 4.4 ft) |
+| Zone guides | Shown faintly during the first play of the video, then off until ticked |
 | Perspective | Natural, like your eyes |
 | Picture quality | Smooth playback (draws the 3D view at a fixed, modest size so video stays smooth even full screen). *Sharper* needs a strong graphics card |
 | Field of view | 108° (very wide) |
 | Mapping on the wall | Keep media proportions |
-| Wall | Sample video (`media/sample-video-smooth.mp4`), playing on loop. *Plain white* and *Test pattern* are one click away |
+| Wall | Plum final video (`media/plum-video-smooth.mp4`), playing on loop. *Plain white* and *Test pattern* are one click away |
 | Realism | On for computers, off for phones |
 | People in the stall | Off |
 | Rope & stanchions | Off |
@@ -112,7 +118,7 @@ Then open http://localhost:8000.
 ## Files
 
 - `index.html`: the whole app (layout, styles and 3D code).
-- `media/sample-video-smooth.mp4`: the video the page opens with. It holds a 7904 × 1152 wall video stored as 3952 × 2304 (left half on top, right half below), so the computer's graphics hardware can decode it smoothly.
+- `media/plum-video-smooth.mp4`: the video the page opens with. It holds a 7904 × 1152 wall video stored as 3952 × 2304 (left half on top, right half below), so the computer's graphics hardware can decode it smoothly.
 - `vendor/three/`: the parts of [three.js](https://threejs.org) r162 the app uses, bundled so the page doesn't depend on a CDN. MIT licensed, see `vendor/three/LICENSE`.
 
 Fonts load from Google Fonts. Without internet the page falls back to system fonts and still works.
@@ -132,10 +138,10 @@ For smooth playback, use one of these:
 - **3 part files**, each 2746 × 1200 H.264. Each one is inside the hardware limit, and the page keeps the three in step.
 - **One file at 4096 px wide or less**, for example 4096 × 596.
 
-To make a new opening video in the same smooth layout as the sample, run this with [ffmpeg](https://ffmpeg.org) (replace `input.mp4`), then save the result as `media/sample-video-smooth.mp4`:
+To make a new opening video in the same smooth layout as the sample, run this with [ffmpeg](https://ffmpeg.org) (replace `input.mp4`), then save the result as `media/plum-video-smooth.mp4`:
 
 ```
-ffmpeg -i input.mp4 -filter_complex "[0:v]scale=7904:1152,split[a][b];[a]crop=3952:1152:0:0[l];[b]crop=3952:1152:3952:0[r];[l][r]vstack[v]" -map "[v]" -map 0:a? -c:v libx264 -profile:v high -level:v 5.1 -crf 18 -pix_fmt yuv420p -c:a copy -movflags +faststart sample-video-smooth.mp4
+ffmpeg -i input.mp4 -filter_complex "[0:v]scale=7904:1152,split[a][b];[a]crop=3952:1152:0:0[l];[b]crop=3952:1152:3952:0[r];[l][r]vstack[v]" -map "[v]" -map 0:a? -c:v libx264 -profile:v high -level:v 5.1 -crf 18 -pix_fmt yuv420p -c:a copy -movflags +faststart plum-video-smooth.mp4
 ```
 
 ### Checking performance
