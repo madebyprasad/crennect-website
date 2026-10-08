@@ -59,7 +59,7 @@ What the page shows when it opens:
 | Perspective | Natural, like your eyes |
 | Field of view | 108° (very wide) |
 | Mapping on the wall | Keep media proportions |
-| Wall | Sample video (`media/sample-video.mp4`), playing on loop. *Plain white* and *Test pattern* are one click away |
+| Wall | Sample video (`media/sample-video-smooth.mp4`), playing on loop. *Plain white* and *Test pattern* are one click away |
 | Realism | On for computers, off for phones |
 | People in the stall | Off |
 | Rope & stanchions | Off |
@@ -111,7 +111,7 @@ Then open http://localhost:8000.
 ## Files
 
 - `index.html`: the whole app (layout, styles and 3D code).
-- `media/sample-video.mp4`: the video the page opens with (8240 × 1200, H.264). To change the opening video, replace this file with another one of the same name.
+- `media/sample-video-smooth.mp4`: the video the page opens with. It holds a 7904 × 1152 wall video stored as 3952 × 2304 (left half on top, right half below), so the computer's graphics hardware can decode it smoothly.
 - `vendor/three/`: the parts of [three.js](https://threejs.org) r162 the app uses, bundled so the page doesn't depend on a CDN. MIT licensed, see `vendor/three/LICENSE`.
 
 Fonts load from Google Fonts. Without internet the page falls back to system fonts and still works.
@@ -121,3 +121,18 @@ Fonts load from Google Fonts. Without internet the page falls back to system fon
 - People are 3D figures, not photographic. Faces are simple, and they read best from behind and at a distance, which is how they are mostly seen.
 - Shadows that visitors would cast on the projection, by standing between a projector and the wall, are not modelled.
 - Realism mode is demanding. On older laptops the page lowers its own resolution to stay smooth, and turning Realism off is always fast.
+
+## Smooth video playback
+
+Most computers can only decode video in their graphics hardware up to **4096 px wide** (and about 9 million pixels per frame). An 8240 × 1200 video is over that limit, so the browser decodes it in software and it plays at a few frames per second. The page warns when a loaded file is too wide.
+
+For smooth playback, use one of these:
+
+- **3 part files**, each 2746 × 1200 H.264. Each one is inside the hardware limit, and the page keeps the three in step.
+- **One file at 4096 px wide or less**, for example 4096 × 596.
+
+To make a new opening video in the same smooth layout as the sample, run this with [ffmpeg](https://ffmpeg.org) (replace `input.mp4`), then save the result as `media/sample-video-smooth.mp4`:
+
+```
+ffmpeg -i input.mp4 -filter_complex "[0:v]scale=7904:1152,split[a][b];[a]crop=3952:1152:0:0[l];[b]crop=3952:1152:3952:0[r];[l][r]vstack[v]" -map "[v]" -map 0:a? -c:v libx264 -profile:v high -level:v 5.1 -crf 18 -pix_fmt yuv420p -c:a copy -movflags +faststart sample-video-smooth.mp4
+```

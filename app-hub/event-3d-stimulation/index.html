@@ -151,6 +151,7 @@ dt{color:var(--muted)} dd{margin:0;white-space:nowrap;font-family:var(--mono);fo
       <div class="media-card">
         <span class="media-name" id="mediaName">Plain white wall</span>
         <span class="pill ok" id="mediaPill">Load your media to preview it</span>
+        <p class="note" id="vidNote" hidden>Most computers can only decode video up to 4096 px wide, so this file plays choppily. For smooth playback, load it as 3 part files (2746 × 1200 each), or export it at 4096 px wide or less.</p>
         <div class="row" id="videoCtl" hidden>
           <button id="playBtn" type="button">Pause</button>
           <button id="muteBtn" type="button">Unmute</button>
@@ -368,21 +369,30 @@ function clearGroup(g) { g.traverse(o => { if (o.geometry && o !== g) o.geometry
 const placeholder = new THREE.DataTexture(new Uint8Array([0, 0, 0, 255]), 1, 1, THREE.RGBAFormat); placeholder.needsUpdate = true;
 const wallMat = new THREE.ShaderMaterial({
   side: THREE.DoubleSide,
-  uniforms: { map: { value: placeholder }, p0: { value: placeholder }, p1: { value: placeholder }, p2: { value: placeholder }, parts: { value: 0 }, raw: { value: new THREE.Vector4(0, 0, 0, 0) }, rect: { value: new THREE.Vector4(0, 0, 1, 1) }, bright: { value: 1 }, guides: { value: placeholder }, showGuides: { value: 0 } },
+  uniforms: { map: { value: placeholder }, p0: { value: placeholder }, p1: { value: placeholder }, p2: { value: placeholder }, parts: { value: 0 }, stacked: { value: 0 }, raw: { value: new THREE.Vector4(0, 0, 0, 0) }, rect: { value: new THREE.Vector4(0, 0, 1, 1) }, bright: { value: 1 }, guides: { value: placeholder }, showGuides: { value: 0 } },
   vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
-  fragmentShader: `uniform sampler2D map; uniform sampler2D p0; uniform sampler2D p1; uniform sampler2D p2; uniform float parts; uniform vec4 raw; uniform sampler2D guides; uniform vec4 rect; uniform float bright; uniform float showGuides; varying vec2 vUv;
+  fragmentShader: `uniform sampler2D map; uniform sampler2D p0; uniform sampler2D p1; uniform sampler2D p2; uniform float parts; uniform float stacked; uniform vec4 raw; uniform sampler2D guides; uniform vec4 rect; uniform float bright; uniform float showGuides; varying vec2 vUv;
     vec3 dec(vec3 c, float r){ return mix(c, mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(vec3(0.04045), c)), r); }
-    vec3 media(vec2 m){
+    vec4 fullTex(vec2 m, vec2 dx, vec2 dy){
+      if (stacked < 0.5) return textureGrad(map, m, dx, dy);
+      // smooth-playback layout: left half of the wall is the top half of the frame, right half is the bottom half
+      float r = step(0.5, m.x);
+      float ht = 0.5 / float(textureSize(map, 0).y);
+      vec2 uv = vec2(m.x * 2.0 - r, clamp((1.0 - r) * 0.5 + m.y * 0.5, (1.0 - r) * 0.5 + ht, (1.0 - r) * 0.5 + 0.5 - ht));
+      return textureGrad(map, uv, dx * vec2(2.0, 0.5), dy * vec2(2.0, 0.5));
+    }
+    vec3 media(vec2 m, vec2 dx, vec2 dy){
       const float A = 2746.0 / 8240.0; const float Bq = 5492.0 / 8240.0;
-      vec3 full = dec(texture2D(map, m).rgb, raw.x);
+      vec3 full = dec(fullTex(m, dx, dy).rgb, raw.x);
       vec3 c0 = dec(texture2D(p0, vec2(m.x / A, m.y)).rgb, raw.y);
       vec3 c1 = dec(texture2D(p1, vec2((m.x - A) / (Bq - A), m.y)).rgb, raw.z);
       vec3 c2 = dec(texture2D(p2, vec2((m.x - Bq) / (1.0 - Bq), m.y)).rgb, raw.w);
       return mix(full, m.x < A ? c0 : (m.x < Bq ? c1 : c2), parts);
     }
     void main(){ vec2 m = (vUv - rect.xy) / rect.zw; vec3 c = vec3(0.0);
+      vec2 dx = dFdx(m), dy = dFdy(m);
       if (m.x >= 0.0 && m.x <= 1.0 && m.y >= 0.0 && m.y <= 1.0) {
-        c = media(m) * bright;
+        c = media(m, dx, dy) * bright;
         vec4 g = texture2D(guides, m); c = mix(c, g.rgb, g.a * showGuides);
       }
       gl_FragColor = vec4(c, 1.0);
@@ -393,7 +403,7 @@ const wallMat = new THREE.ShaderMaterial({
 const shellMat = new THREE.MeshStandardMaterial({ color: 0xe9e4e6, side: THREE.DoubleSide, roughness: 0.8 });
 const fasciaMat = new THREE.MeshStandardMaterial({ color: 0xc4153b, side: THREE.DoubleSide, emissive: 0x3a0510, roughness: 0.6 });
 const capMat = new THREE.MeshStandardMaterial({ color: 0xc4153b, roughness: 0.5 });
-const floorMat = new THREE.MeshPhysicalMaterial({ color: 0x0b0b0c, roughness: 0.55, metalness: 0.0, clearcoat: 0.6, clearcoatRoughness: 0.2, transparent: false, opacity: 1 });
+const floorMat = new THREE.MeshPhysicalMaterial({ color: 0x0b0b0c, roughness: 0.55, metalness: 0.0, clearcoat: 0, clearcoatRoughness: 0.2, transparent: false, opacity: 1 });
 const boothFloorMat = new THREE.MeshStandardMaterial({ color: 0x0b0b0c, roughness: 0.8 });
 const greyMat = new THREE.MeshStandardMaterial({ color: 0x77706f, roughness: 0.9 });
 const shelfMat = new THREE.MeshStandardMaterial({ color: 0x9a8f8c, roughness: 0.85 });
@@ -413,7 +423,7 @@ const gapCaps = new THREE.Group(); scene.add(gapCaps);
 const ceilingGroup = new THREE.Group(); scene.add(ceilingGroup);
 const wallSolid = pair(), wallGap = pair(), peds = pair(), rope = pair();
 const realRig = new THREE.Group(); scene.add(realRig);
-const AREA_N = 8; let areaLights = [];
+const AREA_N = 4; let areaLights = [];
 let domeFloor = null, boothFloor = null;
 function spot(color, intensity, from, to, angle) {
   const s = new THREE.SpotLight(color, intensity, 40, angle, 0.65, 2);
@@ -1114,18 +1124,21 @@ function mediaTexture(el, w, h, isVideo) {
 function setMedia(el, w, h, name, isVideo, opt = {}) {
   if (media.tex && media.tex !== placeholder) { media.tex.dispose(); wallMat.uniforms.map.value = placeholder; }
   if (media.video && media.el && media.el !== el) media.el.pause();
-  media = { el, w, h, video: isVideo, name, drawCanvas: null, tex: null, parts: !!opt.parts };
+  media = { el, w, h, video: isVideo, name, drawCanvas: null, tex: null, parts: !!opt.parts, stacked: !!opt.stacked };
   let tex = placeholder;
-  if (!opt.parts) { const r = mediaTexture(el, w, h, isVideo); tex = r.tex; media.drawCanvas = r.drawCanvas; wallMat.uniforms.raw.value.x = tex.userData.raw ? 1 : 0; }
-  wallMat.uniforms.parts.value = opt.parts ? 1 : 0;
+  if (!opt.parts) { const r = mediaTexture(el, opt.stacked ? w / 2 : w, opt.stacked ? h * 2 : h, isVideo); tex = r.tex; media.drawCanvas = r.drawCanvas; wallMat.uniforms.raw.value.x = tex.userData.raw ? 1 : 0; }
+  wallMat.uniforms.parts.value = opt.parts ? 1 : 0; wallMat.uniforms.stacked.value = opt.stacked ? 1 : 0;
   media.tex = opt.parts ? null : tex; if (!opt.parts) wallMat.uniforms.map.value = tex;
   $('mediaName').textContent = name;
   const ratio = w / h, spec = MEDIA_W / MEDIA_H, pill = $('mediaPill');
   if (opt.parts) { pill.className = 'pill ' + (opt.warn ? 'warn' : 'ok'); pill.textContent = opt.pill; }
   else if (el === whiteCanvas) { pill.className = 'pill ok'; pill.textContent = 'Load your media to preview it'; }
+  else if (opt.stacked) { pill.className = 'pill ok'; pill.textContent = `${w} × ${h} · smooth-playback version`; }
+  else if (isVideo && w > 4096) { pill.className = 'pill warn'; pill.textContent = `${w} × ${h} · too wide to play smoothly`; }
   else if (w === MEDIA_W && h === MEDIA_H) { pill.className = 'pill ok'; pill.textContent = `${w} × ${h} · matches wall spec`; }
   else if (Math.abs(ratio - spec) / spec < 0.01) { pill.className = 'pill ok'; pill.textContent = `${w} × ${h} · same shape as spec`; }
   else { pill.className = 'pill warn'; pill.textContent = `${w} × ${h} · shape differs from 8240 × 1200`; }
+  $('vidNote').hidden = !(isVideo && !opt.stacked && w > 4096);
   syncVideoCtl();
   applyFit(); updateHud();
   envDirty = 2; setTimeout(() => { refreshThumb(); sampleGlow(); updatePhones(); }, 60);
@@ -1175,9 +1188,10 @@ function syncVideoCtl() {
   if (vids.length) { $('playBtn').textContent = vids.some(v => !v.paused) ? 'Pause' : 'Play'; $('muteBtn').textContent = vids.every(v => v.muted) ? 'Unmute' : 'Mute'; }
 }
 function setFull(src) {
+  // src.stacked: frame holds the left half of the wall on top and the right half below (hardware-decodable)
   if (fullSource && fullSource !== src && fullSource.url) { if (fullSource.video) fullSource.el.pause(); URL.revokeObjectURL(fullSource.url); }
   fullSource = src; if (mediaMode !== 'full') setMode('full', true);
-  setMedia(src.el, src.w, src.h, src.name, src.video);
+  setMedia(src.el, src.w, src.h, src.name, src.video, { stacked: src.stacked });
 }
 function showParts() {
   ['p0', 'p1', 'p2'].forEach((u, k) => { wallMat.uniforms[u].value = parts[k] ? parts[k].tex : emptyParts[k].tex; });
@@ -1197,7 +1211,9 @@ function drawWall(ctx, x, y, w, h) {
   } else {
     const src = media.drawCanvas || media.el; if (!src) return;
     if (media.video && media.el.readyState < 2) return;
-    ctx.drawImage(src, x, y, w, h);
+    if (media.stacked) { const vw = media.el.videoWidth, vh = media.el.videoHeight / 2;
+      ctx.drawImage(src, 0, 0, vw, vh, x, y, w / 2, h); ctx.drawImage(src, 0, vh, vw, vh, x + w / 2, y, w / 2, h); }
+    else ctx.drawImage(src, x, y, w, h);
   }
 }
 function updatePartRow(k) {
@@ -1234,7 +1250,7 @@ function setMode(m, silent) {
   $('modeFull').setAttribute('aria-pressed', m === 'full'); $('modeParts').setAttribute('aria-pressed', m === 'parts');
   $('fullCtl').hidden = m !== 'full'; $('partsCtl').hidden = m !== 'parts';
   if (m === 'parts') { if (fullSource && fullSource.video) fullSource.el.pause(); parts.forEach(p => { if (p && p.video) p.el.play().catch(() => {}); }); if (!silent || !media.parts) showParts(); }
-  else { parts.forEach(p => { if (p && p.video) p.el.pause(); }); if (!silent) { setMedia(fullSource.el, fullSource.w, fullSource.h, fullSource.name, fullSource.video); if (fullSource.video) fullSource.el.play().catch(() => {}); } }
+  else { parts.forEach(p => { if (p && p.video) p.el.pause(); }); if (!silent) { setMedia(fullSource.el, fullSource.w, fullSource.h, fullSource.name, fullSource.video, { stacked: fullSource.stacked }); if (fullSource.video) fullSource.el.play().catch(() => {}); } }
   syncVideoCtl();
 }
 [0, 1, 2].forEach(k => {
@@ -1321,7 +1337,7 @@ class NaturalViewPass extends Pass {
     this.fsQuad = new FullScreenQuad(this.material); this.scale = 1; this.w = 16; this.h = 16;
   }
   setSize(w, h) { this.w = w; this.h = h; this.resizeRT(); }
-  resizeRT() { let s = renderer.getPixelRatio() >= 1.75 ? Math.min(this.scale, 1.15) : this.scale; const maxPx = 5e6; if (this.w * this.h * s * s > maxPx) s = Math.sqrt(maxPx / (this.w * this.h)); this.rt.setSize(Math.max(1, Math.round(this.w * s)), Math.max(1, Math.round(this.h * s))); }
+  resizeRT() { let s = renderer.getPixelRatio() >= 1.75 ? Math.min(this.scale, 1.15) : this.scale; const maxPx = 3.5e6; if (this.w * this.h * s * s > maxPx) s = Math.sqrt(maxPx / (this.w * this.h)); this.rt.setSize(Math.max(1, Math.round(this.w * s)), Math.max(1, Math.round(this.h * s))); }
   render(renderer, writeBuffer) {
     renderer.setRenderTarget(this.rt); renderer.clear(); renderer.render(scene, camera);
     this.material.uniforms.tDiffuse.value = this.rt.texture;
@@ -1584,7 +1600,7 @@ let dprScale = 1, fpsN = 0, fpsT = performance.now();
 function resize() {
   const w = stage.clientWidth, h = stage.clientHeight;
   const real = $('realism').checked;
-  const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2) * (real ? dprScale : 1));
+  const dpr = Math.max(0.7, Math.min(window.devicePixelRatio || 1, 2) * dprScale);
   renderer.setPixelRatio(dpr);
   renderer.setSize(w, h, false); viewAspect = w / Math.max(1, h); applyFov();
   composer.setPixelRatio(dpr); composer.setSize(w, h);
@@ -1592,7 +1608,7 @@ function resize() {
 }
 new ResizeObserver(resize).observe(stage);
 const ease = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-let last = performance.now(), glowT = 0, hudT = 0;
+let last = performance.now(), glowT = 0, hudT = 0, syncT = 0;
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   if (anim) {
@@ -1638,13 +1654,19 @@ function frame(now) {
     bloom.enabled = false; finish.enabled = false;
     composer.render(dt);
   }
+  if (mediaMode === 'parts' && now - syncT > 250) { syncT = now;
+    const vids = parts.filter(p => p && p.video && !p.el.paused).map(p => p.el);
+    if (vids.length > 1) { const m0 = vids[0];
+      for (let i = 1; i < vids.length; i++) { const v = vids[i]; if (Math.abs(v.duration - m0.duration) > 0.1) continue;
+        let d = v.currentTime - m0.currentTime; if (d > m0.duration / 2) d -= m0.duration; if (d < -m0.duration / 2) d += m0.duration;
+        if (Math.abs(d) > 0.3) v.currentTime = m0.currentTime; else v.playbackRate = Math.abs(d) > 0.03 ? (d > 0 ? 0.95 : 1.05) : 1; } } }
   if (!cam.plan) { const A = crowd.a.children, Bc = crowd.b.children, S_ = shadowsGroup.children;
     for (let i = 0; i < A.length; i++) { const v = Math.hypot(A[i].position.x - camera.position.x, A[i].position.z - camera.position.z) > 2.6; A[i].visible = v; if (Bc[i]) Bc[i].visible = v; if (S_[i]) S_[i].visible = v; } }
   if (now - hudT > 200) { hudT = now; updateHud(); }
   // keep realism smooth on slower GPUs by lowering render resolution
   fpsN++; if (now - fpsT > 2500) { const fps = fpsN * 1000 / (now - fpsT); fpsN = 0; fpsT = now;
-    if (real && fps < 22 && dprScale > 0.8) { dprScale = Math.max(0.8, dprScale - 0.1); resize(); }
-    else if (real && fps > 55 && dprScale < 1) { dprScale = Math.min(1, dprScale + 0.1); resize(); } }
+    if (fps < 40 && dprScale > 0.7) { dprScale = Math.max(0.7, dprScale - 0.1); resize(); }
+    else if (fps > 57 && dprScale < 1) { dprScale = Math.min(1, dprScale + 0.05); resize(); } }
   requestAnimationFrame(frame);
 }
 
@@ -1655,13 +1677,13 @@ guideTex = texFromCanvas(guideCanvas, true); wallMat.uniforms.guides.value = gui
 fullSource = { el: whiteCanvas, w: MEDIA_W, h: MEDIA_H, name: 'Plain white wall', video: false };
 setMedia(whiteCanvas, MEDIA_W, MEDIA_H, 'Plain white wall', false);
 // open with the sample video playing (published next to the page); stays on plain white if it can't load
-const DEFAULT_VIDEO = 'media/sample-video.mp4';
+const DEFAULT_VIDEO = 'media/sample-video-smooth.mp4'; // 7904 × 1152 wall, stored as 3952 × 2304 so graphics hardware can decode it
 { const v = document.createElement('video'); v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto'; videoHost.appendChild(v);
   v.addEventListener('play', syncVideoCtl); v.addEventListener('pause', syncVideoCtl);
   $('mediaName').textContent = 'Loading sample video…';
   v.onloadeddata = () => {
     if (fullSource.el !== whiteCanvas || mediaMode !== 'full') return; // someone already chose other media
-    setFull({ el: v, w: v.videoWidth, h: v.videoHeight, name: 'Sample video', video: true }); v.play().catch(() => syncVideoCtl());
+    setFull({ el: v, w: v.videoWidth * 2, h: v.videoHeight / 2, name: 'Sample video', video: true, stacked: true }); v.play().catch(() => syncVideoCtl());
   };
   v.onerror = () => { if (fullSource.el === whiteCanvas) $('mediaName').textContent = 'Plain white wall'; };
   v.src = DEFAULT_VIDEO; }
