@@ -37,6 +37,7 @@ body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:14px
 .hint kbd{font-family:var(--mono);font-size:11px;border:1px solid #ffffff40;border-radius:3px;padding:0 4px;background:#00000066}
 .drop{position:absolute;inset:12px;border:2px dashed var(--accent);border-radius:10px;background:#0c0709cc;display:grid;place-items:center;font-family:var(--display);font-size:26px;font-weight:600;letter-spacing:.04em}
 .loading{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-family:var(--display);font-size:18px;letter-spacing:.08em;text-transform:uppercase;text-align:center;padding:0 24px}
+.stats{position:absolute;right:16px;bottom:40px;font:500 12px var(--mono);background:#000c;border:1px solid var(--line);border-radius:6px;padding:8px 10px;color:#9ef0b8;white-space:pre;pointer-events:none}
 .toast{position:absolute;right:16px;top:14px;font:600 12px var(--body);letter-spacing:.06em;text-transform:uppercase;background:#0c0709d9;border:1px solid var(--line);border-radius:99px;padding:7px 12px;color:var(--fg)}
 
 aside{background:var(--panel);border-left:1px solid var(--line);overflow-y:auto;min-width:0}
@@ -117,6 +118,7 @@ dt{color:var(--muted)} dd{margin:0;white-space:nowrap;font-family:var(--mono);fo
       <span class="meta" id="viewMeta"></span>
     </div>
     <div class="toast" id="toast" hidden>Building realistic scene…</div>
+    <div class="stats" id="stats" hidden></div>
     <div class="hint" id="hint"><span class="wide">Drag to look around · <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or arrows to walk · double-click the floor to walk there · scroll to change lens</span><span class="narrow">Drag to look · double-tap the floor to walk there</span></div>
     <div class="drop" id="drop" hidden>Drop image or video to project</div>
   </div>
@@ -182,6 +184,12 @@ dt{color:var(--muted)} dd{margin:0;white-space:nowrap;font-family:var(--mono);fo
       </label>
       <label class="ctl" for="lens">Field of view <output id="lensOut">108° · very wide</output>
         <input type="range" id="lens" min="11" max="50" step="1" value="13">
+      </label>
+      <label class="ctl" for="quality">Picture quality
+        <select id="quality" style="grid-column:1/-1">
+          <option value="smooth" selected>Smooth playback (recommended)</option>
+          <option value="sharp">Sharper (needs a strong graphics card)</option>
+        </select>
       </label>
       <label class="toggle"><input type="checkbox" id="pan"> Slowly look around</label>
     </section>
@@ -1337,7 +1345,7 @@ class NaturalViewPass extends Pass {
     this.fsQuad = new FullScreenQuad(this.material); this.scale = 1; this.w = 16; this.h = 16;
   }
   setSize(w, h) { this.w = w; this.h = h; this.resizeRT(); }
-  resizeRT() { let s = renderer.getPixelRatio() >= 1.75 ? Math.min(this.scale, 1.15) : this.scale; const maxPx = 3.5e6; if (this.w * this.h * s * s > maxPx) s = Math.sqrt(maxPx / (this.w * this.h)); this.rt.setSize(Math.max(1, Math.round(this.w * s)), Math.max(1, Math.round(this.h * s))); }
+  resizeRT() { const sharp = $('quality').value === 'sharp'; let s = sharp ? (renderer.getPixelRatio() >= 1.75 ? Math.min(this.scale, 1.15) : this.scale) : Math.min(this.scale, 1.1); const maxPx = sharp ? 3.5e6 : 1.3e6; if (this.w * this.h * s * s > maxPx) s = Math.sqrt(maxPx / (this.w * this.h)); this.rt.setSize(Math.max(1, Math.round(this.w * s)), Math.max(1, Math.round(this.h * s))); }
   render(renderer, writeBuffer) {
     renderer.setRenderTarget(this.rt); renderer.clear(); renderer.render(scene, camera);
     this.material.uniforms.tDiffuse.value = this.rt.texture;
@@ -1462,6 +1470,7 @@ function applyFov() {
 }
 $('persp').addEventListener('change', applyFov);
 $('lens').addEventListener('input', onLens);
+$('quality').addEventListener('change', () => { dprScale = 1; resize(); naturalPass.resizeRT(); });
 const eyeOf = h => h - 0.38;
 $('height').addEventListener('input', () => { const f = +$('height').value; $('heightOut').textContent = `${f.toFixed(1)} ft · eyes at ${eyeOf(f).toFixed(1)} ft`; });
 $('height').dispatchEvent(new Event('input'));
@@ -1600,7 +1609,8 @@ let dprScale = 1, fpsN = 0, fpsT = performance.now();
 function resize() {
   const w = stage.clientWidth, h = stage.clientHeight;
   const real = $('realism').checked;
-  const dpr = Math.max(0.7, Math.min(window.devicePixelRatio || 1, 2) * dprScale);
+  const sharp = $('quality').value === 'sharp';
+  const dpr = Math.max(0.5, Math.min(window.devicePixelRatio || 1, sharp ? 2 : 1) * dprScale);
   renderer.setPixelRatio(dpr);
   renderer.setSize(w, h, false); viewAspect = w / Math.max(1, h); applyFov();
   composer.setPixelRatio(dpr); composer.setSize(w, h);
@@ -1609,6 +1619,7 @@ function resize() {
 new ResizeObserver(resize).observe(stage);
 const ease = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
 let last = performance.now(), glowT = 0, hudT = 0, syncT = 0;
+const showStats = location.hash === '#stats'; let statFrames = 0, statT = performance.now(), statVF = 0; if (showStats) $('stats').hidden = false;
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   if (anim) {
@@ -1643,7 +1654,7 @@ function frame(now) {
   if (real) {
     hemi.color.copy(glow).multiplyScalar(0.015 * b); hemi.groundColor.copy(glow).multiplyScalar(0.005 * b); hemi.intensity = 1;
     ambient.intensity = 0.002 + house * 0.35;
-    areaLights.forEach((l, i) => { l.color.copy(sliceCols[i]); l.intensity = 0.12 * b; });
+    const guests = $('people').checked; areaLights.forEach((l, i) => { l.visible = guests; l.color.copy(sliceCols[i]); l.intensity = 0.12 * b; });
     if (envDirty > 0) { if (envDirty > 0) envDirty--; envT = now; captureEnv(); }
     finish.uniforms.uTime.value = (now % 10000) / 1000;
     bloom.enabled = finish.enabled = $('camfx').checked;
@@ -1663,9 +1674,14 @@ function frame(now) {
   if (!cam.plan) { const A = crowd.a.children, Bc = crowd.b.children, S_ = shadowsGroup.children;
     for (let i = 0; i < A.length; i++) { const v = Math.hypot(A[i].position.x - camera.position.x, A[i].position.z - camera.position.z) > 2.6; A[i].visible = v; if (Bc[i]) Bc[i].visible = v; if (S_[i]) S_[i].visible = v; } }
   if (now - hudT > 200) { hudT = now; updateHud(); }
+  if (showStats) { statFrames++; if (now - statT > 1000) { const vids = activeVideos(); let vf = 0, dropped = 0;
+      vids.forEach(v => { const q = v.getVideoPlaybackQuality ? v.getVideoPlaybackQuality() : null; if (q) { vf += q.totalVideoFrames; dropped += q.droppedVideoFrames; } });
+      const vfps = vids.length ? Math.round((vf - statVF) * 1000 / (now - statT) / vids.length) : 0; statVF = vf;
+      $('stats').textContent = `3D view   ${Math.round(statFrames * 1000 / (now - statT))} fps\nVideo     ${vids.length ? vfps + ' fps' : 'none'}\nDropped   ${dropped}\nRender    ${renderer.domElement.width}×${renderer.domElement.height} (${(renderer.getPixelRatio()).toFixed(2)}×)`;
+      statFrames = 0; statT = now; } }
   // keep realism smooth on slower GPUs by lowering render resolution
-  fpsN++; if (now - fpsT > 2500) { const fps = fpsN * 1000 / (now - fpsT); fpsN = 0; fpsT = now;
-    if (fps < 40 && dprScale > 0.7) { dprScale = Math.max(0.7, dprScale - 0.1); resize(); }
+  fpsN++; if (now - fpsT > 1500) { const fps = fpsN * 1000 / (now - fpsT); fpsN = 0; fpsT = now;
+    if (fps < 45 && dprScale > 0.55) { dprScale = Math.max(0.55, dprScale - 0.1); resize(); }
     else if (fps > 57 && dprScale < 1) { dprScale = Math.min(1, dprScale + 0.05); resize(); } }
   requestAnimationFrame(frame);
 }
@@ -1686,7 +1702,15 @@ const DEFAULT_VIDEO = 'media/sample-video-smooth.mp4'; // 7904 × 1152 wall, sto
     setFull({ el: v, w: v.videoWidth * 2, h: v.videoHeight / 2, name: 'Sample video', video: true, stacked: true }); v.play().catch(() => syncVideoCtl());
   };
   v.onerror = () => { if (fullSource.el === whiteCanvas) $('mediaName').textContent = 'Plain white wall'; };
-  v.src = DEFAULT_VIDEO; }
+  (async () => {
+    try {
+      const res = await fetch(DEFAULT_VIDEO); if (!res.ok) throw new Error(res.status);
+      const total = +res.headers.get('content-length') || 0, reader = res.body.getReader(), chunks = []; let got = 0;
+      for (;;) { const { done, value } = await reader.read(); if (done) break; chunks.push(value); got += value.length;
+        if (total && fullSource.el === whiteCanvas) $('mediaName').textContent = `Loading sample video… ${Math.round(got / total * 100)}%`; }
+      v.src = URL.createObjectURL(new Blob(chunks, { type: 'video/mp4' }));
+    } catch (e) { v.src = DEFAULT_VIDEO; } // fall back to streaming
+  })(); }
 wallGap.visible = !$('openings').checked; gapCaps.visible = $('openings').checked;
 updateMeasures(); onLens(); goView('inside', true);
 pedLight.visible = pedSpot.visible = $('pedestals').checked;

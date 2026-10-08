@@ -57,6 +57,7 @@ What the page shows when it opens:
 |---|---|
 | Standing spot | Inside the rope |
 | Perspective | Natural, like your eyes |
+| Picture quality | Smooth playback (draws the 3D view at a fixed, modest size so video stays smooth even full screen). *Sharper* needs a strong graphics card |
 | Field of view | 108° (very wide) |
 | Mapping on the wall | Keep media proportions |
 | Wall | Sample video (`media/sample-video-smooth.mp4`), playing on loop. *Plain white* and *Test pattern* are one click away |
@@ -136,3 +137,10 @@ To make a new opening video in the same smooth layout as the sample, run this wi
 ```
 ffmpeg -i input.mp4 -filter_complex "[0:v]scale=7904:1152,split[a][b];[a]crop=3952:1152:0:0[l];[b]crop=3952:1152:3952:0[r];[l][r]vstack[v]" -map "[v]" -map 0:a? -c:v libx264 -profile:v high -level:v 5.1 -crf 18 -pix_fmt yuv420p -c:a copy -movflags +faststart sample-video-smooth.mp4
 ```
+
+### Checking performance
+
+Add `#stats` to the end of the page address (for example `.../event-3d-stimulation#stats`) and reload. A small box shows how many frames per second the 3D view and the video are running at, and how many video frames were dropped.
+
+- **Video below 25 fps or many dropped frames:** the computer is decoding the video in software. Check `chrome://gpu` shows *Video Decode: Hardware accelerated*.
+- **3D view below 30 fps:** the graphics card is struggling. Keep **Picture quality** on *Smooth playback*, turn **Realism** off, or make the browser window smaller.
